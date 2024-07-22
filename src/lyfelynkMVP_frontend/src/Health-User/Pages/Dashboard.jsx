@@ -3,9 +3,8 @@ import {
   CarouselContent,
   Carousel,
 } from "@/components/ui/carousel";
-
-import HealthAnalytics from "../../Functions/healthanalytics";
 import { HeartPulse } from "lucide-react";
+import HealthAnalyticsOld from "../../Functions/healthanalyticsold";
 
 export default function DashboardContent() {
   return (
@@ -25,7 +24,7 @@ export default function DashboardContent() {
                 <img
                   alt="How to Create Health ID"
                   className="object-cover w-full h-full rounded-lg"
-                  src="/assets/carousel1.png"
+                  src="/assets/placeholder.jpeg"
                   style={{
                     aspectRatio: "1600/900",
                     objectFit: "cover",
@@ -65,7 +64,7 @@ export default function DashboardContent() {
               Health Analytics
             </h1>
           </div>
-          <HealthAnalytics />
+          <HealthAnalyticsOld/>
         </section>
       </div>
     </div>

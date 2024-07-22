@@ -6,7 +6,7 @@ import LoadingScreen from "../LoadingScreen";
 
 import * as vetkd from "ic-vetkd-utils";
 
-function HealthAnalytics() {
+function HealthAnalyticsOld() {
   const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
   const [loading, setLoading] = useState(false);
   const [age, setAge] = useState("");
@@ -353,4 +353,4 @@ function HealthAnalytics() {
   );
 }
 
-export default HealthAnalytics;
+export default HealthAnalyticsOld;

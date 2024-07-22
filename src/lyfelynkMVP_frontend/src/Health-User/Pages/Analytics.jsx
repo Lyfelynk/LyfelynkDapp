@@ -1,55 +1,20 @@
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { ChevronRightIcon, Hospital } from "lucide-react";
+import CalorieIntake from "../../Functions/calorietracker/calorieintake";
+import BMICalculator from "../../Functions/bmicalc";
 
-const dummyBloodPressureData = [
-  { name: "Jan", systolic: 120, diastolic: 80 },
-  { name: "Feb", systolic: 122, diastolic: 82 },
-  { name: "Mar", systolic: 118, diastolic: 78 },
-  { name: "Apr", systolic: 124, diastolic: 85 },
-  { name: "May", systolic: 115, diastolic: 79 },
-  { name: "Jun", systolic: 126, diastolic: 81 },
-  // Add more dummy data as needed
-];
 
-const dummyHeartRateData = [
-  { name: "Jan", rate: 72 },
-  { name: "Feb", rate: 74 },
-  { name: "Mar", rate: 70 },
-  { name: "Apr", rate: 75 },
-  { name: "May", rate: 71 },
-  { name: "Jun", rate: 73 },
-  // Add more dummy data as needed
-];
-
-const dummyOxygenSaturationData = [
-  { name: "Jan", saturation: 98 },
-  { name: "Feb", saturation: 97 },
-  { name: "Mar", saturation: 99 },
-  { name: "Apr", saturation: 96 },
-  { name: "May", saturation: 98 },
-  { name: "Jun", saturation: 95 },
-];
-
-const dummyStepsData = [
-  { name: "Jan", steps: 8456 },
-  { name: "Feb", steps: 9234 },
-  { name: "Mar", steps: 10543 },
-  { name: "Apr", steps: 7843 },
-  { name: "May", steps: 9567 },
-  { name: "Jun", steps: 8345 },
-];
-
-const dummyCaloriesBurnedData = [
-  { name: "Jan", calories: 1234 },
-  { name: "Feb", calories: 1345 },
-  { name: "Mar", calories: 1456 },
-  { name: "Apr", calories: 1324 },
-  { name: "May", calories: 1287 },
-  { name: "Jun", calories: 1365 },
-];
-
-// Calculate BMI and weight status
 const calculateBMI = (weight, height) => {
   return (weight / Math.pow(height / 100, 2)).toFixed(1);
 };
@@ -79,115 +44,160 @@ export default function AnalyticsContent() {
         Explore and Analyze Your Health Data Effectively.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardDescription>Blood Pressure</CardDescription>
-            <CardTitle>120/80 mmHg</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={dummyBloodPressureData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="systolic" stroke="#8884d8" name="Systolic" />
-                <Line type="monotone" dataKey="diastolic" stroke="#82ca9d" name="Diastolic" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      <div className="py-4 grid grid-cols-2 gap-4">
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="max-w-xl group cursor-pointer rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-900">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-gray-50">BMI Calculator</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Assess your weight status and maintain a healthy lifestyle.</p>
+                </div>
+                <ChevronRightIcon className="h-6 w-6 text-gray-500 transition-transform duration-200 group-hover:translate-x-1 dark:text-gray-400" />
+              </div>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>BMI Calculator</DialogTitle>
+              <DialogDescription>
+                Assess your weight status and maintain a healthy lifestyle.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <BMICalculator/>
+              {/* Add your form inputs or other content here */}
+            </div>
+            <DialogFooter>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-        <Card>
-          <CardHeader>
-            <CardDescription>Steps</CardDescription>
-            <CardTitle>8,456</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={dummyStepsData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="steps" fill="#8884d8" name="Steps" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="max-w-xl group cursor-pointer rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-900">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-gray-50">Calorie Intake</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Track your daily calorie intake to manage your weight effectively.</p>
+                </div>
+                <ChevronRightIcon className="h-6 w-6 text-gray-500 transition-transform duration-200 group-hover:translate-x-1 dark:text-gray-400" />
+              </div>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Calorie Intake</DialogTitle>
+              <DialogDescription>
+                Track your daily calorie intake to manage your weight effectively.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <CalorieIntake/>
+              {/* Add your form inputs or other content here */}
+            </div>
+            <DialogFooter>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-        <Card>
-          <CardHeader>
-            <CardDescription>Calories Burned</CardDescription>
-            <CardTitle>1,234 kcal</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={dummyCaloriesBurnedData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="calories" fill="#8884d8" name="Calories Burned" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardDescription>Heart Rate</CardDescription>
-            <CardTitle>72 bpm</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={dummyHeartRateData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="rate" stroke="#8884d8" name="Heart Rate" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardDescription>Oxygen Saturation</CardDescription>
-            <CardTitle>98%</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={dummyOxygenSaturationData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="saturation" stroke="#8884d8" name="Saturation" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardDescription>Weight Status</CardDescription>
-            <CardTitle>{weightStatus}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>BMI: {bmi}</p>
-            <p>Weight: {weightKg} kg</p>
-            <p>Height: {heightCm} cm</p>
-          </CardContent>
-        </Card>
       </div>
+
+      <div className="border border-gray-600 my-8 "></div>
+
+      <div className="flex items-center gap-2">
+        <Hospital/> 
+        <h1 className="text-3xl font-bold text-foreground"> Health Dashboard</h1>
+      </div>
+
+      <main className="flex-1 py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Weight</CardTitle>
+            <CardDescription>Current weight</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold">165 lbs</div>
+            <div className="text-gray-500 dark:text-gray-400">
+              <span className="font-medium">BMI:</span> 24.2
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              <span className="font-medium">Status:</span> Normal
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Height</CardTitle>
+            <CardDescription>Current height</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold">5'10"</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Calorie Intake</CardTitle>
+            <CardDescription>Daily calorie goal</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold">2,100 cal</div>
+            <div className="text-gray-500 dark:text-gray-400">
+              <span className="font-medium">Consumed:</span> 1,850 cal
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              <span className="font-medium">Remaining:</span> 250 cal
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="col-span-1 md:col-span-2 lg:col-span-3">
+          <CardHeader>
+            <CardTitle>Personalized Diet Plan</CardTitle>
+            <CardDescription>Your recommended daily diet</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-bold mb-2">Breakfast</h3>
+                <ul className="space-y-2">
+                  <li>1 cup of oatmeal with berries</li>
+                  <li>2 eggs scrambled</li>
+                  <li>1 slice of whole-wheat toast</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold mb-2">Lunch</h3>
+                <ul className="space-y-2">
+                  <li>Grilled chicken salad with mixed greens</li>
+                  <li>1/2 cup of quinoa</li>
+                  <li>1 apple</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold mb-2">Dinner</h3>
+                <ul className="space-y-2">
+                  <li>Baked salmon with roasted vegetables</li>
+                  <li>1 cup of brown rice</li>
+                  <li>1 glass of water</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold mb-2">Snacks</h3>
+                <ul className="space-y-2">
+                  <li>1 cup of Greek yogurt with berries</li>
+                  <li>1 handful of almonds</li>
+                  <li>1 banana</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }
+
+

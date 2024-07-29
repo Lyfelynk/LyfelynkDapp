@@ -7,9 +7,8 @@ import RecentActivityTable from '../Tables/RecentActivityData';
 export default function MyHealthContent() {
 
   return (
-    <div className="bg-background">
-      
-      <main className="px-8 py-12">
+    <div className="bg-background min-h-screen">
+      <section className="px-8 py-12">
         <section className="text-center">
           <h1 className="text-4xl font-bold mb-2">Upload and Share Your Health Data</h1>
           <p className="text-lg text-gray-600 mb-8">
@@ -40,7 +39,7 @@ export default function MyHealthContent() {
             <RecentActivityTable/>
           </div>
         </section>
-      </main>
+      </section>
     </div>
   );
 }

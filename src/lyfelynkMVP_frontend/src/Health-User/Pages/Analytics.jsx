@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { ChevronRightIcon, Hospital } from "lucide-react";
-import CalorieIntake from "../../Functions/calorietracker/calorieintake";
 import BMICalculator from "../../Functions/bmicalc";
+import NutritionTracker from "../../Functions/NutrientCalc/NutritionTracker";
 
 
 const calculateBMI = (weight, height) => {
@@ -86,7 +86,7 @@ export default function AnalyticsContent() {
               </div>
             </div>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl">
+          <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
               <DialogTitle>Calorie Intake</DialogTitle>
               <DialogDescription>
@@ -94,7 +94,7 @@ export default function AnalyticsContent() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <CalorieIntake/>
+              {/* <CalorieIntake/> */}
               {/* Add your form inputs or other content here */}
             </div>
             <DialogFooter>
@@ -105,6 +105,7 @@ export default function AnalyticsContent() {
 
 
       </div>
+      <NutritionTracker/>
 
       <div className="border border-gray-600 my-8 "></div>
 

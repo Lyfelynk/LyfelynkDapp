@@ -94,8 +94,8 @@ export default function AnalyticsContent() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              {/* <CalorieIntake/> */}
-              {/* Add your form inputs or other content here */}
+              <NutritionTracker/>
+
             </div>
             <DialogFooter>
               <Button type="submit">Save changes</Button>
@@ -105,7 +105,6 @@ export default function AnalyticsContent() {
 
 
       </div>
-      <NutritionTracker/>
 
       <div className="border border-gray-600 my-8 "></div>
 

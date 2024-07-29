@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { BookText, Heart, LayoutDashboard, ShoppingCart, User, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookText, Heart, LayoutDashboard, ShoppingCart, User, ChevronLeft, ChevronRight, Share, Upload, Forward } from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -12,6 +12,8 @@ const Sidebar = ({ isOpen, onClose }) => {
   const links = [
     { to: "/Health-User/Home", icon: <LayoutDashboard />, text: "Dashboard" },
     { to: "/Health-User/Records", icon: <BookText />, text: "Records" },
+    { to: "/Health-User/Records/Share", icon: <Forward />, text: "Share" },
+    { to: "/Health-User/Records/Upload", icon: <Upload />, text: "Upload" },
     { to: "/Health-User/Analytics", icon: <Heart />, text: "Analytics" },
     { to: "/Health-User/Marketplace", icon: <ShoppingCart />, text: "Marketplace" },
     { to: "/Health-User/Profile", icon: <User />, text: "Profile" }
@@ -19,13 +21,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <aside
-      className={`bg-background z-50 h-full transition-transform duration-300 ease-in-out ${
-        isExpanded ? 'w-64' : 'w-20'
-      } ${
-        isExpanded ? 'lg:w-64' : 'lg:w-20'
-      } ${
-        isOpen ? 'fixed inset-y-0 left-0 z-50 bg-gray-50 dark:bg-gray-900 border-r' : 'absolute lg:relative'
-      }`}
+      className={`bg-background z-50 h-full transition-transform duration-300 ease-in-out
+        ${isExpanded ? 'w-64' : 'w-20'} 
+        ${isOpen ? 'fixed inset-y-0 left-0 z-50 bg-gray-50 dark:bg-gray-900 border-r' : 'lg:relative'}
+        ${isOpen || !isExpanded ? '' : 'hidden lg:block'}`}  // Hide on small screens if not open
     >
       <div className="h-full flex flex-col items-center px-3 py-4 overflow-y-auto transition-all duration-300 ease-in-out">
         <div className="flex items-center justify-center w-full mb-5">
@@ -63,11 +62,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               >
                 <span>{link.icon}</span>
                 <span
-                  className={`ml-3 transition-all duration-300 ease-in-out ${
-                    isExpanded
-                      ? 'block'
-                      : 'hidden'
-                  }`}
+                  className={`ml-3 transition-all duration-300 ease-in-out ${isExpanded ? 'block' : 'hidden'}`}
                 >
                   {link.text}
                 </span>

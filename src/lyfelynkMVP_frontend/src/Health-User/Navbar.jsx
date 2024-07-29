@@ -6,7 +6,7 @@ import "../connect2ic/connect2ic.css";
 import Sidebar from "./Sidebar";
 import { useLocation } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ( { toggleSidebar }) => {
   const location = useLocation();
 
   const getCurrentPageName = () => {
@@ -20,6 +20,12 @@ const Navbar = () => {
         <header className="bg-background border-b border-muted">
           <div className="flex justify-between items-center py-4 px-6">
             <div className="flex items-center space-x-4">
+              <button
+                className="lg:hidden" // Hidden on screens larger than lg
+                onClick={toggleSidebar}
+              >
+                <Menu size={24} /> {/* Menu icon for mobile */}
+              </button>
               <h1 className="text-xl font-bold">{getCurrentPageName()}</h1>
             </div>
             <div className="flex items-center gap-2">

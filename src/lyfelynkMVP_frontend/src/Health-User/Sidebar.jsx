@@ -19,9 +19,13 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 bg-gray-50 dark:bg-gray-900 border-r transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } ${isExpanded ? 'w-64' : 'w-20'}`}
+      className={`bg-background z-50 h-full transition-transform duration-300 ease-in-out ${
+        isExpanded ? 'w-64' : 'w-20'
+      } ${
+        isExpanded ? 'lg:w-64' : 'lg:w-20'
+      } ${
+        isOpen ? 'fixed inset-y-0 left-0 z-50 bg-gray-50 dark:bg-gray-900 border-r' : 'absolute lg:relative'
+      }`}
     >
       <div className="h-full flex flex-col items-center px-3 py-4 overflow-y-auto transition-all duration-300 ease-in-out">
         <div className="flex items-center justify-center w-full mb-5">
@@ -57,12 +61,12 @@ const Sidebar = ({ isOpen, onClose }) => {
                   }`
                 }
               >
-                {link.icon}
+                <span>{link.icon}</span>
                 <span
                   className={`ml-3 transition-all duration-300 ease-in-out ${
                     isExpanded
                       ? 'block'
-                      : 'hidden group-hover:block absolute left-full bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white whitespace-nowrap px-2 py-1 rounded shadow-lg'
+                      : 'hidden'
                   }`}
                 >
                   {link.text}

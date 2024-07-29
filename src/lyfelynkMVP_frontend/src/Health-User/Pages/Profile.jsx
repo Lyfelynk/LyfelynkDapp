@@ -297,8 +297,8 @@ export default function ProfileContent() {
   }
   return (
     <div>
-      <div className="h-min py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-screen-sm">
+      <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto">
           <h1 className="text-center text-4xl font-bold leading-9 ">
             Update Profile
           </h1>

@@ -5,7 +5,7 @@ import { ConnectButton, ConnectDialog } from "@connect2ic/react";
 import "../connect2ic/connect2ic.css";
 import { useLocation } from "react-router-dom";
 
-const Navbar = ( { toggleSidebar }) => {
+const Navbar = ({ toggleSidebar }) => {
   const location = useLocation();
 
   const getCurrentPageName = () => {

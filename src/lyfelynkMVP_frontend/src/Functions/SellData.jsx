@@ -32,7 +32,7 @@ export function SellDataFunc({ assetID }) {
         description,
         parseInt(price),
         category,
-        assetID
+        assetID,
       );
       if (result.ok) {
         //alert("Listing added successfully");
@@ -58,15 +58,9 @@ export function SellDataFunc({ assetID }) {
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          onClick={() => setOpen(true)}
-          disabled={selling}
-        >
+        <Button onClick={() => setOpen(true)} disabled={selling}>
           Sell
         </Button>
       </DialogTrigger>
@@ -79,10 +73,7 @@ export function SellDataFunc({ assetID }) {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label
-              htmlFor="title"
-              className="text-right"
-            >
+            <Label htmlFor="title" className="text-right">
               Title
             </Label>
             <Input
@@ -93,10 +84,7 @@ export function SellDataFunc({ assetID }) {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label
-              htmlFor="description"
-              className="text-right"
-            >
+            <Label htmlFor="description" className="text-right">
               Description
             </Label>
             <Input
@@ -107,10 +95,7 @@ export function SellDataFunc({ assetID }) {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label
-              htmlFor="price"
-              className="text-right"
-            >
+            <Label htmlFor="price" className="text-right">
               Price
             </Label>
             <Input
@@ -122,10 +107,7 @@ export function SellDataFunc({ assetID }) {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label
-              htmlFor="category"
-              className="text-right"
-            >
+            <Label htmlFor="category" className="text-right">
               Category
             </Label>
             <Input
@@ -137,10 +119,7 @@ export function SellDataFunc({ assetID }) {
           </div>
         </div>
         <DialogFooter>
-          <Button
-            onClick={handleSell}
-            disabled={selling}
-          >
+          <Button onClick={handleSell} disabled={selling}>
             Confirm
           </Button>
         </DialogFooter>

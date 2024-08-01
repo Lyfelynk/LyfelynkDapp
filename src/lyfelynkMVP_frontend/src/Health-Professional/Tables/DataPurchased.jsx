@@ -92,7 +92,7 @@ function DataPurchasedTable() {
             ([dataAsset, purchasedInfo]) => ({
               ...purchasedInfo,
               dataAsset,
-            })
+            }),
           );
           setData(purchasedAssets);
           setLoading(false);
@@ -142,10 +142,7 @@ function DataPurchasedTable() {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="ml-auto"
-            >
+            <Button variant="outline" className="ml-auto">
               Columns <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -182,7 +179,7 @@ function DataPurchasedTable() {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -201,7 +198,7 @@ function DataPurchasedTable() {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

@@ -65,12 +65,16 @@ export default function FirstPageContent() {
             <div className="flex items-center mb-4">
               <img alt="Logo" className="h-10 w-48" src="assets/lyfelynk.png" />
             </div>
-            <p className="text-xl md:text-2xl">Digitally Linking your health.</p>
+            <p className="text-xl md:text-2xl">
+              Digitally Linking your health.
+            </p>
           </div>
 
           <div className="flex-1 items-center max-w-md bg-white rounded-lg p-8">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl md:text-2xl font-bold text-black">Get Started</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-black">
+                Get Started
+              </h2>
               <div className="auth-section">
                 <ConnectButton />
               </div>

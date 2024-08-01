@@ -1,7 +1,11 @@
-import { CarouselItem, CarouselContent, Carousel } from "@/components/ui/carousel"
-import { Card } from "@/components/ui/card"
-import RecentActivityTable from "../Tables/RecentActivityData"
-import DataPurchasedTable from "../Tables/DataPurchased"
+import {
+  CarouselItem,
+  CarouselContent,
+  Carousel,
+} from "@/components/ui/carousel";
+import { Card } from "@/components/ui/card";
+import RecentActivityTable from "../Tables/RecentActivityData";
+import DataPurchasedTable from "../Tables/DataPurchased";
 
 export default function DashboardContent() {
   return (
@@ -50,11 +54,9 @@ export default function DashboardContent() {
         </div>
 
         <section className="py-4">
-          <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-
-          </div>
+          <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2"></div>
         </section>
       </div>
     </div>
-  )
+  );
 }

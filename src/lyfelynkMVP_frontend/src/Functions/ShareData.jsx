@@ -61,12 +61,15 @@ export function ShareDataFunc({ assetID }) {
         <DialogHeader>
           <DialogTitle>Share your data</DialogTitle>
           <DialogDescription>
-            Enter the user ID you want to share your data with. Click share when you're done.
+            Enter the user ID you want to share your data with. Click share when
+            you're done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="userId" className="text-right">User ID</Label>
+            <Label htmlFor="userId" className="text-right">
+              User ID
+            </Label>
             <Input
               id="userId"
               value={userId}
@@ -76,7 +79,9 @@ export function ShareDataFunc({ assetID }) {
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleShare} disabled={sharing}>Send</Button>
+          <Button onClick={handleShare} disabled={sharing}>
+            Send
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

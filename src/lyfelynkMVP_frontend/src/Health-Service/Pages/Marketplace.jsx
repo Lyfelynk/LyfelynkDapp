@@ -1,6 +1,12 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import DataOnSaleTable from "../Tables/DataOnSale";
 import DataPurchasedTable from "../Tables/DataPurchased";
 import Wallet from "../../Functions/Wallet";
@@ -15,7 +21,7 @@ export default function MarketplaceContent() {
         </p>
 
         <div className="pt-4 pb-10">
-          <Wallet/>
+          <Wallet />
         </div>
 
         <Tabs defaultValue="Purchase" className="">

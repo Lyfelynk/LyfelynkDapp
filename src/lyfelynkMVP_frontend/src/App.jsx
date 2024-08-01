@@ -36,10 +36,19 @@ function App() {
           <Route path="/Register">
             <Route path="Health-User" element={<RegisterPage1Content />} />
             <Route path="Health-User/verify" element={<RegisteredContent1 />} />
-            <Route path="Health-Professional" element={<RegisterPage2Content />} />
-            <Route path="Health-Professional/verify" element={<RegisteredContent2 />} />
+            <Route
+              path="Health-Professional"
+              element={<RegisterPage2Content />}
+            />
+            <Route
+              path="Health-Professional/verify"
+              element={<RegisteredContent2 />}
+            />
             <Route path="Health-Service" element={<RegisterPage3Content />} />
-            <Route path="Health-Service/verify" element={<RegisteredContent3 />} />
+            <Route
+              path="Health-Service/verify"
+              element={<RegisteredContent3 />}
+            />
           </Route>
           <Route path="/Health-User/*" element={<AppRoute1 />} />
           <Route path="/Health-Professional/*" element={<AppRoute2 />} />

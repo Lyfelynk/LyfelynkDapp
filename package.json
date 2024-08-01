@@ -9,13 +9,15 @@
     "prebuild": "npm run prebuild --workspaces --if-present",
     "pretest": "npm run prebuild --workspaces --if-present",
     "start": "npm start --workspaces --if-present",
-    "test": "npm test --workspaces --if-present"
+    "test": "npm test --workspaces --if-present",
+    "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\""
   },
   "type": "module",
   "workspaces": [
     "src/lyfelynkMVP_frontend"
   ],
   "devDependencies": {
+    "prettier": "^3.3.3",
     "vite-plugin-wasm-esm": "^1.0.1"
   },
   "dependencies": {

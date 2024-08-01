@@ -1,6 +1,17 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { BookText, Heart, LayoutDashboard, ShoppingCart, User, ChevronLeft, ChevronRight, Share, Upload, Forward } from "lucide-react";
+import {
+  BookText,
+  Heart,
+  LayoutDashboard,
+  ShoppingCart,
+  User,
+  ChevronLeft,
+  ChevronRight,
+  Share,
+  Upload,
+  Forward,
+} from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -10,19 +21,27 @@ const Sidebar = ({ isOpen, onClose }) => {
   };
 
   const links = [
-    { to: "/Health-Professional/Home", icon: <LayoutDashboard />, text: "Dashboard" },
+    {
+      to: "/Health-Professional/Home",
+      icon: <LayoutDashboard />,
+      text: "Dashboard",
+    },
     { to: "/Health-Professional/Records", icon: <BookText />, text: "Records" },
     { to: "/Health-Professional/Upload", icon: <Upload />, text: "Upload" },
-    { to: "/Health-Professional/Marketplace", icon: <ShoppingCart />, text: "Marketplace" },
-    { to: "/Health-Professional/Profile", icon: <User />, text: "Profile" }
+    {
+      to: "/Health-Professional/Marketplace",
+      icon: <ShoppingCart />,
+      text: "Marketplace",
+    },
+    { to: "/Health-Professional/Profile", icon: <User />, text: "Profile" },
   ];
 
   return (
     <aside
       className={`bg-background z-50 h-full transition-transform duration-300 ease-in-out
-        ${isExpanded ? 'w-64' : 'w-20'} 
-        ${isOpen ? 'fixed inset-y-0 left-0 z-50 bg-gray-50 dark:bg-gray-900 border-r' : 'lg:relative'}
-        ${isOpen || !isExpanded ? '' : 'hidden lg:block'}`}  // Hide on small screens if not open
+        ${isExpanded ? "w-64" : "w-20"} 
+        ${isOpen ? "fixed inset-y-0 left-0 z-50 bg-gray-50 dark:bg-gray-900 border-r" : "lg:relative"}
+        ${isOpen || !isExpanded ? "" : "hidden lg:block"}`} // Hide on small screens if not open
     >
       <div className="h-full flex flex-col items-center px-3 py-4 overflow-y-auto transition-all duration-300 ease-in-out">
         <div className="flex items-center justify-center w-full mb-5">
@@ -36,7 +55,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <button
             onClick={toggleSidebar}
             className={`text-gray-900 dark:text-white focus:outline-none transition-transform duration-300 ease-in-out ${
-              isExpanded ? 'ml-auto' : ''
+              isExpanded ? "ml-auto" : ""
             }`}
           >
             {isExpanded ? (
@@ -53,14 +72,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                 to={link.to}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center ${isExpanded ? 'justify-start' : 'justify-center'} p-2 text-gray-900 rounded-lg dark:text-white transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-blue-900 ${
-                    isActive ? 'bg-blue-400 dark:bg-blue-700' : ''
+                  `flex items-center ${isExpanded ? "justify-start" : "justify-center"} p-2 text-gray-900 rounded-lg dark:text-white transition-all duration-300 ease-in-out hover:bg-blue-100 dark:hover:bg-blue-900 ${
+                    isActive ? "bg-blue-400 dark:bg-blue-700" : ""
                   }`
                 }
               >
                 <span>{link.icon}</span>
                 <span
-                  className={`ml-3 transition-all duration-300 ease-in-out ${isExpanded ? 'block' : 'hidden'}`}
+                  className={`ml-3 transition-all duration-300 ease-in-out ${isExpanded ? "block" : "hidden"}`}
                 >
                   {link.text}
                 </span>

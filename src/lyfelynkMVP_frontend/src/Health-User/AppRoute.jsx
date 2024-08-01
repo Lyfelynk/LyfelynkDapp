@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
-import DashboardContent from './Pages/Dashboard';
-import MarketplaceContent from './Pages/Marketplace';
-import ProfileContent from './Pages/Profile';
-import UploadContent from './Pages/UploadPage';
-import Records from './Pages/Records';
-import AnalyticsContent from './Pages/Analytics';
+import React, { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
+import DashboardContent from "./Pages/Dashboard";
+import MarketplaceContent from "./Pages/Marketplace";
+import ProfileContent from "./Pages/Profile";
+import UploadContent from "./Pages/UploadPage";
+import Records from "./Pages/Records";
+import AnalyticsContent from "./Pages/Analytics";
 
-import NotFoundPage from './NotFoundPage';
-import AppBanner from '../AppBanner';
+import NotFoundPage from "./NotFoundPage";
+import AppBanner from "../AppBanner";
 
 export default function AppRoute1() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);

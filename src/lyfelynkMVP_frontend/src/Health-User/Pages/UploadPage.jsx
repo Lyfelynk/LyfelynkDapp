@@ -91,7 +91,7 @@ export default function UploadContent() {
     const encryptedKeyResult =
       await lyfelynkMVP_backend.encrypted_symmetric_key_for_dataAsset(
         uniqueID,
-        Object.values(tsk.public_key())
+        Object.values(tsk.public_key()),
       );
 
     let encryptedKey = "";
@@ -121,7 +121,7 @@ export default function UploadContent() {
       hex_decode(pkBytesHex),
       new TextEncoder().encode(uniqueID),
       32,
-      new TextEncoder().encode("aes-256-gcm")
+      new TextEncoder().encode("aes-256-gcm"),
     );
     console.log(aesGCMKey);
     // Step 3: Encrypt the user's file using the AES-GCM key
@@ -162,7 +162,7 @@ export default function UploadContent() {
       // Step 4: Update the data asset with the encrypted file
       const updateResult = await lyfelynkMVP_backend.updateDataAsset(
         uniqueID.split("-")[1],
-        dataAsset
+        dataAsset,
       );
 
       Object.keys(updateResult).forEach((key) => {
@@ -191,12 +191,12 @@ export default function UploadContent() {
       rawKey,
       "AES-GCM",
       false,
-      ["encrypt"]
+      ["encrypt"],
     );
     const ciphertext_buffer = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      data
+      data,
     );
     const ciphertext = new Uint8Array(ciphertext_buffer);
     const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
@@ -208,7 +208,7 @@ export default function UploadContent() {
   //   bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
     );
 
   if (loading) {
@@ -217,7 +217,6 @@ export default function UploadContent() {
   return (
     <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center justify-center p-8">
-
         <h1 className="mt-4 text-4xl font-bold">Upload your Health Data</h1>
         <p className="mt-2 text-lg text-gray-600">
           Choose a suitable format to upload your data.
@@ -225,16 +224,10 @@ export default function UploadContent() {
         <div className="mt-6 w-full max-w-4xl">
           <Tabs defaultValue="Document">
             <TabsList className="w-full">
-              <TabsTrigger
-                className="w-1/2"
-                value="Document"
-              >
+              <TabsTrigger className="w-1/2" value="Document">
                 Document
               </TabsTrigger>
-              <TabsTrigger
-                className="w-1/2"
-                value="Form"
-              >
+              <TabsTrigger className="w-1/2" value="Form">
                 Form
               </TabsTrigger>
             </TabsList>
@@ -247,20 +240,14 @@ export default function UploadContent() {
                 Fill the form out carefully and make sure the information is
                 true to your knowledge.
               </p>
-              <form
-                className="space-y-6"
-                onSubmit={handleSubmit}
-              >
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <h2 className="text-xl font-semibold">
                     Health Checkup Details
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div className="flex flex-col space-y-1.5">
-                      <label
-                        className="font-medium"
-                        htmlFor="date-of-checkup"
-                      >
+                      <label className="font-medium" htmlFor="date-of-checkup">
                         Date of Checkup
                       </label>
                       <DatePicker
@@ -270,10 +257,7 @@ export default function UploadContent() {
                       />
                     </div>
                     <div className="flex flex-col space-y-1.5">
-                      <label
-                        className="font-medium"
-                        htmlFor="type-of-checkup"
-                      >
+                      <label className="font-medium" htmlFor="type-of-checkup">
                         Type of Checkup
                       </label>
                       <Select
@@ -352,10 +336,7 @@ export default function UploadContent() {
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div className="flex flex-col space-y-1.5">
-                      <label
-                        className="font-medium"
-                        htmlFor="medication-name"
-                      >
+                      <label className="font-medium" htmlFor="medication-name">
                         Medication Name(s)
                       </label>
                       <Input
@@ -366,10 +347,7 @@ export default function UploadContent() {
                       />
                     </div>
                     <div className="flex flex-col space-y-1.5">
-                      <label
-                        className="font-medium"
-                        htmlFor="dosage"
-                      >
+                      <label className="font-medium" htmlFor="dosage">
                         Dosage
                       </label>
                       <Input
@@ -380,10 +358,7 @@ export default function UploadContent() {
                       />
                     </div>
                     <div className="flex flex-col space-y-1.5">
-                      <label
-                        className="font-medium"
-                        htmlFor="frequency"
-                      >
+                      <label className="font-medium" htmlFor="frequency">
                         Frequency
                       </label>
                       <Input

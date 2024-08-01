@@ -4,7 +4,13 @@ import { Principal } from "@dfinity/principal";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 
 export default function Wallet() {
@@ -55,7 +61,8 @@ export default function Wallet() {
           subaccount: [],
         },
       };
-      const result = await icrc1_ledger_canister.icrc2_allowance(allowanceArgument);
+      const result =
+        await icrc1_ledger_canister.icrc2_allowance(allowanceArgument);
 
       if ("allowance" in result) {
         setAllowanceValue(Number(result.allowance) / 100000000);
@@ -108,15 +115,27 @@ export default function Wallet() {
         <div className="md:grid grid-cols-2 gap-4">
           <div className="space-y-2 pb-2">
             <Label>Current allowance</Label>
-            <p className="text-3xl pb-2 font-semibold">{allowanceValue} LYF Tokens</p>
-            <Button size="sm" type="button" variant="outline" onClick={getAllowance}>
+            <p className="text-3xl pb-2 font-semibold">
+              {allowanceValue} LYF Tokens
+            </p>
+            <Button
+              size="sm"
+              type="button"
+              variant="outline"
+              onClick={getAllowance}
+            >
               Update Current Allowance Amount
             </Button>
           </div>
           <div className="space-y-2 pb-2">
             <Label>Your Balance</Label>
             <p className="text-3xl pb-2 font-semibold">{balance} LYF Tokens</p>
-            <Button size="sm" type="button" variant="outline" onClick={getBalance}>
+            <Button
+              size="sm"
+              type="button"
+              variant="outline"
+              onClick={getBalance}
+            >
               Update Current Balance Amount
             </Button>
           </div>

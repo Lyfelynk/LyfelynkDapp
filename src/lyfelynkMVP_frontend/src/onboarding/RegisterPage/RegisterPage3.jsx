@@ -51,7 +51,7 @@ export default function RegisterPage3Content() {
     // Convert JSON strings to Uint8Array
     const demoInfoArray = new TextEncoder().encode(demoInfoJson);
     const servicesOfferedInfoArray = new TextEncoder().encode(
-      servicesOfferedInfoJson
+      servicesOfferedInfoJson,
     );
     const licenseInfoArray = new TextEncoder().encode(licenseInfoJson);
 
@@ -60,7 +60,7 @@ export default function RegisterPage3Content() {
     const tsk = new vetkd.TransportSecretKey(seed);
     const encryptedKeyResult =
       await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-        Object.values(tsk.public_key())
+        Object.values(tsk.public_key()),
       );
 
     let encryptedKey = "";
@@ -91,23 +91,23 @@ export default function RegisterPage3Content() {
       hex_decode(pkBytesHex),
       new TextEncoder().encode(principal),
       32,
-      new TextEncoder().encode("aes-256-gcm")
+      new TextEncoder().encode("aes-256-gcm"),
     );
     console.log(aesGCMKey);
 
     const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
     const encryptedDataService = await aes_gcm_encrypt(
       servicesOfferedInfoArray,
-      aesGCMKey
+      aesGCMKey,
     );
     const encryptedDataLicense = await aes_gcm_encrypt(
       licenseInfoArray,
-      aesGCMKey
+      aesGCMKey,
     );
     const result = await lyfelynkMVP_backend.createFacility(
       Object.values(encryptedDataDemo),
       Object.values(encryptedDataService),
-      Object.values(encryptedDataLicense)
+      Object.values(encryptedDataLicense),
     );
     Object.keys(result).forEach((key) => {
       if (key == "err") {
@@ -139,12 +139,12 @@ export default function RegisterPage3Content() {
       rawKey,
       "AES-GCM",
       false,
-      ["encrypt"]
+      ["encrypt"],
     );
     const ciphertext_buffer = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      data
+      data,
     );
     const ciphertext = new Uint8Array(ciphertext_buffer);
     const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
@@ -156,7 +156,7 @@ export default function RegisterPage3Content() {
   //   bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
     );
 
   if (loading) {
@@ -327,10 +327,7 @@ export default function RegisterPage3Content() {
                 </div>
               </div>
             </div>
-            <Button
-              className="w-full"
-              onClick={registerService}
-            >
+            <Button className="w-full" onClick={registerService}>
               Submit
             </Button>
           </div>

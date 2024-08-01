@@ -1,21 +1,43 @@
-import React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
-import { Hospital } from 'lucide-react';
+import React from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Hospital } from "lucide-react";
 
 const AnalyticsDashboard = () => {
   const weight = 165;
   const bmi = 24.2;
-  const weightStatus = 'Normal';
+  const weightStatus = "Normal";
   const height = "5'10\"";
   const calorieGoal = 2100;
   const caloriesConsumed = 1850;
   const caloriesRemaining = calorieGoal - caloriesConsumed;
 
   const dietPlan = {
-    breakfast: ['1 cup of oatmeal with berries', '2 eggs scrambled', '1 slice of whole-wheat toast'],
-    lunch: ['Grilled chicken salad with mixed greens', '1/2 cup of quinoa', '1 apple'],
-    dinner: ['Baked salmon with roasted vegetables', '1 cup of brown rice', '1 glass of water'],
-    snacks: ['1 cup of Greek yogurt with berries', '1 handful of almonds', '1 banana'],
+    breakfast: [
+      "1 cup of oatmeal with berries",
+      "2 eggs scrambled",
+      "1 slice of whole-wheat toast",
+    ],
+    lunch: [
+      "Grilled chicken salad with mixed greens",
+      "1/2 cup of quinoa",
+      "1 apple",
+    ],
+    dinner: [
+      "Baked salmon with roasted vegetables",
+      "1 cup of brown rice",
+      "1 glass of water",
+    ],
+    snacks: [
+      "1 cup of Greek yogurt with berries",
+      "1 handful of almonds",
+      "1 banana",
+    ],
   };
 
   return (
@@ -58,10 +80,12 @@ const AnalyticsDashboard = () => {
           <CardContent>
             <div className="text-4xl font-bold">{calorieGoal} cal</div>
             <div className="text-gray-500 dark:text-gray-400">
-              <span className="font-medium">Consumed:</span> {caloriesConsumed} cal
+              <span className="font-medium">Consumed:</span> {caloriesConsumed}{" "}
+              cal
             </div>
             <div className="text-gray-500 dark:text-gray-400">
-              <span className="font-medium">Remaining:</span> {caloriesRemaining} cal
+              <span className="font-medium">Remaining:</span>{" "}
+              {caloriesRemaining} cal
             </div>
           </CardContent>
         </Card>
@@ -110,6 +134,6 @@ const AnalyticsDashboard = () => {
       </main>
     </div>
   );
-}
+};
 
 export default AnalyticsDashboard;

@@ -26,12 +26,12 @@ export default function ProfileContent() {
       rawKey,
       "AES-GCM",
       false,
-      ["encrypt"]
+      ["encrypt"],
     );
     const ciphertext_buffer = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      data
+      data,
     );
     const ciphertext = new Uint8Array(ciphertext_buffer);
     const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
@@ -48,18 +48,18 @@ export default function ProfileContent() {
       rawKey,
       "AES-GCM",
       false,
-      ["decrypt"]
+      ["decrypt"],
     );
     const decrypted_buffer = await window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      ciphertext
+      ciphertext,
     );
     return new Uint8Array(decrypted_buffer);
   };
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
     );
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function ProfileContent() {
           const tsk = new vetkd.TransportSecretKey(seed);
           const encryptedKeyResult =
             await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-              Object.values(tsk.public_key())
+              Object.values(tsk.public_key()),
             );
 
           let encryptedKey = "";
@@ -111,29 +111,29 @@ export default function ProfileContent() {
             hex_decode(pkBytesHex),
             new TextEncoder().encode(principal),
             32,
-            new TextEncoder().encode("aes-256-gcm")
+            new TextEncoder().encode("aes-256-gcm"),
           );
           console.log(aesGCMKey);
           const decryptedDataDemo = await aes_gcm_decrypt(
             DemographicInformation,
-            aesGCMKey
+            aesGCMKey,
           );
           const decryptedDataService = await aes_gcm_decrypt(
             ServicesOfferedInformation,
-            aesGCMKey
+            aesGCMKey,
           );
           const decryptedDataLicense = await aes_gcm_decrypt(
             LicenseInformation,
-            aesGCMKey
+            aesGCMKey,
           );
           const parsedDemographicInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataDemo)
+            String.fromCharCode.apply(null, decryptedDataDemo),
           );
           const parsedServicesOfferedInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataService)
+            String.fromCharCode.apply(null, decryptedDataService),
           );
           const parsedLicenseInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataLicense)
+            String.fromCharCode.apply(null, decryptedDataLicense),
           );
 
           setFacilityData({
@@ -197,7 +197,7 @@ export default function ProfileContent() {
       // Convert JSON strings to Uint8Array
       const demoInfoArray = new TextEncoder().encode(demoInfoJson);
       const servicesOfferedInfoArray = new TextEncoder().encode(
-        servicesOfferedInfoJson
+        servicesOfferedInfoJson,
       );
       const licenseInfoArray = new TextEncoder().encode(licenseInfoJson);
 
@@ -206,7 +206,7 @@ export default function ProfileContent() {
       const tsk = new vetkd.TransportSecretKey(seed);
       const encryptedKeyResult =
         await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-          Object.values(tsk.public_key())
+          Object.values(tsk.public_key()),
         );
 
       let encryptedKey = "";
@@ -237,23 +237,23 @@ export default function ProfileContent() {
         hex_decode(pkBytesHex),
         new TextEncoder().encode(principal),
         32,
-        new TextEncoder().encode("aes-256-gcm")
+        new TextEncoder().encode("aes-256-gcm"),
       );
       console.log(aesGCMKey);
 
       const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
       const encryptedDataService = await aes_gcm_encrypt(
         servicesOfferedInfoArray,
-        aesGCMKey
+        aesGCMKey,
       );
       const encryptedDataLicense = await aes_gcm_encrypt(
         licenseInfoArray,
-        aesGCMKey
+        aesGCMKey,
       );
       const result = await lyfelynkMVP_backend.updateFacility(
         Object.values(encryptedDataDemo),
         Object.values(encryptedDataService),
-        Object.values(encryptedDataLicense)
+        Object.values(encryptedDataLicense),
       );
       Object.keys(result).forEach((key) => {
         if (key == "err") {
@@ -295,17 +295,11 @@ export default function ProfileContent() {
           <p className="mt-2 text-center text-sm leading-5 text-gray-600">
             Update your Profile Information
           </p>
-          <form
-            className="mt-8"
-            onSubmit={handleUpdateFacility}
-          >
+          <form className="mt-8" onSubmit={handleUpdateFacility}>
             <div className="rounded-md shadow-sm">
               <div className="flex flex-col items-center">
                 <Avatar className="-z-10 w-36 h-36">
-                  <AvatarImage
-                    alt="John Lenon"
-                    src=""
-                  />
+                  <AvatarImage alt="John Lenon" src="" />
                   <AvatarFallback className="text-4xl">JL</AvatarFallback>
                 </Avatar>
 
@@ -453,10 +447,7 @@ export default function ProfileContent() {
               </div>
             </div>
             <div className="mt-6">
-              <Button
-                className="w-full"
-                type="submit"
-              >
+              <Button className="w-full" type="submit">
                 Update
               </Button>
             </div>

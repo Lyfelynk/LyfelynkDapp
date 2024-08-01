@@ -36,12 +36,12 @@ export default function ProfileContent() {
       rawKey,
       "AES-GCM",
       false,
-      ["encrypt"]
+      ["encrypt"],
     );
     const ciphertext_buffer = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      data
+      data,
     );
     const ciphertext = new Uint8Array(ciphertext_buffer);
     const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
@@ -58,18 +58,18 @@ export default function ProfileContent() {
       rawKey,
       "AES-GCM",
       false,
-      ["decrypt"]
+      ["decrypt"],
     );
     const decrypted_buffer = await window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      ciphertext
+      ciphertext,
     );
     return new Uint8Array(decrypted_buffer);
   };
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
     );
   useEffect(() => {
     const fetchUserData = async () => {
@@ -89,7 +89,7 @@ export default function ProfileContent() {
           const tsk = new vetkd.TransportSecretKey(seed);
           const encryptedKeyResult =
             await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-              Object.values(tsk.public_key())
+              Object.values(tsk.public_key()),
             );
 
           let encryptedKey = "";
@@ -120,7 +120,7 @@ export default function ProfileContent() {
             hex_decode(pkBytesHex),
             new TextEncoder().encode(principal),
             32,
-            new TextEncoder().encode("aes-256-gcm")
+            new TextEncoder().encode("aes-256-gcm"),
           );
           console.log(aesGCMKey);
           console.log(typeof DemographicInformation);
@@ -129,18 +129,18 @@ export default function ProfileContent() {
           console.log(BasicHealthParameters);
           const decryptedDataDemo = await aes_gcm_decrypt(
             new Uint8Array(DemographicInformation),
-            aesGCMKey
+            aesGCMKey,
           );
           const decryptedDataBasicHealth = await aes_gcm_decrypt(
             new Uint8Array(BasicHealthParameters),
-            aesGCMKey
+            aesGCMKey,
           );
 
           const parsedDemographicInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataDemo)
+            String.fromCharCode.apply(null, decryptedDataDemo),
           );
           const parsedBasicHealthParams = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataBasicHealth)
+            String.fromCharCode.apply(null, decryptedDataBasicHealth),
           );
           const parsedBiometricData =
             BiometricData.length > 0
@@ -211,7 +211,7 @@ export default function ProfileContent() {
       // Convert JSON strings to Uint8Array
       const demoInfoArray = new TextEncoder().encode(demoInfoJson);
       const basicHealthParaArray = new TextEncoder().encode(
-        basicHealthParaJson
+        basicHealthParaJson,
       );
 
       // Step 2: Fetch the encrypted key using encrypted_symmetric_key_for_dataAsset
@@ -219,7 +219,7 @@ export default function ProfileContent() {
       const tsk = new vetkd.TransportSecretKey(seed);
       const encryptedKeyResult =
         await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-          Object.values(tsk.public_key())
+          Object.values(tsk.public_key()),
         );
 
       let encryptedKey = "";
@@ -250,20 +250,20 @@ export default function ProfileContent() {
         hex_decode(pkBytesHex),
         new TextEncoder().encode(principal),
         32,
-        new TextEncoder().encode("aes-256-gcm")
+        new TextEncoder().encode("aes-256-gcm"),
       );
       console.log(aesGCMKey);
 
       const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
       const encryptedDataBasicHealth = await aes_gcm_encrypt(
         basicHealthParaArray,
-        aesGCMKey
+        aesGCMKey,
       );
       const result = await lyfelynkMVP_backend.updateUser(
         Object.values(encryptedDataDemo),
         Object.values(encryptedDataBasicHealth),
         [],
-        []
+        [],
       );
       Object.keys(result).forEach((key) => {
         if (key == "err") {
@@ -305,17 +305,11 @@ export default function ProfileContent() {
           <p className="mt-2 text-center text-sm leading-5 text-gray-600">
             Update your Profile Information
           </p>
-          <form
-            className="mt-8"
-            onSubmit={handleUpdateUser}
-          >
+          <form className="mt-8" onSubmit={handleUpdateUser}>
             <div className="rounded-md shadow-sm">
               <div className="flex flex-col items-center">
                 <Avatar className="-z-10 w-36 h-36">
-                  <AvatarImage
-                    alt="John Lenon"
-                    src=""
-                  />
+                  <AvatarImage alt="John Lenon" src="" />
                   <AvatarFallback className="text-4xl">JL</AvatarFallback>
                 </Avatar>
 
@@ -369,10 +363,7 @@ export default function ProfileContent() {
                     Gender
                   </label>
                   <div className="mt-1">
-                    <Select
-                      value={gender}
-                      onValueChange={setGender}
-                    >
+                    <Select value={gender} onValueChange={setGender}>
                       <SelectTrigger id="gender">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -393,10 +384,7 @@ export default function ProfileContent() {
                     Blood Type
                   </label>
                   <div className="mt-1">
-                    <Select
-                      value={bloodType}
-                      onValueChange={setBloodType}
-                    >
+                    <Select value={bloodType} onValueChange={setBloodType}>
                       <SelectTrigger id="blood_type">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -518,10 +506,7 @@ export default function ProfileContent() {
               </div>
             </div>
             <div className="mt-6">
-              <Button
-                className="w-full"
-                type="submit"
-              >
+              <Button className="w-full" type="submit">
                 Update
               </Button>
             </div>

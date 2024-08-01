@@ -14,7 +14,6 @@ import BMICalculator from "../../Functions/bmicalc";
 import NutritionTracker from "../../Functions/NutrientCalc/NutritionTracker";
 import AnalyticsDashboard from "../sub/AnalyticsDashboard";
 
-
 const calculateBMI = (weight, height) => {
   return (weight / Math.pow(height / 100, 2)).toFixed(1);
 };
@@ -50,8 +49,12 @@ export default function AnalyticsContent() {
             <div className="max-w-xl group cursor-pointer rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-900">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h4 className="text-lg font-medium text-gray-900 dark:text-gray-50">BMI Calculator</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Assess your weight status and maintain a healthy lifestyle.</p>
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-gray-50">
+                    BMI Calculator
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Assess your weight status and maintain a healthy lifestyle.
+                  </p>
                 </div>
                 <ChevronRightIcon className="h-6 w-6 text-gray-500 transition-transform duration-200 group-hover:translate-x-1 dark:text-gray-400" />
               </div>
@@ -65,7 +68,7 @@ export default function AnalyticsContent() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <BMICalculator/>
+              <BMICalculator />
               {/* Add your form inputs or other content here */}
             </div>
             <DialogFooter>
@@ -79,8 +82,13 @@ export default function AnalyticsContent() {
             <div className="max-w-xl group cursor-pointer rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-900">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h4 className="text-lg font-medium text-gray-900 dark:text-gray-50">Calorie Intake</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Track your daily calorie intake to manage your weight effectively.</p>
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-gray-50">
+                    Calorie Intake
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Track your daily calorie intake to manage your weight
+                    effectively.
+                  </p>
                 </div>
                 <ChevronRightIcon className="h-6 w-6 text-gray-500 transition-transform duration-200 group-hover:translate-x-1 dark:text-gray-400" />
               </div>
@@ -90,26 +98,21 @@ export default function AnalyticsContent() {
             <DialogHeader>
               <DialogTitle>Calorie Intake</DialogTitle>
               <DialogDescription>
-                Track your daily calorie intake to manage your weight effectively.
+                Track your daily calorie intake to manage your weight
+                effectively.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <NutritionTracker/>
-
+              <NutritionTracker />
             </div>
             <DialogFooter>
               <Button type="submit">Save changes</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
-
       </div>
 
       <AnalyticsDashboard />
-      
     </div>
   );
 }
-
-

@@ -20,7 +20,10 @@ export function BuyDataFunc({ listingID, seller }) {
 
   const handleConfirmPurchase = async () => {
     try {
-      const result = await lyfelynkMVP_backend.purchaseListing(listingID, seller);
+      const result = await lyfelynkMVP_backend.purchaseListing(
+        listingID,
+        seller,
+      );
       if (result.ok) {
         toast({
           title: "Purchase successful",

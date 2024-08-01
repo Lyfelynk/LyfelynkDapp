@@ -64,7 +64,7 @@ export default function DashboardContent() {
               Health Analytics
             </h1>
           </div>
-          <HealthAnalyticsOld/>
+          <HealthAnalyticsOld />
         </section>
       </div>
     </div>

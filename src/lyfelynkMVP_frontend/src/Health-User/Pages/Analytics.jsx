@@ -9,10 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
-import { ChevronRightIcon, Hospital } from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 import BMICalculator from "../../Functions/bmicalc";
 import NutritionTracker from "../../Functions/NutrientCalc/NutritionTracker";
+import AnalyticsDashboard from "../sub/AnalyticsDashboard";
 
 
 const calculateBMI = (weight, height) => {
@@ -106,96 +106,8 @@ export default function AnalyticsContent() {
 
       </div>
 
-      <div className="border border-gray-600 my-8 "></div>
-
-      <div className="flex items-center gap-2">
-        <Hospital/> 
-        <h1 className="text-3xl font-bold text-foreground"> Health Dashboard</h1>
-      </div>
-
-      <main className="flex-1 py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Weight</CardTitle>
-            <CardDescription>Current weight</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold">165 lbs</div>
-            <div className="text-gray-500 dark:text-gray-400">
-              <span className="font-medium">BMI:</span> 24.2
-            </div>
-            <div className="text-gray-500 dark:text-gray-400">
-              <span className="font-medium">Status:</span> Normal
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Height</CardTitle>
-            <CardDescription>Current height</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold">5'10"</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Calorie Intake</CardTitle>
-            <CardDescription>Daily calorie goal</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold">2,100 cal</div>
-            <div className="text-gray-500 dark:text-gray-400">
-              <span className="font-medium">Consumed:</span> 1,850 cal
-            </div>
-            <div className="text-gray-500 dark:text-gray-400">
-              <span className="font-medium">Remaining:</span> 250 cal
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="col-span-1 md:col-span-2 lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Personalized Diet Plan</CardTitle>
-            <CardDescription>Your recommended daily diet</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-bold mb-2">Breakfast</h3>
-                <ul className="space-y-2">
-                  <li>1 cup of oatmeal with berries</li>
-                  <li>2 eggs scrambled</li>
-                  <li>1 slice of whole-wheat toast</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold mb-2">Lunch</h3>
-                <ul className="space-y-2">
-                  <li>Grilled chicken salad with mixed greens</li>
-                  <li>1/2 cup of quinoa</li>
-                  <li>1 apple</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold mb-2">Dinner</h3>
-                <ul className="space-y-2">
-                  <li>Baked salmon with roasted vegetables</li>
-                  <li>1 cup of brown rice</li>
-                  <li>1 glass of water</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold mb-2">Snacks</h3>
-                <ul className="space-y-2">
-                  <li>1 cup of Greek yogurt with berries</li>
-                  <li>1 handful of almonds</li>
-                  <li>1 banana</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+      <AnalyticsDashboard />
+      
     </div>
   );
 }

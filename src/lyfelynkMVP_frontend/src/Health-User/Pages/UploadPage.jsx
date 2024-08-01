@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,7 +18,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
-import { ChevronLeft } from "lucide-react";
 import FileUpload from "../../Functions/file-upload";
 import { DatePicker } from "@/Functions/DatePicker";
 import { jsPDF } from "jspdf";
@@ -27,6 +25,7 @@ import { useState } from "react";
 import { useCanister } from "@connect2ic/react";
 import LoadingScreen from "../../LoadingScreen";
 import * as vetkd from "ic-vetkd-utils";
+
 export default function UploadContent() {
   const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
   const [formData, setFormData] = useState({
@@ -218,14 +217,7 @@ export default function UploadContent() {
   return (
     <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center justify-center p-8">
-        <div className="flex items-center justify-between w-full">
-          <Link to="/Health-Service/MyHealth">
-            <div className="flex text-foreground">
-              <ChevronLeft className="mr-2" />
-              Back
-            </div>
-          </Link>
-        </div>
+
         <h1 className="mt-4 text-4xl font-bold">Upload your Health Data</h1>
         <p className="mt-2 text-lg text-gray-600">
           Choose a suitable format to upload your data.

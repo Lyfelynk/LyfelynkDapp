@@ -10,12 +10,11 @@ const Sidebar = ({ isOpen, onClose }) => {
   };
 
   const links = [
-    { to: "/Health-User/Home", icon: <LayoutDashboard />, text: "Dashboard" },
-    { to: "/Health-User/Records", icon: <BookText />, text: "Records" },
-    { to: "/Health-User/Upload", icon: <Upload />, text: "Upload" },
-    { to: "/Health-User/Analytics", icon: <Heart />, text: "Analytics" },
-    { to: "/Health-User/Marketplace", icon: <ShoppingCart />, text: "Marketplace" },
-    { to: "/Health-User/Profile", icon: <User />, text: "Profile" }
+    { to: "/Health-Service/Home", icon: <LayoutDashboard />, text: "Dashboard" },
+    { to: "/Health-Service/Records", icon: <BookText />, text: "Records" },
+    { to: "/Health-Service/Upload", icon: <Upload />, text: "Upload" },
+    { to: "/Health-Service/Marketplace", icon: <ShoppingCart />, text: "Marketplace" },
+    { to: "/Health-Service/Profile", icon: <User />, text: "Profile" }
   ];
 
   return (

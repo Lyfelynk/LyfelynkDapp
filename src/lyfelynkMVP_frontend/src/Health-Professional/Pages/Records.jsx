@@ -1,47 +1,52 @@
-import { Upload } from 'lucide-react';
-import { Share2 } from 'lucide-react';
-import { Link } from "react-router-dom";
-import RecentActivityTable from '../Tables/RecentActivityData';
+import React from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ShareSellTable } from "../../Health-Service/Tables/ShareSellData";
+import { DataReceivedTable } from "../../Health-Service/Tables/DataReceived";
 
-
-export default function MyHealthContent() {
-
+export default function Records() {
   return (
-    <div className="bg-background">
-      
-      <main className="px-8 py-12">
-        <section className="text-center">
-          <h1 className="text-4xl font-bold mb-2">Upload and Share Your Health Data</h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Easily upload and securely share your health data with professionals or facilities using LyfeLynk.
+    <div>
+      <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-center p-8">
+          <div className="flex items-center justify-between w-full">
+
+          </div>
+          <h1 className="mt-4 text-4xl font-bold">Find and Share your Health Data</h1>
+          <p className="mt-2 text-lg text-gray-600">
+            Choose the documents below to share or sell the data.
           </p>
-        
-          <div className="flex justify-center space-x-8 mb-12">
-            <Link to="Upload">
-              <div className="p-6 border rounded-lg cursor-pointer">
-                <Upload className="text-blue-500 h-16 w-24 mb-4" />
-                <span className="block text-lg font-semibold">Upload</span>
-              </div>
-            </Link>
 
-            <Link to="Share">
-              <div className="p-6 border rounded-lg cursor-pointer">
-                <Share2 className="text-blue-500 h-16 w-24 mb-4" />
-                <span className="block text-lg font-semibold">Share</span>
-              </div>
-            </Link>
-          </div>
+          <div className="mt-4 w-full max-w-2xl">
+            <Tabs
+              defaultValue="uploadedfiles"
+              className="mt-4"
+            >
+              <TabsList className="w-full flex">
+                <TabsTrigger
+                  value="uploadedfiles"
+                  className="w-1/2 text-center"
+                >
+                  Your Uploads
+                </TabsTrigger>
+                <TabsTrigger
+                  value="shareddocuments"
+                  className="w-1/2 text-center"
+                >
+                  Shared With You
+                </TabsTrigger>
+              </TabsList>
 
-        </section>
-        <section className="mx-auto max-w-4xl mt-8">
-          <h2 className="text-2xl md:text-4xl font-semibold">Recent Activities</h2>
-          <p className="pb-6 text-gray-600">Recently shared or uploaded files on LyfeLynk.</p>
-          <div>
-            <RecentActivityTable/>
+              <TabsContent value="uploadedfiles">
+                <ShareSellTable shareMode />
+              </TabsContent>
+
+              <TabsContent value="shareddocuments">
+                <DataReceivedTable />
+              </TabsContent>
+            </Tabs>
           </div>
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
   );
 }
-

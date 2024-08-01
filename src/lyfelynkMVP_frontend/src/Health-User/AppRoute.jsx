@@ -3,14 +3,14 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import DashboardContent from './Pages/Dashboard';
-import MyHealthContent from './Pages/Records';
 import MarketplaceContent from './Pages/Marketplace';
 import ProfileContent from './Pages/Profile';
-import ShareContent from './sub/SharePage';
-import UploadContent from './sub/UploadPage';
+import UploadContent from './Pages/UploadPage';
+import Records from './Pages/Records';
+import AnalyticsContent from './Pages/Analytics';
+
 import NotFoundPage from './NotFoundPage';
 import AppBanner from '../AppBanner';
-import AnalyticsContent from './Pages/Analytics';
 
 export default function AppRoute1() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -35,10 +35,9 @@ export default function AppRoute1() {
           </div>
           <Routes>
             <Route path="/Home" element={<DashboardContent />} />
-            <Route path="/Records" element={<MyHealthContent />} />
-            <Route path="/Records/Share" element={<ShareContent />} />
-            <Route path="/Records/Upload" element={<UploadContent />} />
+            <Route path="/Records" element={<Records />} />
             <Route path="/Analytics" element={<AnalyticsContent />} />
+            <Route path="/Upload" element={<UploadContent />} />
             <Route path="/Marketplace" element={<MarketplaceContent />} />
             <Route path="/Profile" element={<ProfileContent />} />
             <Route path="*" element={<NotFoundPage />} />

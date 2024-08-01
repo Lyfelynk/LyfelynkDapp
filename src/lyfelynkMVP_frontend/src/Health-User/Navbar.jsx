@@ -3,7 +3,6 @@ import { Menu } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ConnectButton, ConnectDialog } from "@connect2ic/react";
 import "../connect2ic/connect2ic.css";
-import Sidebar from "./Sidebar";
 import { useLocation } from "react-router-dom";
 
 const Navbar = ( { toggleSidebar }) => {

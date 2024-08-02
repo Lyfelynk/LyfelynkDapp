@@ -22,13 +22,12 @@ import {
 } from "recharts";
 import { parseCSV } from "./csvParser";
 
-// Assume we have a CSV parser function
-
 const NutritionTracker = () => {
   const [data, setData] = useState([]);
-  const [numMeals, setNumMeals] = useState(1);
   const [meals, setMeals] = useState([]);
   const [totalNutrients, setTotalNutrients] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     // Load and parse CSV data
@@ -42,12 +41,8 @@ const NutritionTracker = () => {
   }, []);
 
   useEffect(() => {
-    setMeals(
-      Array(numMeals)
-        .fill()
-        .map(() => []),
-    );
-  }, [numMeals]);
+    setSearchResults(stringMatchSearch(searchQuery));
+  }, [searchQuery, data]);
 
   const unitBasedItems = {
     egg: 50,
@@ -59,13 +54,13 @@ const NutritionTracker = () => {
   };
 
   const stringMatchSearch = (query) => {
-    // Implement fuzzy search here
+    if (!query) return [];
     return data
       .filter((item) => item.name.toLowerCase().includes(query.toLowerCase()))
       .slice(0, 5);
   };
 
-  const calculateNutrients = (items) => {
+  const calculateNutrients = (meals) => {
     const totalNutrients = {
       calories: 0,
       carbohydrates_total_g: 0,
@@ -79,54 +74,43 @@ const NutritionTracker = () => {
       sugar_g: 0,
     };
 
-    items.forEach(({ item, quantity, isUnit }) => {
-      const foodItem = data.find((d) => d.name === item);
-      if (foodItem) {
-        const quantityInGrams = isUnit
-          ? quantity * (unitBasedItems[item.toLowerCase()] || 100)
-          : quantity;
-        const factor = quantityInGrams / 100.0;
-        Object.keys(totalNutrients).forEach((key) => {
-          totalNutrients[key] += (foodItem[key] || 0) * factor;
-        });
-      }
+    meals.forEach((meal) => {
+      const quantityInGrams = meal.isUnit
+        ? meal.quantity * (unitBasedItems[meal.name.toLowerCase()] || 100)
+        : meal.quantity;
+      const factor = quantityInGrams / 100.0;
+      Object.keys(totalNutrients).forEach((key) => {
+        totalNutrients[key] += (meal[key] || 0) * factor;
+      });
     });
 
     return Object.fromEntries(
       Object.entries(totalNutrients).map(([key, value]) => [
         key,
         Number(value.toFixed(2)),
-      ]),
+      ])
     );
   };
 
-  const handleAddItem = (mealIndex) => {
-    setMeals((prevMeals) => {
-      const newMeals = [...prevMeals];
-      newMeals[mealIndex] = [
-        ...newMeals[mealIndex],
-        { item: "", quantity: 0, isUnit: false },
-      ];
-      return newMeals;
-    });
+  const handleAddMeal = (selectedFood) => {
+    setMeals((prevMeals) => [...prevMeals, { ...selectedFood, quantity: 100, isUnit: false }]);
+    setSearchQuery('');
   };
 
-  const handleItemChange = (mealIndex, itemIndex, field, value) => {
+  const handleRemoveMeal = (index) => {
+    setMeals((prevMeals) => prevMeals.filter((_, i) => i !== index));
+  };
+
+  const handleItemChange = (index, field, value) => {
     setMeals((prevMeals) => {
       const newMeals = [...prevMeals];
-      newMeals[mealIndex][itemIndex][field] = value;
+      newMeals[index][field] = value;
       return newMeals;
     });
   };
 
   const handleCalculate = () => {
-    const mealNutrients = meals.map((meal) => calculateNutrients(meal));
-    const total = mealNutrients.reduce((acc, curr) => {
-      Object.keys(curr).forEach((key) => {
-        acc[key] = (acc[key] || 0) + curr[key];
-      });
-      return acc;
-    }, {});
+    const total = calculateNutrients(meals);
     setTotalNutrients(total);
   };
 
@@ -186,80 +170,53 @@ const NutritionTracker = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">
-        Food Calorie and Nutrient Tracker
-      </h1>
 
       <div className="mb-4">
         <Input
-          type="number"
-          value={numMeals}
-          onChange={(e) => setNumMeals(Number(e.target.value))}
-          placeholder="Number of meals"
-          className="w-full"
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search for a food item"
+          className="w-full mb-2"
         />
+        {searchResults.map((food) => (
+          <Button
+            key={food.name}
+            onClick={() => handleAddMeal(food)}
+            className="mr-2 mb-2"
+          >
+            {food.name}
+          </Button>
+        ))}
       </div>
 
-      {meals.map((meal, mealIndex) => (
-        <Card key={mealIndex} className="mb-4">
+      {meals.map((meal, index) => (
+        <Card key={index} className="mb-4">
           <CardHeader>
-            <CardTitle>Meal {mealIndex + 1}</CardTitle>
+            <CardTitle>{meal.name}</CardTitle>
           </CardHeader>
           <CardContent>
-            {meal.map((item, itemIndex) => (
-              <div key={itemIndex} className="flex space-x-2 mb-2">
-                <Select
-                  onValueChange={(value) =>
-                    handleItemChange(mealIndex, itemIndex, "item", value)
-                  }
-                  value={item.item}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select food item" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {stringMatchSearch(item.item).map((food) => (
-                      <SelectItem key={food.name} value={food.name}>
-                        {food.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  type="number"
-                  value={item.quantity}
-                  onChange={(e) =>
-                    handleItemChange(
-                      mealIndex,
-                      itemIndex,
-                      "quantity",
-                      Number(e.target.value),
-                    )
-                  }
-                  placeholder="Quantity"
-                />
-                <Select
-                  onValueChange={(value) =>
-                    handleItemChange(
-                      mealIndex,
-                      itemIndex,
-                      "isUnit",
-                      value === "units",
-                    )
-                  }
-                  value={item.isUnit ? "units" : "grams"}
-                >
-                  <SelectTrigger className="w-[100px]">
-                    <SelectValue placeholder="Unit" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="grams">grams</SelectItem>
-                    <SelectItem value="units">units</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            ))}
-            <Button onClick={() => handleAddItem(mealIndex)}>Add Item</Button>
+            <div className="flex space-x-2 mb-2">
+              <Input
+                type="number"
+                value={meal.quantity}
+                onChange={(e) => handleItemChange(index, "quantity", Number(e.target.value))}
+                placeholder="Quantity"
+              />
+              <Select
+                onValueChange={(value) => handleItemChange(index, "isUnit", value === "units")}
+                value={meal.isUnit ? "units" : "grams"}
+              >
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue placeholder="Unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="grams">grams</SelectItem>
+                  <SelectItem value="units">units</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button onClick={() => handleRemoveMeal(index)}>Remove</Button>
+            </div>
           </CardContent>
         </Card>
       ))}

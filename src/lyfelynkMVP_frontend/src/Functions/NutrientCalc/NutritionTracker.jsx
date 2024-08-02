@@ -20,6 +20,7 @@ import {
   Legend,
   Cell,
 } from "recharts";
+import { Search } from "lucide-react";
 import { parseCSV } from "./csvParser";
 
 const NutritionTracker = () => {
@@ -170,15 +171,15 @@ const NutritionTracker = () => {
 
   return (
     <div className="container mx-auto p-4">
-
-      <div className="mb-4">
+      <div className="mb-4 relative">
         <Input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search for a food item"
-          className="w-full mb-2"
+          className="w-full mb-2 pr-10"
         />
+        <Search className="absolute right-2 top-2.5 w-5 h-5 text-gray-400" />
         {searchResults.map((food) => (
           <Button
             key={food.name}
@@ -228,13 +229,22 @@ const NutritionTracker = () => {
       {Object.keys(totalNutrients).length > 0 && (
         <div>
           <h2 className="text-xl font-bold mb-2">Total Nutrients</h2>
-          <ul>
-            {Object.entries(totalNutrients).map(([key, value]) => (
-              <li key={key}>
-                {key}: {value}
-              </li>
-            ))}
-          </ul>
+          <table className="w-full border-collapse border border-gray-200">
+            <thead>
+              <tr>
+                <th className="border border-gray-200 px-4 py-2">Nutrient</th>
+                <th className="border border-gray-200 px-4 py-2">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(totalNutrients).map(([key, value]) => (
+                <tr key={key}>
+                  <td className="border border-gray-200 px-4 py-2">{key}</td>
+                  <td className="border border-gray-200 px-4 py-2">{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
           <div className="mt-4">
             <h3 className="text-lg font-bold mb-2">Macronutrient Breakdown</h3>

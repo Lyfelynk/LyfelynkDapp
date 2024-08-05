@@ -11,6 +11,7 @@ import AnalyticsContent from "./Pages/Analytics";
 
 import NotFoundPage from "./NotFoundPage";
 import AppBanner from "../AppBanner";
+import Gamification from "./Pages/Gamification";
 
 export default function AppRoute1() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -39,6 +40,7 @@ export default function AppRoute1() {
             <Route path="/Analytics" element={<AnalyticsContent />} />
             <Route path="/Upload" element={<UploadContent />} />
             <Route path="/Marketplace" element={<MarketplaceContent />} />
+            <Route path="/Gamification" element={<Gamification />} />
             <Route path="/Profile" element={<ProfileContent />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

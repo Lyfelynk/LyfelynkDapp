@@ -11,6 +11,7 @@ import {
   Share,
   Upload,
   Forward,
+  Gamepad,
 } from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -30,6 +31,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <ShoppingCart />,
       text: "Marketplace",
     },
+    { to: "/Health-User/Gamification", icon: <Gamepad />, text: "Gamification" },
     { to: "/Health-User/Profile", icon: <User />, text: "Profile" },
   ];
 

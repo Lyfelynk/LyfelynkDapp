@@ -23,6 +23,7 @@
   "dependencies": {
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "zod": "^3.23.8"
   }
 }

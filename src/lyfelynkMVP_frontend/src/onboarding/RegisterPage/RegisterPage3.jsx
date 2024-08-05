@@ -4,132 +4,148 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { ChevronLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCanister } from "@connect2ic/react"; // Connect2ic library to interact with the backend canister
+import { useCanister } from "@connect2ic/react";
 import LoadingScreen from "../../LoadingScreen";
 import OnboardingBanner from "../../OnboardingBanner";
 import * as vetkd from "ic-vetkd-utils";
+import { z } from "zod";
+
+// Define the Zod schema
+const formSchema = z.object({
+  facultyName: z.string().min(1, "Faculty Name is required"),
+  registrationId: z.string().min(1, "Registration ID is required"),
+  country: z.string().optional(),
+  state: z.string().optional(),
+  city: z.string().optional(),
+  pincode: z.string().min(1, "Pincode is required"),
+  serviceName: z.string().min(1, "Service Name is required"),
+  serviceDesc: z.string().optional(),
+});
 
 export default function RegisterPage3Content() {
-  // State variables
   const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
   const navigate = useNavigate();
-  const [facultyName, setFacultyName] = useState("");
-  const [registrationId, setRegistrationId] = useState("");
-  const [country, setCountry] = useState("");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
-  const [pincode, setPincode] = useState("");
-  const [serviceName, setServiceName] = useState("");
-  const [serviceDesc, setServiceDesc] = useState("");
+  const [formData, setFormData] = useState({
+    facultyName: "",
+    registrationId: "",
+    country: "",
+    state: "",
+    city: "",
+    pincode: "",
+    serviceName: "",
+    serviceDesc: "",
+  });
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
   const registerService = async () => {
-    setLoading(true);
+    try {
+      // Validate the form data
+      formSchema.parse(formData);
+      setErrors({});
 
-    const demoInfo = {
-      facultyName,
-      country,
-      state,
-      city,
-      pincode,
-    };
+      setLoading(true);
+      const { facultyName, registrationId, country, state, city, pincode, serviceName, serviceDesc } = formData;
 
-    const servicesOfferedInfo = {
-      serviceName,
-      serviceDesc,
-    };
+      const demoInfo = { facultyName, country, state, city, pincode };
+      const servicesOfferedInfo = { serviceName, serviceDesc };
+      const licenseInfo = { registrationId };
 
-    const licenseInfo = {
-      registrationId,
-    };
+      // Convert to JSON strings
+      const demoInfoJson = JSON.stringify(demoInfo);
+      const servicesOfferedInfoJson = JSON.stringify(servicesOfferedInfo);
+      const licenseInfoJson = JSON.stringify(licenseInfo);
 
-    // Convert demoInfo, servicesOfferedInfo, and licenseInfo objects to JSON strings
-    const demoInfoJson = JSON.stringify(demoInfo);
-    const servicesOfferedInfoJson = JSON.stringify(servicesOfferedInfo);
-    const licenseInfoJson = JSON.stringify(licenseInfo);
+      // Convert JSON strings to Uint8Array
+      const demoInfoArray = new TextEncoder().encode(demoInfoJson);
+      const servicesOfferedInfoArray = new TextEncoder().encode(servicesOfferedInfoJson);
+      const licenseInfoArray = new TextEncoder().encode(licenseInfoJson);
 
-    // Convert JSON strings to Uint8Array
-    const demoInfoArray = new TextEncoder().encode(demoInfoJson);
-    const servicesOfferedInfoArray = new TextEncoder().encode(
-      servicesOfferedInfoJson,
-    );
-    const licenseInfoArray = new TextEncoder().encode(licenseInfoJson);
-
-    // Step 2: Fetch the encrypted key using encrypted_symmetric_key_for_dataAsset
-    const seed = window.crypto.getRandomValues(new Uint8Array(32));
-    const tsk = new vetkd.TransportSecretKey(seed);
-    const encryptedKeyResult =
-      await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
+      // Fetch the encrypted key
+      const seed = window.crypto.getRandomValues(new Uint8Array(32));
+      const tsk = new vetkd.TransportSecretKey(seed);
+      const encryptedKeyResult = await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
         Object.values(tsk.public_key()),
       );
 
-    let encryptedKey = "";
+      let encryptedKey = "";
 
-    Object.keys(encryptedKeyResult).forEach((key) => {
-      if (key === "err") {
-        alert(encryptedKeyResult[key]);
+      Object.keys(encryptedKeyResult).forEach((key) => {
+        if (key === "err") {
+          toast({
+            title: "Error",
+            description: encryptedKeyResult[key],
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+        if (key === "ok") {
+          encryptedKey = encryptedKeyResult[key];
+        }
+      });
+
+      if (!encryptedKey) {
         setLoading(false);
         return;
       }
-      if (key === "ok") {
-        encryptedKey = encryptedKeyResult[key];
-      }
-    });
 
-    if (!encryptedKey) {
+      const pkBytesHex = await lyfelynkMVP_backend.symmetric_key_verification_key();
+      const principal = await lyfelynkMVP_backend.whoami();
+      const aesGCMKey = tsk.decrypt_and_hash(
+        hex_decode(encryptedKey),
+        hex_decode(pkBytesHex),
+        new TextEncoder().encode(principal),
+        32,
+        new TextEncoder().encode("aes-256-gcm"),
+      );
+
+      const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
+      const encryptedDataService = await aes_gcm_encrypt(servicesOfferedInfoArray, aesGCMKey);
+      const encryptedDataLicense = await aes_gcm_encrypt(licenseInfoArray, aesGCMKey);
+
+      const result = await lyfelynkMVP_backend.createFacility(
+        Object.values(encryptedDataDemo),
+        Object.values(encryptedDataService),
+        Object.values(encryptedDataLicense),
+      );
+
+      Object.keys(result).forEach((key) => {
+        if (key == "err") {
+          toast({
+            title: "Error",
+            description: result[key],
+            variant: "destructive",
+          });
+          setLoading(false);
+        }
+        if (key == "ok") {
+          toast({
+            title: "Success",
+            description: result[key],
+            variant: "success",
+          });
+          setLoading(false);
+          navigate("verify");
+        }
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMap = {};
+        error.errors.forEach((err) => {
+          errorMap[err.path[0]] = err.message;
+        });
+        setErrors(errorMap);
+      } else {
+        console.error("An unexpected error occurred:", error);
+      }
       setLoading(false);
-      return;
     }
-
-    const pkBytesHex =
-      await lyfelynkMVP_backend.symmetric_key_verification_key();
-    const principal = await lyfelynkMVP_backend.whoami();
-    console.log(pkBytesHex);
-    console.log(encryptedKey);
-    const aesGCMKey = tsk.decrypt_and_hash(
-      hex_decode(encryptedKey),
-      hex_decode(pkBytesHex),
-      new TextEncoder().encode(principal),
-      32,
-      new TextEncoder().encode("aes-256-gcm"),
-    );
-    console.log(aesGCMKey);
-
-    const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
-    const encryptedDataService = await aes_gcm_encrypt(
-      servicesOfferedInfoArray,
-      aesGCMKey,
-    );
-    const encryptedDataLicense = await aes_gcm_encrypt(
-      licenseInfoArray,
-      aesGCMKey,
-    );
-    const result = await lyfelynkMVP_backend.createFacility(
-      Object.values(encryptedDataDemo),
-      Object.values(encryptedDataService),
-      Object.values(encryptedDataLicense),
-    );
-    Object.keys(result).forEach((key) => {
-      if (key == "err") {
-        //alert(result[key]);
-        toast({
-          title: "Error",
-          description: result[key],
-          variant: "destructive",
-        });
-        setLoading(false);
-      }
-      if (key == "ok") {
-        //alert(result[key]);
-        toast({
-          title: "Success",
-          description: result[key],
-          variant: "success",
-        });
-        setLoading(false);
-        navigate("verify");
-      }
-    });
   };
 
   const aes_gcm_encrypt = async (data, rawKey) => {
@@ -152,8 +168,7 @@ export default function RegisterPage3Content() {
     iv_and_ciphertext.set(ciphertext, iv.length);
     return iv_and_ciphertext;
   };
-  // const hex_encode = (bytes) =>
-  //   bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
+
   const hex_decode = (hexString) =>
     Uint8Array.from(
       hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
@@ -162,6 +177,7 @@ export default function RegisterPage3Content() {
   if (loading) {
     return <LoadingScreen />;
   }
+
   return (
     <section className="bg-[conic-gradient(at_bottom_right,_var(--tw-gradient-stops))] from-blue-700 via-blue-800 to-gray-900">
       <OnboardingBanner />
@@ -192,137 +208,121 @@ export default function RegisterPage3Content() {
 
             <div className="grid grid-cols-2 gap-4 py-4">
               <div>
-                <label
-                  className="block text-sm font-medium leading-5 text-foreground"
-                  htmlFor="facultyname"
-                >
-                  Faculty Name
+                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="facultyName">
+                  Faculty Name *
                 </label>
                 <div className="mt-1">
                   <Input
-                    id="facultyname"
+                    id="facultyName"
                     placeholder="Faculty Name"
-                    value={facultyName}
-                    onChange={(e) => setFacultyName(e.target.value)}
+                    value={formData.facultyName}
+                    onChange={handleInputChange}
+                    required
                   />
+                  {errors.facultyName && <p className="text-red-500 text-xs mt-1">{errors.facultyName}</p>}
                 </div>
               </div>
 
               <div>
-                <label
-                  className="block text-sm font-medium leading-5 text-foreground"
-                  htmlFor="regId"
-                >
-                  Registeration ID
+                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="registrationId">
+                  Registration ID *
                 </label>
                 <div className="mt-1">
                   <Input
-                    id="regId"
-                    placeholder="Registeration ID"
-                    value={registrationId}
-                    onChange={(e) => setRegistrationId(e.target.value)}
+                    id="registrationId"
+                    placeholder="Registration ID"
+                    value={formData.registrationId}
+                    onChange={handleInputChange}
+                    required
                   />
+                  {errors.registrationId && <p className="text-red-500 text-xs mt-1">{errors.registrationId}</p>}
                 </div>
               </div>
 
               <div>
-                <label
-                  className="block text-sm font-medium leading-5 text-foreground"
-                  htmlFor="country"
-                >
+                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="country">
                   Country
                 </label>
                 <div className="mt-1">
                   <Input
                     id="country"
                     placeholder="Country"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
+                    value={formData.country}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
 
               <div>
-                <label
-                  className="block text-sm font-medium leading-5 text-foreground"
-                  htmlFor="state"
-                >
+                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="state">
                   State
                 </label>
                 <div className="mt-1">
                   <Input
                     id="state"
                     placeholder="State"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
+                    value={formData.state}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
 
               <div>
-                <label
-                  className="block text-sm font-medium leading-5 text-foreground"
-                  htmlFor="city"
-                >
+                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="city">
                   City
                 </label>
                 <div className="mt-1">
                   <Input
                     id="city"
                     placeholder="City"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
+                    value={formData.city}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
 
               <div>
-                <label
-                  className="block text-sm font-medium leading-5 text-foreground"
-                  htmlFor="pincode"
-                >
-                  Pincode
+                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="pincode">
+                  Pincode *
                 </label>
                 <div className="mt-1">
                   <Input
                     id="pincode"
                     placeholder="Pincode"
-                    value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
+                    value={formData.pincode}
+                    onChange={handleInputChange}
+                    required
                   />
+                  {errors.pincode && <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>}
                 </div>
               </div>
 
               <div>
-                <label
-                  className="block text-sm font-medium leading-5 text-foreground"
-                  htmlFor="service_name"
-                >
-                  Service Name
+                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="serviceName">
+                  Service Name *
                 </label>
                 <div className="mt-1">
                   <Input
-                    id="service_name"
+                    id="serviceName"
                     placeholder="Service Name"
-                    value={serviceName}
-                    onChange={(e) => setServiceName(e.target.value)}
+                    value={formData.serviceName}
+                    onChange={handleInputChange}
+                    required
                   />
+                  {errors.serviceName && <p className="text-red-500 text-xs mt-1">{errors.serviceName}</p>}
                 </div>
               </div>
 
               <div>
-                <label
-                  className="block text-sm font-medium leading-5 text-foreground"
-                  htmlFor="service_name"
-                >
-                  Service Desc
+                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="serviceDesc">
+                  Service Description
                 </label>
                 <div className="mt-1">
                   <Input
-                    id="service_name"
-                    placeholder="Service Desc"
-                    value={serviceDesc}
-                    onChange={(e) => setServiceDesc(e.target.value)}
+                    id="serviceDesc"
+                    placeholder="Service Description"
+                    value={formData.serviceDesc}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>

@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertCircle } from "lucide-react";
 
 const INITIAL_TOKENS = 100;
 const INITIAL_HP = 100;
@@ -16,24 +21,39 @@ const INITIAL_ATTRIBUTES = {
 };
 
 const ACTIVITY_TYPES = {
-  YOGA: 'yoga',
-  MEDITATION: 'meditation',
-  NUTRITION: 'nutrition',
-  HOLISTIC: 'holistic',
+  YOGA: "yoga",
+  MEDITATION: "meditation",
+  NUTRITION: "nutrition",
+  HOLISTIC: "holistic",
 };
 
 const ACTIVITY_REWARDS = {
-  [ACTIVITY_TYPES.YOGA]: { primaryAttribute: 'energy', reward: 5 },
-  [ACTIVITY_TYPES.MEDITATION]: { primaryAttribute: 'focus', reward: 5 },
-  [ACTIVITY_TYPES.NUTRITION]: { primaryAttribute: 'vitality', reward: 5 },
-  [ACTIVITY_TYPES.HOLISTIC]: { primaryAttribute: 'resilience', reward: 5 },
+  [ACTIVITY_TYPES.YOGA]: { primaryAttribute: "energy", reward: 5 },
+  [ACTIVITY_TYPES.MEDITATION]: { primaryAttribute: "focus", reward: 5 },
+  [ACTIVITY_TYPES.NUTRITION]: { primaryAttribute: "vitality", reward: 5 },
+  [ACTIVITY_TYPES.HOLISTIC]: { primaryAttribute: "resilience", reward: 5 },
 };
 
-const QUALITY_TIERS = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'];
-const AVATAR_TYPES = ['Fitness Champion', 'Mindfulness Master', 'Nutrition Expert', 'Holistic Healer'];
+const QUALITY_TIERS = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+const AVATAR_TYPES = [
+  "Fitness Champion",
+  "Mindfulness Master",
+  "Nutrition Expert",
+  "Holistic Healer",
+];
 
-const PROFESSIONAL_TYPES = ['Medical Specialist', 'Mental Health Expert', 'Nutritional Advisor', 'Physical Trainer'];
-const FACILITY_TYPES = ['Health Hub', 'Fitness Center', 'Wellness Retreat', 'Medical Clinic'];
+const PROFESSIONAL_TYPES = [
+  "Medical Specialist",
+  "Mental Health Expert",
+  "Nutritional Advisor",
+  "Physical Trainer",
+];
+const FACILITY_TYPES = [
+  "Health Hub",
+  "Fitness Center",
+  "Wellness Retreat",
+  "Medical Clinic",
+];
 
 const generateNFT = (type, types) => ({
   id: Math.random().toString(36).substr(2, 9),
@@ -61,19 +81,19 @@ const WellnessAvatarPlatform = () => {
 
   useEffect(() => {
     setNfts([
-      generateNFT('avatar', AVATAR_TYPES),
-      generateNFT('avatar', AVATAR_TYPES),
-      generateNFT('avatar', AVATAR_TYPES),
+      generateNFT("avatar", AVATAR_TYPES),
+      generateNFT("avatar", AVATAR_TYPES),
+      generateNFT("avatar", AVATAR_TYPES),
     ]);
     setProfessionals([
-      generateNFT('professional', PROFESSIONAL_TYPES),
-      generateNFT('professional', PROFESSIONAL_TYPES),
-      generateNFT('professional', PROFESSIONAL_TYPES),
+      generateNFT("professional", PROFESSIONAL_TYPES),
+      generateNFT("professional", PROFESSIONAL_TYPES),
+      generateNFT("professional", PROFESSIONAL_TYPES),
     ]);
     setFacilities([
-      generateNFT('facility', FACILITY_TYPES),
-      generateNFT('facility', FACILITY_TYPES),
-      generateNFT('facility', FACILITY_TYPES),
+      generateNFT("facility", FACILITY_TYPES),
+      generateNFT("facility", FACILITY_TYPES),
+      generateNFT("facility", FACILITY_TYPES),
     ]);
   }, []);
 
@@ -139,7 +159,9 @@ const WellnessAvatarPlatform = () => {
         </TabsContent>
 
         <TabsContent value="professionals">
-          <h2 className="text-xl font-semibold mb-4">Available Professionals</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Available Professionals
+          </h2>
           <div className="grid grid-cols-2 gap-4">
             {professionals.map((prof) => renderNFTCard(prof, performActivity))}
           </div>
@@ -148,7 +170,9 @@ const WellnessAvatarPlatform = () => {
         <TabsContent value="facilities">
           <h2 className="text-xl font-semibold mb-4">Available Facilities</h2>
           <div className="grid grid-cols-2 gap-4">
-            {facilities.map((facility) => renderNFTCard(facility, performActivity))}
+            {facilities.map((facility) =>
+              renderNFTCard(facility, performActivity),
+            )}
           </div>
         </TabsContent>
       </Tabs>
@@ -167,7 +191,9 @@ const WellnessAvatarPlatform = () => {
           <div className="mt-2">
             {Object.keys(avatar.attributes).map((attr) => (
               <div key={attr}>
-                <p>{attr}: {avatar.attributes[attr]}</p>
+                <p>
+                  {attr}: {avatar.attributes[attr]}
+                </p>
                 <Progress value={avatar.attributes[attr]} max={20} />
               </div>
             ))}
@@ -182,7 +208,9 @@ const WellnessAvatarPlatform = () => {
         <CardContent>
           <div className="flex flex-wrap gap-2">
             {avatar.achievements.map((achievement, index) => (
-              <Badge key={index} variant="secondary">{achievement}</Badge>
+              <Badge key={index} variant="secondary">
+                {achievement}
+              </Badge>
             ))}
           </div>
         </CardContent>
@@ -195,13 +223,19 @@ const WellnessAvatarPlatform = () => {
       {avatar.hp <= 20 && (
         <div className="mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md flex items-center">
           <AlertCircle className="mr-2" />
-          <p>Warning: Your HP is low! Consider restoring it to maintain optimal performance.</p>
+          <p>
+            Warning: Your HP is low! Consider restoring it to maintain optimal
+            performance.
+          </p>
         </div>
       )}
 
       {selectedActivity && selectedNFT && (
         <div className="mt-4 p-4 bg-green-100 text-green-800 rounded-md">
-          <p>You completed a {selectedActivity} activity with a {selectedNFT.type} ({selectedNFT.quality}) and earned tokens!</p>
+          <p>
+            You completed a {selectedActivity} activity with a{" "}
+            {selectedNFT.type} ({selectedNFT.quality}) and earned tokens!
+          </p>
         </div>
       )}
     </div>

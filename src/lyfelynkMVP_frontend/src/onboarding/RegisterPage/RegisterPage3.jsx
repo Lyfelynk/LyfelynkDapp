@@ -50,7 +50,16 @@ export default function RegisterPage3Content() {
       setErrors({});
 
       setLoading(true);
-      const { facultyName, registrationId, country, state, city, pincode, serviceName, serviceDesc } = formData;
+      const {
+        facultyName,
+        registrationId,
+        country,
+        state,
+        city,
+        pincode,
+        serviceName,
+        serviceDesc,
+      } = formData;
 
       const demoInfo = { facultyName, country, state, city, pincode };
       const servicesOfferedInfo = { serviceName, serviceDesc };
@@ -63,15 +72,18 @@ export default function RegisterPage3Content() {
 
       // Convert JSON strings to Uint8Array
       const demoInfoArray = new TextEncoder().encode(demoInfoJson);
-      const servicesOfferedInfoArray = new TextEncoder().encode(servicesOfferedInfoJson);
+      const servicesOfferedInfoArray = new TextEncoder().encode(
+        servicesOfferedInfoJson,
+      );
       const licenseInfoArray = new TextEncoder().encode(licenseInfoJson);
 
       // Fetch the encrypted key
       const seed = window.crypto.getRandomValues(new Uint8Array(32));
       const tsk = new vetkd.TransportSecretKey(seed);
-      const encryptedKeyResult = await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-        Object.values(tsk.public_key()),
-      );
+      const encryptedKeyResult =
+        await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
+          Object.values(tsk.public_key()),
+        );
 
       let encryptedKey = "";
 
@@ -95,7 +107,8 @@ export default function RegisterPage3Content() {
         return;
       }
 
-      const pkBytesHex = await lyfelynkMVP_backend.symmetric_key_verification_key();
+      const pkBytesHex =
+        await lyfelynkMVP_backend.symmetric_key_verification_key();
       const principal = await lyfelynkMVP_backend.whoami();
       const aesGCMKey = tsk.decrypt_and_hash(
         hex_decode(encryptedKey),
@@ -106,8 +119,14 @@ export default function RegisterPage3Content() {
       );
 
       const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
-      const encryptedDataService = await aes_gcm_encrypt(servicesOfferedInfoArray, aesGCMKey);
-      const encryptedDataLicense = await aes_gcm_encrypt(licenseInfoArray, aesGCMKey);
+      const encryptedDataService = await aes_gcm_encrypt(
+        servicesOfferedInfoArray,
+        aesGCMKey,
+      );
+      const encryptedDataLicense = await aes_gcm_encrypt(
+        licenseInfoArray,
+        aesGCMKey,
+      );
 
       const result = await lyfelynkMVP_backend.createFacility(
         Object.values(encryptedDataDemo),
@@ -208,7 +227,10 @@ export default function RegisterPage3Content() {
 
             <div className="grid grid-cols-2 gap-4 py-4">
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="facultyName">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="facultyName"
+                >
                   Faculty Name *
                 </label>
                 <div className="mt-1">
@@ -219,12 +241,19 @@ export default function RegisterPage3Content() {
                     onChange={handleInputChange}
                     required
                   />
-                  {errors.facultyName && <p className="text-red-500 text-xs mt-1">{errors.facultyName}</p>}
+                  {errors.facultyName && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.facultyName}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="registrationId">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="registrationId"
+                >
                   Registration ID *
                 </label>
                 <div className="mt-1">
@@ -235,12 +264,19 @@ export default function RegisterPage3Content() {
                     onChange={handleInputChange}
                     required
                   />
-                  {errors.registrationId && <p className="text-red-500 text-xs mt-1">{errors.registrationId}</p>}
+                  {errors.registrationId && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.registrationId}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="country">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="country"
+                >
                   Country
                 </label>
                 <div className="mt-1">
@@ -254,7 +290,10 @@ export default function RegisterPage3Content() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="state">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="state"
+                >
                   State
                 </label>
                 <div className="mt-1">
@@ -268,7 +307,10 @@ export default function RegisterPage3Content() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="city">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="city"
+                >
                   City
                 </label>
                 <div className="mt-1">
@@ -282,7 +324,10 @@ export default function RegisterPage3Content() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="pincode">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="pincode"
+                >
                   Pincode *
                 </label>
                 <div className="mt-1">
@@ -293,12 +338,19 @@ export default function RegisterPage3Content() {
                     onChange={handleInputChange}
                     required
                   />
-                  {errors.pincode && <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>}
+                  {errors.pincode && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.pincode}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="serviceName">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="serviceName"
+                >
                   Service Name *
                 </label>
                 <div className="mt-1">
@@ -309,12 +361,19 @@ export default function RegisterPage3Content() {
                     onChange={handleInputChange}
                     required
                   />
-                  {errors.serviceName && <p className="text-red-500 text-xs mt-1">{errors.serviceName}</p>}
+                  {errors.serviceName && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.serviceName}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="serviceDesc">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="serviceDesc"
+                >
                   Service Description
                 </label>
                 <div className="mt-1">

@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -39,7 +45,6 @@ const BMICalculator = ({ updateHealthData }) => {
         dietPlan: results.dietChart,
       });
       console.log("BMI Calculator updating health data");
-
     } else {
       if (weightNum <= 0) {
         setError("Please enter a positive value for weight.");
@@ -61,35 +66,75 @@ const BMICalculator = ({ updateHealthData }) => {
     const diets = {
       Underweight: {
         Veg: [
-          ["Breakfast", "Oats with milk and fruits, nuts (almonds, walnuts)", 450],
+          [
+            "Breakfast",
+            "Oats with milk and fruits, nuts (almonds, walnuts)",
+            450,
+          ],
           ["Mid-Morning Snack", "Banana shake, a handful of dry fruits", 300],
           ["Lunch", "Dal, paneer curry, chapati, rice, salad, and yogurt", 700],
-          ["Evening Snack", "Smoothie with nuts, whole-grain toast with avocado", 250],
+          [
+            "Evening Snack",
+            "Smoothie with nuts, whole-grain toast with avocado",
+            250,
+          ],
           ["Dinner", "Vegetable curry, chapati, quinoa, and salad", 600],
           ["Before Bed", "A glass of milk with honey", 150],
         ],
         "Non-Veg": [
-          ["Breakfast", "Omelette with vegetables, whole-grain toast, and a glass of milk", 500],
-          ["Mid-Morning Snack", "Chicken or turkey slices, a handful of nuts", 250],
-          ["Lunch", "Grilled chicken, dal, chapati, rice, salad, and yogurt", 750],
-          ["Evening Snack", "Protein shake, whole-grain toast with chicken spread", 300],
+          [
+            "Breakfast",
+            "Omelette with vegetables, whole-grain toast, and a glass of milk",
+            500,
+          ],
+          [
+            "Mid-Morning Snack",
+            "Chicken or turkey slices, a handful of nuts",
+            250,
+          ],
+          [
+            "Lunch",
+            "Grilled chicken, dal, chapati, rice, salad, and yogurt",
+            750,
+          ],
+          [
+            "Evening Snack",
+            "Protein shake, whole-grain toast with chicken spread",
+            300,
+          ],
           ["Dinner", "Fish curry, chapati, quinoa, and salad", 600],
           ["Before Bed", "A glass of milk with honey", 150],
         ],
       },
       "Normal weight": {
         Veg: [
-          ["Breakfast", "Smoothie bowl with fruits and nuts, whole-grain toast", 350],
+          [
+            "Breakfast",
+            "Smoothie bowl with fruits and nuts, whole-grain toast",
+            350,
+          ],
           ["Mid-Morning Snack", "Fresh fruit, a handful of seeds", 150],
-          ["Lunch", "Dal, mixed vegetable curry, chapati, brown rice, and salad", 600],
+          [
+            "Lunch",
+            "Dal, mixed vegetable curry, chapati, brown rice, and salad",
+            600,
+          ],
           ["Evening Snack", "Carrot sticks with hummus, herbal tea", 150],
           ["Dinner", "Paneer tikka, chapati, quinoa, and vegetable soup", 500],
           ["Before Bed", "Herbal tea or warm milk", 50],
         ],
         "Non-Veg": [
-          ["Breakfast", "Scrambled eggs with vegetables, whole-grain toast, and a glass of fresh juice", 400],
+          [
+            "Breakfast",
+            "Scrambled eggs with vegetables, whole-grain toast, and a glass of fresh juice",
+            400,
+          ],
           ["Mid-Morning Snack", "Greek yogurt with berries", 150],
-          ["Lunch", "Grilled chicken breast, dal, chapati, brown rice, and salad", 600],
+          [
+            "Lunch",
+            "Grilled chicken breast, dal, chapati, brown rice, and salad",
+            600,
+          ],
           ["Evening Snack", "Boiled eggs, herbal tea", 150],
           ["Dinner", "Fish curry, chapati, quinoa, and vegetable soup", 500],
           ["Before Bed", "Herbal tea or warm milk", 50],
@@ -99,44 +144,98 @@ const BMICalculator = ({ updateHealthData }) => {
         Veg: [
           ["Breakfast", "Smoothie with spinach, apple, and flaxseeds", 300],
           ["Mid-Morning Snack", "Fresh fruit", 100],
-          ["Lunch", "Dal, mixed vegetable curry, chapati, and a small portion of brown rice, salad", 500],
-          ["Evening Snack", "Sliced cucumber and carrot sticks, green tea", 100],
-          ["Dinner", "Grilled vegetables, chapati, and a bowl of lentil soup", 400],
+          [
+            "Lunch",
+            "Dal, mixed vegetable curry, chapati, and a small portion of brown rice, salad",
+            500,
+          ],
+          [
+            "Evening Snack",
+            "Sliced cucumber and carrot sticks, green tea",
+            100,
+          ],
+          [
+            "Dinner",
+            "Grilled vegetables, chapati, and a bowl of lentil soup",
+            400,
+          ],
           ["Before Bed", "Warm water with lemon", 50],
         ],
         "Non-Veg": [
           ["Breakfast", "Boiled eggs, whole-grain toast, and green tea", 300],
           ["Mid-Morning Snack", "Fresh fruit, a handful of walnuts", 150],
-          ["Lunch", "Grilled chicken salad with lots of greens, dal, and a small portion of brown rice", 500],
-          ["Evening Snack", "Sliced cucumber and carrot sticks, green tea", 100],
-          ["Dinner", "Baked fish, steamed vegetables, and a bowl of lentil soup", 400],
+          [
+            "Lunch",
+            "Grilled chicken salad with lots of greens, dal, and a small portion of brown rice",
+            500,
+          ],
+          [
+            "Evening Snack",
+            "Sliced cucumber and carrot sticks, green tea",
+            100,
+          ],
+          [
+            "Dinner",
+            "Baked fish, steamed vegetables, and a bowl of lentil soup",
+            400,
+          ],
           ["Before Bed", "Warm water with lemon", 50],
         ],
       },
       Obesity: {
         Veg: [
-          ["Breakfast", "Green smoothie with spinach, kale, cucumber, and apple", 250],
+          [
+            "Breakfast",
+            "Green smoothie with spinach, kale, cucumber, and apple",
+            250,
+          ],
           ["Mid-Morning Snack", "Fresh fruit", 100],
-          ["Lunch", "Mixed bean salad, vegetable curry, chapati, and a small portion of quinoa", 400],
-          ["Evening Snack", "Sliced bell peppers and carrots with hummus, green tea", 100],
-          ["Dinner", "Steamed vegetables, chapati, and a bowl of clear vegetable soup", 300],
+          [
+            "Lunch",
+            "Mixed bean salad, vegetable curry, chapati, and a small portion of quinoa",
+            400,
+          ],
+          [
+            "Evening Snack",
+            "Sliced bell peppers and carrots with hummus, green tea",
+            100,
+          ],
+          [
+            "Dinner",
+            "Steamed vegetables, chapati, and a bowl of clear vegetable soup",
+            300,
+          ],
           ["Before Bed", "Warm water with lemon", 50],
         ],
         "Non-Veg": [
-          ["Breakfast", "Egg white omelette with vegetables, whole-grain toast, and green tea", 250],
+          [
+            "Breakfast",
+            "Egg white omelette with vegetables, whole-grain toast, and green tea",
+            250,
+          ],
           ["Mid-Morning Snack", "Fresh fruit", 100],
-          ["Lunch", "Grilled chicken breast, mixed green salad, and a small portion of quinoa", 400],
-          ["Evening Snack", "Sliced bell peppers and carrots with hummus, green tea", 100],
-          ["Dinner", "Steamed fish, steamed vegetables, and a bowl of clear vegetable soup", 300],
+          [
+            "Lunch",
+            "Grilled chicken breast, mixed green salad, and a small portion of quinoa",
+            400,
+          ],
+          [
+            "Evening Snack",
+            "Sliced bell peppers and carrots with hummus, green tea",
+            100,
+          ],
+          [
+            "Dinner",
+            "Steamed fish, steamed vegetables, and a bowl of clear vegetable soup",
+            300,
+          ],
           ["Before Bed", "Warm water with lemon", 50],
         ],
       },
     };
 
     return diets[category][preference]
-      .map(
-        (meal) => `${meal[0]} (${meal[2]} kcal):\n${meal[1]}\n`
-      )
+      .map((meal) => `${meal[0]} (${meal[2]} kcal):\n${meal[1]}\n`)
       .join("\n");
   };
 
@@ -200,7 +299,9 @@ const BMICalculator = ({ updateHealthData }) => {
               <h3 className="text-lg font-semibold mb-2">
                 Suggested {preference} Diet Chart:
               </h3>
-              <pre className="whitespace-pre-wrap text-sm font-normal">{results.dietChart}</pre>
+              <pre className="whitespace-pre-wrap text-sm font-normal">
+                {results.dietChart}
+              </pre>
             </div>
           </div>
         )}

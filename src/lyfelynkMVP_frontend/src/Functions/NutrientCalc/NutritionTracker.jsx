@@ -27,7 +27,7 @@ const NutritionTracker = ({ updateHealthData }) => {
   const [data, setData] = useState([]);
   const [meals, setMeals] = useState([]);
   const [totalNutrients, setTotalNutrients] = useState({});
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
@@ -89,13 +89,16 @@ const NutritionTracker = ({ updateHealthData }) => {
       Object.entries(totalNutrients).map(([key, value]) => [
         key,
         Number(value.toFixed(2)),
-      ])
+      ]),
     );
   };
 
   const handleAddMeal = (selectedFood) => {
-    setMeals((prevMeals) => [...prevMeals, { ...selectedFood, quantity: 100, isUnit: false }]);
-    setSearchQuery('');
+    setMeals((prevMeals) => [
+      ...prevMeals,
+      { ...selectedFood, quantity: 100, isUnit: false },
+    ]);
+    setSearchQuery("");
   };
 
   const handleRemoveMeal = (index) => {
@@ -211,11 +214,15 @@ const NutritionTracker = ({ updateHealthData }) => {
               <Input
                 type="number"
                 value={meal.quantity}
-                onChange={(e) => handleItemChange(index, "quantity", Number(e.target.value))}
+                onChange={(e) =>
+                  handleItemChange(index, "quantity", Number(e.target.value))
+                }
                 placeholder="Quantity"
               />
               <Select
-                onValueChange={(value) => handleItemChange(index, "isUnit", value === "units")}
+                onValueChange={(value) =>
+                  handleItemChange(index, "isUnit", value === "units")
+                }
                 value={meal.isUnit ? "units" : "grams"}
               >
                 <SelectTrigger className="w-[100px]">

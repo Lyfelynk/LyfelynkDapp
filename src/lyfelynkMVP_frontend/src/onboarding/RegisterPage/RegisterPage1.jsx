@@ -25,11 +25,20 @@ const formSchema = z.object({
     required_error: "Gender is required",
   }),
   bloodType: z.string().optional(),
-  height: z.string().regex(/^\d*\.?\d*$/, "Height must be a number").optional(),
+  height: z
+    .string()
+    .regex(/^\d*\.?\d*$/, "Height must be a number")
+    .optional(),
   country: z.string().optional(),
-  weight: z.string().regex(/^\d*\.?\d*$/, "Weight must be a number").optional(),
+  weight: z
+    .string()
+    .regex(/^\d*\.?\d*$/, "Weight must be a number")
+    .optional(),
   state: z.string().optional(),
-  heartRate: z.string().regex(/^\d*$/, "Heart rate must be a whole number").optional(),
+  heartRate: z
+    .string()
+    .regex(/^\d*$/, "Heart rate must be a whole number")
+    .optional(),
   pincode: z.string().min(1, "Pincode is required"),
 });
 
@@ -58,8 +67,8 @@ export default function RegisterPage1Content() {
 
   const handleNumericInputChange = (e) => {
     const { id, value } = e.target;
-    const regex = id === 'heartRate' ? /^\d*$/ : /^\d*\.?\d*$/;
-    if (regex.test(value) || value === '') {
+    const regex = id === "heartRate" ? /^\d*$/ : /^\d*\.?\d*$/;
+    if (regex.test(value) || value === "") {
       setFormData((prev) => ({ ...prev, [id]: value }));
     }
   };
@@ -87,7 +96,9 @@ export default function RegisterPage1Content() {
 
       // Convert JSON strings to Uint8Array
       const demoInfoArray = new TextEncoder().encode(demoInfoJson);
-      const basicHealthParaArray = new TextEncoder().encode(basicHealthParaJson);
+      const basicHealthParaArray = new TextEncoder().encode(
+        basicHealthParaJson,
+      );
 
       // Step 2: Fetch the encrypted key using encrypted_symmetric_key_for_dataAsset
       const seed = window.crypto.getRandomValues(new Uint8Array(32));
@@ -235,7 +246,10 @@ export default function RegisterPage1Content() {
 
             <div className="grid grid-cols-2 gap-4 py-4">
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="name">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="name"
+                >
                   Name *
                 </label>
                 <div className="mt-1">
@@ -246,12 +260,17 @@ export default function RegisterPage1Content() {
                     onChange={handleInputChange}
                     required
                   />
-                  {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                  {errors.name && (
+                    <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="dob">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="dob"
+                >
                   Date of Birth *
                 </label>
                 <div className="mt-1">
@@ -262,18 +281,25 @@ export default function RegisterPage1Content() {
                     onChange={handleInputChange}
                     required
                   />
-                  {errors.dob && <p className="text-red-500 text-xs mt-1">{errors.dob}</p>}
+                  {errors.dob && (
+                    <p className="text-red-500 text-xs mt-1">{errors.dob}</p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="gender">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="gender"
+                >
                   Gender *
                 </label>
                 <div className="mt-1">
                   <Select
                     value={formData.gender}
-                    onValueChange={(value) => handleSelectChange("gender", value)}
+                    onValueChange={(value) =>
+                      handleSelectChange("gender", value)
+                    }
                   >
                     <SelectTrigger id="gender">
                       <SelectValue placeholder="Select" />
@@ -284,18 +310,25 @@ export default function RegisterPage1Content() {
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender}</p>}
+                  {errors.gender && (
+                    <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="blood_type">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="blood_type"
+                >
                   Blood Type
                 </label>
                 <div className="mt-1">
                   <Select
                     value={formData.bloodType}
-                    onValueChange={(value) => handleSelectChange("bloodType", value)}
+                    onValueChange={(value) =>
+                      handleSelectChange("bloodType", value)
+                    }
                   >
                     <SelectTrigger id="blood_type">
                       <SelectValue placeholder="Select" />
@@ -315,7 +348,10 @@ export default function RegisterPage1Content() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="height">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="height"
+                >
                   Height
                 </label>
                 <div className="mt-1">
@@ -327,12 +363,17 @@ export default function RegisterPage1Content() {
                     value={formData.height}
                     onChange={handleNumericInputChange}
                   />
-                  {errors.height && <p className="text-red-500 text-xs mt-1">{errors.height}</p>}
+                  {errors.height && (
+                    <p className="text-red-500 text-xs mt-1">{errors.height}</p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="country">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="country"
+                >
                   Country
                 </label>
                 <div className="mt-1">
@@ -346,7 +387,10 @@ export default function RegisterPage1Content() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="weight">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="weight"
+                >
                   Weight
                 </label>
                 <div className="mt-1">
@@ -358,12 +402,17 @@ export default function RegisterPage1Content() {
                     value={formData.weight}
                     onChange={handleNumericInputChange}
                   />
-                  {errors.weight && <p className="text-red-500 text-xs mt-1">{errors.weight}</p>}
+                  {errors.weight && (
+                    <p className="text-red-500 text-xs mt-1">{errors.weight}</p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="state">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="state"
+                >
                   State
                 </label>
                 <div className="mt-1">
@@ -377,7 +426,10 @@ export default function RegisterPage1Content() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="heartRate">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="heartRate"
+                >
                   Heart Rate
                 </label>
                 <div className="mt-1">
@@ -389,12 +441,19 @@ export default function RegisterPage1Content() {
                     value={formData.heartRate}
                     onChange={handleNumericInputChange}
                   />
-                  {errors.heartRate && <p className="text-red-500 text-xs mt-1">{errors.heartRate}</p>}
+                  {errors.heartRate && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.heartRate}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium leading-5 text-foreground" htmlFor="pincode">
+                <label
+                  className="block text-sm font-medium leading-5 text-foreground"
+                  htmlFor="pincode"
+                >
                   Pincode *
                 </label>
                 <div className="mt-1">
@@ -405,7 +464,11 @@ export default function RegisterPage1Content() {
                     onChange={handleInputChange}
                     required
                   />
-                  {errors.pincode && <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>}
+                  {errors.pincode && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.pincode}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

@@ -299,7 +299,7 @@ const BMICalculator = ({ updateHealthData }) => {
               <h3 className="text-lg font-semibold mb-2">
                 Suggested {preference} Diet Chart:
               </h3>
-              <pre className="whitespace-pre-wrap text-sm font-normal">
+              <pre className="whitespace-pre-wrap text-sm font-normal p-4 rounded-md border">
                 {results.dietChart}
               </pre>
             </div>

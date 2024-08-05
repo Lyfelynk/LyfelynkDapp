@@ -31,11 +31,11 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <ShoppingCart />,
       text: "Marketplace",
     },
-    {
-      to: "/Health-User/Gamification",
-      icon: <Gamepad />,
-      text: "Gamification",
-    },
+    // {
+    //   to: "/Health-User/Gamification",
+    //   icon: <Gamepad />,
+    //   text: "Gamification",
+    // },
     { to: "/Health-User/Profile", icon: <User />, text: "Profile" },
   ];
 

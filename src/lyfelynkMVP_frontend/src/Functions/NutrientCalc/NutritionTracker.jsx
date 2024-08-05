@@ -23,7 +23,7 @@ import {
 import { Search } from "lucide-react";
 import { parseCSV } from "./csvParser";
 
-const NutritionTracker = () => {
+const NutritionTracker = ({ updateHealthData }) => {
   const [data, setData] = useState([]);
   const [meals, setMeals] = useState([]);
   const [totalNutrients, setTotalNutrients] = useState({});
@@ -113,6 +113,16 @@ const NutritionTracker = () => {
   const handleCalculate = () => {
     const total = calculateNutrients(meals);
     setTotalNutrients(total);
+
+    // Update the main Analytics component's state
+    updateHealthData({
+      calories: total.calories,
+      proteinIntake: total.protein_g,
+      carbIntake: total.carbohydrates_total_g,
+      fatIntake: total.fat_total_g,
+    });
+
+    console.log("Nutrition Tracker updating health data", total);
   };
 
   const renderPieChart = () => {

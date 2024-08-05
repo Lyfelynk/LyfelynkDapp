@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-const BMICalculator = () => {
+const BMICalculator = ({ updateHealthData }) => {
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [preference, setPreference] = useState("Veg");
@@ -23,11 +23,23 @@ const BMICalculator = () => {
       const bmi = weightNum / heightMeters ** 2;
       const category = getBMICategory(bmi);
 
-      setResults({
+      const results = {
         bmi: bmi.toFixed(2),
         category,
         dietChart: generateDietChart(category, preference),
+      };
+
+      setResults(results);
+
+      updateHealthData({
+        height: heightCmNum,
+        weight: weightNum,
+        bmi: bmi.toFixed(2),
+        bmiStatus: category,
+        dietPlan: results.dietChart,
       });
+      console.log("BMI Calculator updating health data");
+
     } else {
       if (weightNum <= 0) {
         setError("Please enter a positive value for weight.");
@@ -123,11 +135,9 @@ const BMICalculator = () => {
 
     return diets[category][preference]
       .map(
-        (meal) => `
-        <p><strong>${meal[0]}</strong> (${meal[2]} kcal): ${meal[1]}</p>
-      `,
+        (meal) => `${meal[0]} (${meal[2]} kcal):\n${meal[1]}\n`
       )
-      .join("");
+      .join("\n");
   };
 
   return (
@@ -190,7 +200,7 @@ const BMICalculator = () => {
               <h3 className="text-lg font-semibold mb-2">
                 Suggested {preference} Diet Chart:
               </h3>
-              <div dangerouslySetInnerHTML={{ __html: results.dietChart }} />
+              <pre className="whitespace-pre-wrap text-sm font-normal">{results.dietChart}</pre>
             </div>
           </div>
         )}

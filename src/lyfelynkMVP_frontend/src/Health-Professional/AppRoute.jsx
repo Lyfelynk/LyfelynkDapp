@@ -6,10 +6,12 @@ import DashboardContent from "./Pages/Dashboard";
 import MarketplaceContent from "./Pages/Marketplace";
 import ProfileContent from "./Pages/Profile";
 import UploadContent from "./Pages/UploadPage";
-import Records from "../Health-Professional/Pages/Records";
+import YourRecords from "./Pages/Records/YourRecords";
+import SharedWithYou from "./Pages/Records/SharedWithYou";
 
 import NotFoundPage from "./NotFoundPage";
 import AppBanner from "../AppBanner";
+
 
 export default function AppRoute1() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -34,7 +36,8 @@ export default function AppRoute1() {
           </div>
           <Routes>
             <Route path="/Home" element={<DashboardContent />} />
-            <Route path="/Records" element={<Records />} />
+            <Route path="/Records/Your-Records" element={<YourRecords />} />
+            <Route path="/Records/Shared-With-You" element={<SharedWithYou />} />
             <Route path="/Upload" element={<UploadContent />} />
             <Route path="/Marketplace" element={<MarketplaceContent />} />
             <Route path="/Profile" element={<ProfileContent />} />

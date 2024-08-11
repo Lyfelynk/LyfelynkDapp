@@ -1,5 +1,16 @@
 {
   "canisters": {
+    "internet_identity": {
+      "type": "custom",
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "frontend": {}
+    },
     "vetkd_system_api": {
       "candid": "vetkd_system_api.did",
       "type": "custom",
@@ -10,12 +21,29 @@
       "candid": "https://raw.githubusercontent.com/dfinity/ic/ff10ea1dba07c0f66c66536a46a97146cf260e90/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/ff10ea1dba07c0f66c66536a46a97146cf260e90/canisters/ic-icrc1-ledger.wasm.gz"
     },
-    "lyfelynkMVP_backend": {
-      "main": "src/lyfelynkMVP_backend/main.mo",
+    "User": {
+      "main": "src/lyfelynkMVP_backend/User/UserService.mo",
+      "type": "motoko"
+    },
+    "UserShard": {
+      "main": "src/lyfelynkMVP_backend/User/UserShardManager.mo",
+      "type": "motoko"
+    },
+
+    "Professional": {
+      "main": "src/lyfelynkMVP_backend/Professional/ProfessionalService.mo",
+      "type": "motoko"
+    },
+    "Facility": {
+      "main": "src/lyfelynkMVP_backend/Facility/FacilityService.mo",
+      "type": "motoko"
+    },
+    "DataAsset": {
+      "main": "src/lyfelynkMVP_backend/DataAsset/DataAssetService.mo",
       "type": "motoko"
     },
     "lyfelynkMVP_frontend": {
-      "dependencies": ["lyfelynkMVP_backend"],
+      "dependencies": ["User", "Professional", "Facility", "DataAsset"],
       "source": ["src/lyfelynkMVP_frontend/dist"],
       "type": "assets",
       "workspace": "lyfelynkMVP_frontend"

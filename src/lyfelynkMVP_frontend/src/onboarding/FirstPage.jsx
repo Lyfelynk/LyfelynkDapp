@@ -1,56 +1,46 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { ConnectButton, ConnectDialog } from "@connect2ic/react";
-import { useCanister } from "@connect2ic/react";
+import { AuthClient } from "@dfinity/auth-client";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import LoadingScreen from "../LoadingScreen";
 import OnboardingBanner from "../OnboardingBanner";
 import { ChevronRight, User, BriefcaseMedical, Building } from "lucide-react";
+import ActorContext from "../ActorContext";
 
 export default function FirstPageContent() {
   const navigate = useNavigate();
+  const { actors, isAuthenticated, login } = useContext(ActorContext);
 
-  const [registrationStatus, setRegistrationStatus] = useState();
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isCalled, setIsCalled] = useState(true);
+  // const [registrationStatus, setRegistrationStatus] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const checkRegistration = (type) => {
-    if (registrationStatus === "User") {
-      navigate("/Health-User/Home");
-    } else if (registrationStatus === "Professional") {
-      navigate("/Health-Professional/Home");
-    } else if (registrationStatus === "Facility") {
-      navigate("/Health-Service/Home");
-    } else {
-      navigate(`/Register/${type}`);
+  const checkRegistration = async (type) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Error",
+        description: "Please log in first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      let resultOfRegistration = await actors.user.whoami();
+      console.log(resultOfRegistration);
+      console.log(type);
+      navigate("/Register/Health-User"); //For Demo only
+
+      // Your navigation logic here based on the registration status and type
+    } catch (error) {
+      console.error("Error checking registration:", error);
+      toast({
+        title: "Error",
+        description: "Failed to check registration status",
+        variant: "destructive",
+      });
     }
   };
-
-  useEffect(() => {
-    setIsLoading(true);
-    const updateRegistrationStatus = async () => {
-      try {
-        const result = await lyfelynkMVP_backend.isRegistered();
-        console.log(result);
-        setIsCalled(!isCalled);
-        setRegistrationStatus(result);
-      } catch (error) {
-        toast({
-          title: "Alert!",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-    };
-
-    updateRegistrationStatus();
-  }, [lyfelynkMVP_backend]);
-
-  useEffect(() => {
-    setIsLoading(false);
-  }, [isCalled]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -63,7 +53,11 @@ export default function FirstPageContent() {
         <div className="flex flex-col md:flex-row md:w-1/2">
           <div className="flex-1 flex flex-col justify-center text-white p-4">
             <div className="flex items-center mb-4">
-              <img alt="Logo" className="h-10 w-48" src="assets/lyfelynk.png" />
+              <img
+                alt="Logo"
+                className="h-10 w-48"
+                src="assets/lyfelynk.png"
+              />
             </div>
             <p className="text-xl md:text-2xl">
               Digitally Linking your health.
@@ -76,9 +70,12 @@ export default function FirstPageContent() {
                 Get Started
               </h2>
               <div className="auth-section">
-                <ConnectButton />
+                {!isAuthenticated ? (
+                  <Button onClick={login}>Login</Button>
+                ) : (
+                  <Button disabled>Logged In</Button>
+                )}
               </div>
-              <ConnectDialog />
             </div>
             <p className="text-sm text-gray-500 mb-4">Login/Register As</p>
             <div>

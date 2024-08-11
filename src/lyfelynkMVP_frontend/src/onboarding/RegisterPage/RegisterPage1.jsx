@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCanister } from "@connect2ic/react";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,7 @@ import LoadingScreen from "../../LoadingScreen";
 import OnboardingBanner from "../../OnboardingBanner";
 import * as vetkd from "ic-vetkd-utils";
 import { z } from "zod";
+import ActorContext from "../../ActorContext";
 
 // Define the Zod schema
 const formSchema = z.object({
@@ -44,7 +44,8 @@ const formSchema = z.object({
 
 export default function RegisterPage1Content() {
   const navigate = useNavigate();
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+
+  const { actors, isAuthenticated, login } = useContext(ActorContext);
   const [formData, setFormData] = useState({
     name: "",
     dob: "",
@@ -57,6 +58,7 @@ export default function RegisterPage1Content() {
     heartRate: "",
     pincode: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -97,15 +99,15 @@ export default function RegisterPage1Content() {
       // Convert JSON strings to Uint8Array
       const demoInfoArray = new TextEncoder().encode(demoInfoJson);
       const basicHealthParaArray = new TextEncoder().encode(
-        basicHealthParaJson,
+        basicHealthParaJson
       );
 
       // Step 2: Fetch the encrypted key using encrypted_symmetric_key_for_dataAsset
       const seed = window.crypto.getRandomValues(new Uint8Array(32));
       const tsk = new vetkd.TransportSecretKey(seed);
       const encryptedKeyResult =
-        await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-          Object.values(tsk.public_key()),
+        await actors.user.encrypted_symmetric_key_for_user(
+          Object.values(tsk.public_key())
         );
 
       let encryptedKey = "";
@@ -130,9 +132,8 @@ export default function RegisterPage1Content() {
         return;
       }
 
-      const pkBytesHex =
-        await lyfelynkMVP_backend.symmetric_key_verification_key();
-      const principal = await lyfelynkMVP_backend.whoami();
+      const pkBytesHex = await actors.user.symmetric_key_verification_key();
+      const principal = await actors.user.whoami();
       console.log(pkBytesHex);
       console.log(encryptedKey);
       const aesGCMKey = tsk.decrypt_and_hash(
@@ -140,20 +141,20 @@ export default function RegisterPage1Content() {
         hex_decode(pkBytesHex),
         new TextEncoder().encode(principal),
         32,
-        new TextEncoder().encode("aes-256-gcm"),
+        new TextEncoder().encode("aes-256-gcm")
       );
       console.log(aesGCMKey);
 
       const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
       const encryptedDataBasicHealth = await aes_gcm_encrypt(
         basicHealthParaArray,
-        aesGCMKey,
+        aesGCMKey
       );
-      const result = await lyfelynkMVP_backend.createUser(
+      const result = await actors.user.createUser(
         Object.values(encryptedDataDemo),
         Object.values(encryptedDataBasicHealth),
         [],
-        [],
+        []
       );
       Object.keys(result).forEach((key) => {
         if (key == "err") {
@@ -195,12 +196,12 @@ export default function RegisterPage1Content() {
       rawKey,
       "AES-GCM",
       false,
-      ["encrypt"],
+      ["encrypt"]
     );
     const ciphertext_buffer = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      data,
+      data
     );
     const ciphertext = new Uint8Array(ciphertext_buffer);
     const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
@@ -211,7 +212,7 @@ export default function RegisterPage1Content() {
 
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
     );
 
   if (loading) {
@@ -472,7 +473,10 @@ export default function RegisterPage1Content() {
                 </div>
               </div>
             </div>
-            <Button className="w-full" onClick={registerUser}>
+            <Button
+              className="w-full"
+              onClick={registerUser}
+            >
               Submit
             </Button>
           </div>

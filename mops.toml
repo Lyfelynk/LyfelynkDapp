@@ -1,4 +1,5 @@
 [dependencies]
-base = "0.11.1"
-map = "9.0.1"
+base = "0.11.2"
 uuid = "1.0.0"
+stableheapbtreemap = "1.5.0"
+map = "9.0.1"

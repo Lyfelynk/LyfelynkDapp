@@ -2,12 +2,7 @@
   "icrc1_ledger_canister": {
     "ic": "344ue-aaaaa-aaaag-ak6fq-cai"
   },
-  "lyfelynkMVP_backend": {
-    "ic": "cn6uk-5aaaa-aaaag-ak43q-cai"
-  },
-  "lyfelynkMVP_frontend": {
-    "ic": "daqqe-siaaa-aaaag-ak44a-cai"
-  },
+
   "vetkd_system_api": {
     "ic": "ck7s6-qyaaa-aaaag-ak43a-cai"
   }

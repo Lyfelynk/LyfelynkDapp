@@ -1,15 +1,9 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import DataOnSaleTable from "../Tables/DataOnSale";
 import DataPurchasedTable from "../Tables/DataPurchased";
 import Wallet from "../../Functions/Wallet";
+import NewWallet from "../../Functions/NewWallet";
 
 export default function MarketplaceContent() {
   return (
@@ -20,8 +14,9 @@ export default function MarketplaceContent() {
           Explore and Acquire Critical Health Insights responsibly.
         </p>
 
-        <div className="pt-4 pb-10">
-          <Wallet />
+        <div className="pt-4 pb-10 space-y-4">
+          {/* <Wallet /> */}
+          <NewWallet />
         </div>
 
         <Tabs defaultValue="Purchase" className="">

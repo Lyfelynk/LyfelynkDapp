@@ -31,7 +31,6 @@ const NutritionTracker = ({ updateHealthData }) => {
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
-    // Load and parse CSV data
     const loadData = async () => {
       const response = await fetch("./nutrition_data.csv");
       const csvText = await response.text();
@@ -117,7 +116,6 @@ const NutritionTracker = ({ updateHealthData }) => {
     const total = calculateNutrients(meals);
     setTotalNutrients(total);
 
-    // Update the main Analytics component's state
     updateHealthData({
       calories: total.calories,
       proteinIntake: total.protein_g,
@@ -137,13 +135,16 @@ const NutritionTracker = ({ updateHealthData }) => {
     const COLORS = ["#0088FE", "#00C49F", "#FFBB28"];
 
     return (
-      <PieChart width={400} height={400}>
+      <PieChart
+        width={window.innerWidth < 768 ? 200 : 400}
+        height={window.innerWidth < 768 ? 200 : 400}
+      >
         <Pie
           data={data}
-          cx={200}
-          cy={200}
-          innerRadius={60}
-          outerRadius={80}
+          cx="50%"
+          cy="50%"
+          innerRadius={window.innerWidth < 768 ? 40 : 60}
+          outerRadius={window.innerWidth < 768 ? 60 : 80}
           fill="#8884d8"
           paddingAngle={5}
           dataKey="value"
@@ -163,8 +164,8 @@ const NutritionTracker = ({ updateHealthData }) => {
       { name: "Total Fat", value: totalNutrients.fat_total_g },
       { name: "Saturated Fat", value: totalNutrients.fat_saturated_g },
       { name: "Protein", value: totalNutrients.protein_g },
-      { name: "Sodium", value: totalNutrients.sodium_mg / 100 }, // Scaled down for visibility
-      { name: "Potassium", value: totalNutrients.potassium_mg / 100 }, // Scaled down for visibility
+      { name: "Sodium", value: totalNutrients.sodium_mg / 100 },
+      { name: "Potassium", value: totalNutrients.potassium_mg / 100 },
       { name: "Cholesterol", value: totalNutrients.cholesterol_mg },
       { name: "Carbs", value: totalNutrients.carbohydrates_total_g },
       { name: "Fiber", value: totalNutrients.fiber_g },
@@ -172,7 +173,11 @@ const NutritionTracker = ({ updateHealthData }) => {
     ];
 
     return (
-      <BarChart width={600} height={300} data={data}>
+      <BarChart
+        width={window.innerWidth < 768 ? 300 : 600}
+        height={window.innerWidth < 768 ? 200 : 300}
+        data={data}
+      >
         <XAxis dataKey="name" />
         <YAxis />
         <Tooltip />
@@ -193,15 +198,17 @@ const NutritionTracker = ({ updateHealthData }) => {
           className="w-full mb-2 pr-10"
         />
         <Search className="absolute right-2 top-2.5 w-5 h-5 text-gray-400" />
-        {searchResults.map((food) => (
-          <Button
-            key={food.name}
-            onClick={() => handleAddMeal(food)}
-            className="mr-2 mb-2"
-          >
-            {food.name}
-          </Button>
-        ))}
+        <div className="flex flex-wrap">
+          {searchResults.map((food) => (
+            <Button
+              key={food.name}
+              onClick={() => handleAddMeal(food)}
+              className="mr-2 mb-2"
+            >
+              {food.name}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {meals.map((meal, index) => (
@@ -210,7 +217,7 @@ const NutritionTracker = ({ updateHealthData }) => {
             <CardTitle>{meal.name}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex space-x-2 mb-2">
+            <div className="flex flex-wrap space-x-2 mb-2">
               <Input
                 type="number"
                 value={meal.quantity}
@@ -218,6 +225,7 @@ const NutritionTracker = ({ updateHealthData }) => {
                   handleItemChange(index, "quantity", Number(e.target.value))
                 }
                 placeholder="Quantity"
+                className="w-24"
               />
               <Select
                 onValueChange={(value) =>
@@ -233,7 +241,12 @@ const NutritionTracker = ({ updateHealthData }) => {
                   <SelectItem value="units">units</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={() => handleRemoveMeal(index)}>Remove</Button>
+              <Button
+                onClick={() => handleRemoveMeal(index)}
+                className="bg-red-500 text-white"
+              >
+                Remove
+              </Button>
             </div>
           </CardContent>
         </Card>

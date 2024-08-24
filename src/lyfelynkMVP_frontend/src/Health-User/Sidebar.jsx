@@ -54,6 +54,11 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <ShoppingCart />,
       text: "Marketplace",
     },
+    {
+      to: "/Health-User/Gamification",
+      icon: <ShoppingCart />,
+      text: "Gamification",
+    },
     { to: "/Health-User/Profile", icon: <User />, text: "Profile" },
   ];
 
@@ -77,7 +82,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             onClick={toggleSidebar}
             className={`text-gray-900 dark:text-white focus:outline-none transition-transform duration-300 ease-in-out ${
               isExpanded ? "ml-auto" : ""
-            }`}
+            } hidden lg:block`}
           >
             {isExpanded ? (
               <ChevronLeft size="32" className="border p-1 rounded-lg" />

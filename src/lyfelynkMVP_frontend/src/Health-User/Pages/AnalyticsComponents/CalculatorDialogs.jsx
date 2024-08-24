@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ChevronRightIcon } from "lucide-react";
 import BMICalculator from "../../../Functions/bmicalc";
 import NutritionTracker from "../../../Functions/NutrientCalc/NutritionTracker";
@@ -69,10 +69,12 @@ export default function CalculatorDialogs({ updateHealthData }) {
               Track your daily nutrients intake to maintain a healthy lifestyle.
             </DialogDescription>
           </DialogHeader>
-          <ScrollArea className="h-[400px] sm:h-[600px]">
-            <div className="grid gap-4 py-4">
+          <ScrollArea className="h-[400px] sm:h-[600px] overflow-auto">
+            <div className="flex w-max space-x-4 p-4">
               <NutritionTracker updateHealthData={updateHealthData} />
             </div>
+            <ScrollBar orientation="horizontal" />
+            <ScrollBar orientation="vertical" />
           </ScrollArea>
         </DialogContent>
       </Dialog>

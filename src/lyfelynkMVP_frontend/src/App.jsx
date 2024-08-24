@@ -28,6 +28,7 @@ import ActorContext from "./ActorContext";
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
 import AdminDashboard from "./AdminDashboard";
+import ConnectPage from "./onboarding/ConnectPage";
 
 function App() {
   const [actors, setActors] = useState({
@@ -108,7 +109,8 @@ function App() {
         <Router>
           <Routes>
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/" element={<Navigate to="/Register" />} />
+            <Route path="/" element={<Navigate to="/Connect" />} />
+            <Route path="/Connect" element={<ConnectPage />} />
 
             <Route path="/Register" element={<FirstPageContent />} />
             <Route path="/Register">

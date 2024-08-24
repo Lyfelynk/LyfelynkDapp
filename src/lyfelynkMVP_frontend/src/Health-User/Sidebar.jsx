@@ -35,13 +35,25 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <BookText />,
       text: "Records",
       subMenu: [
-        { to: "/Health-User/Records/Your-Records", icon: <FileText />, text: "Your Records" },
-        { to: "/Health-User/Records/Shared-With-You", icon: <Share2 />, text: "Shared with You" },
+        {
+          to: "/Health-User/Records/Your-Records",
+          icon: <FileText />,
+          text: "Your Records",
+        },
+        {
+          to: "/Health-User/Records/Shared-With-You",
+          icon: <Share2 />,
+          text: "Shared with You",
+        },
       ],
     },
     { to: "/Health-User/Upload", icon: <Upload />, text: "Upload" },
     { to: "/Health-User/Analytics", icon: <Heart />, text: "Analytics" },
-    { to: "/Health-User/Marketplace", icon: <ShoppingCart />, text: "Marketplace" },
+    {
+      to: "/Health-User/Marketplace",
+      icon: <ShoppingCart />,
+      text: "Marketplace",
+    },
     { to: "/Health-User/Profile", icon: <User />, text: "Profile" },
   ];
 
@@ -87,7 +99,11 @@ const Sidebar = ({ isOpen, onClose }) => {
                       <span>{link.icon}</span>
                       <span className="ml-3">{link.text}</span>
                       <span className="ml-auto">
-                        {isRecordsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        {isRecordsOpen ? (
+                          <ChevronUp size={16} />
+                        ) : (
+                          <ChevronDown size={16} />
+                        )}
                       </span>
                     </button>
                   ) : (
@@ -111,7 +127,9 @@ const Sidebar = ({ isOpen, onClose }) => {
                             }
                           >
                             <span>{subLink.icon}</span>
-                            {isExpanded && <span className="ml-3">{subLink.text}</span>}
+                            {isExpanded && (
+                              <span className="ml-3">{subLink.text}</span>
+                            )}
                           </NavLink>
                         </li>
                       ))}

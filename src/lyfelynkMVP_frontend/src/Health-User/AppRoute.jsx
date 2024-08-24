@@ -14,7 +14,6 @@ import SharedWithYou from "./Pages/Records/SharedWithYou";
 import NotFoundPage from "./NotFoundPage";
 import AppBanner from "../AppBanner";
 
-
 export default function AppRoute1() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -39,7 +38,10 @@ export default function AppRoute1() {
           <Routes>
             <Route path="/Home" element={<DashboardContent />} />
             <Route path="/Records/Your-Records" element={<YourRecords />} />
-            <Route path="/Records/Shared-With-You" element={<SharedWithYou />} />
+            <Route
+              path="/Records/Shared-With-You"
+              element={<SharedWithYou />}
+            />
             <Route path="/Analytics" element={<AnalyticsContent />} />
             <Route path="/Upload" element={<UploadContent />} />
             <Route path="/Marketplace" element={<MarketplaceContent />} />

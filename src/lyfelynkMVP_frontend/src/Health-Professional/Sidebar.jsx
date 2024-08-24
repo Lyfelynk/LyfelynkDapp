@@ -29,18 +29,34 @@ const Sidebar = ({ isOpen, onClose }) => {
   };
 
   const links = [
-    { to: "/Health-Professional/Home", icon: <LayoutDashboard />, text: "Dashboard" },
+    {
+      to: "/Health-Professional/Home",
+      icon: <LayoutDashboard />,
+      text: "Dashboard",
+    },
     {
       to: "/Health-Professional/Records",
       icon: <BookText />,
       text: "Records",
       subMenu: [
-        { to: "/Health-Professional/Records/Your-Records", icon: <FileText />, text: "Your Records" },
-        { to: "/Health-Professional/Records/Shared-With-You", icon: <Share2 />, text: "Shared with You" },
+        {
+          to: "/Health-Professional/Records/Your-Records",
+          icon: <FileText />,
+          text: "Your Records",
+        },
+        {
+          to: "/Health-Professional/Records/Shared-With-You",
+          icon: <Share2 />,
+          text: "Shared with You",
+        },
       ],
     },
     { to: "/Health-Professional/Upload", icon: <Upload />, text: "Upload" },
-    { to: "/Health-Professional/Marketplace", icon: <ShoppingCart />, text: "Marketplace" },
+    {
+      to: "/Health-Professional/Marketplace",
+      icon: <ShoppingCart />,
+      text: "Marketplace",
+    },
     { to: "/Health-Professional/Profile", icon: <User />, text: "Profile" },
   ];
 
@@ -86,7 +102,11 @@ const Sidebar = ({ isOpen, onClose }) => {
                       <span>{link.icon}</span>
                       <span className="ml-3">{link.text}</span>
                       <span className="ml-auto">
-                        {isRecordsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        {isRecordsOpen ? (
+                          <ChevronUp size={16} />
+                        ) : (
+                          <ChevronDown size={16} />
+                        )}
                       </span>
                     </button>
                   ) : (
@@ -110,7 +130,9 @@ const Sidebar = ({ isOpen, onClose }) => {
                             }
                           >
                             <span>{subLink.icon}</span>
-                            {isExpanded && <span className="ml-3">{subLink.text}</span>}
+                            {isExpanded && (
+                              <span className="ml-3">{subLink.text}</span>
+                            )}
                           </NavLink>
                         </li>
                       ))}

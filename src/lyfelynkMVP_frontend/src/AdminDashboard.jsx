@@ -48,11 +48,7 @@ function AdminDashboard() {
       <h1>LyfeLynk Admin Management</h1>
       <form onSubmit={handleUpdateWasmModule}>
         <h2>Update WASM Module</h2>
-        <input
-          type="file"
-          accept=".wasm"
-          onChange={handleWasmFileChange}
-        />
+        <input type="file" accept=".wasm" onChange={handleWasmFileChange} />
         <button type="submit">Update WASM Module</button>
       </form>
       <div>

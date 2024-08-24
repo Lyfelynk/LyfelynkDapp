@@ -73,7 +73,9 @@ export default function HealthDashboard({ healthData }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <pre className="p-4 border rounded-md whitespace-pre-wrap">{healthData.dietPlan}</pre>
+          <pre className="p-4 border rounded-md whitespace-pre-wrap">
+            {healthData.dietPlan}
+          </pre>
         </CardContent>
       </Card>
     </div>

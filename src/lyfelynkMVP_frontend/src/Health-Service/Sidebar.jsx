@@ -29,18 +29,34 @@ const Sidebar = ({ isOpen, onClose }) => {
   };
 
   const links = [
-    { to: "/Health-Service/Home", icon: <LayoutDashboard />, text: "Dashboard" },
+    {
+      to: "/Health-Service/Home",
+      icon: <LayoutDashboard />,
+      text: "Dashboard",
+    },
     {
       to: "/Health-Service/Records",
       icon: <BookText />,
       text: "Records",
       subMenu: [
-        { to: "/Health-Service/Records/Your-Records", icon: <FileText />, text: "Your Records" },
-        { to: "/Health-Service/Records/Shared-With-You", icon: <Share2 />, text: "Shared with You" },
+        {
+          to: "/Health-Service/Records/Your-Records",
+          icon: <FileText />,
+          text: "Your Records",
+        },
+        {
+          to: "/Health-Service/Records/Shared-With-You",
+          icon: <Share2 />,
+          text: "Shared with You",
+        },
       ],
     },
     { to: "/Health-Service/Upload", icon: <Upload />, text: "Upload" },
-    { to: "/Health-Service/Marketplace", icon: <ShoppingCart />, text: "Marketplace" },
+    {
+      to: "/Health-Service/Marketplace",
+      icon: <ShoppingCart />,
+      text: "Marketplace",
+    },
     { to: "/Health-Service/Profile", icon: <User />, text: "Profile" },
   ];
 
@@ -86,7 +102,11 @@ const Sidebar = ({ isOpen, onClose }) => {
                       <span>{link.icon}</span>
                       <span className="ml-3">{link.text}</span>
                       <span className="ml-auto">
-                        {isRecordsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        {isRecordsOpen ? (
+                          <ChevronUp size={16} />
+                        ) : (
+                          <ChevronDown size={16} />
+                        )}
                       </span>
                     </button>
                   ) : (
@@ -110,7 +130,9 @@ const Sidebar = ({ isOpen, onClose }) => {
                             }
                           >
                             <span>{subLink.icon}</span>
-                            {isExpanded && <span className="ml-3">{subLink.text}</span>}
+                            {isExpanded && (
+                              <span className="ml-3">{subLink.text}</span>
+                            )}
                           </NavLink>
                         </li>
                       ))}

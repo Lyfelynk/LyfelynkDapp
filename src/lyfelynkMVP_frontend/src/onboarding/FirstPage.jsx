@@ -53,11 +53,7 @@ export default function FirstPageContent() {
         <div className="flex flex-col md:flex-row md:w-1/2">
           <div className="flex-1 flex flex-col justify-center text-white p-4">
             <div className="flex items-center mb-4">
-              <img
-                alt="Logo"
-                className="h-10 w-48"
-                src="assets/lyfelynk.png"
-              />
+              <img alt="Logo" className="h-10 w-48" src="assets/lyfelynk.png" />
             </div>
             <p className="text-xl md:text-2xl">
               Digitally Linking your health.

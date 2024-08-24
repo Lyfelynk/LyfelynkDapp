@@ -81,7 +81,7 @@ export default function AnalyticsContent() {
 
       <CalculatorDialogs updateHealthData={updateHealthData} />
       <HealthDashboard healthData={healthData} />
-      
+
       <Button onClick={resetHealthData} className="flex items-center mt-4">
         <RefreshCcw className="mr-2 w-4 h-4" />
         Reset Data

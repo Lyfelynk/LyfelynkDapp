@@ -41,6 +41,7 @@
     "jspdf": "^2.5.1",
     "lucide-react": "^0.363.0",
     "papaparse": "^5.4.1",
+    "prettier": "^3.3.3",
     "react": "^18.2.0",
     "react-day-picker": "^8.10.0",
     "react-dom": "^18.2.0",

@@ -23,11 +23,10 @@ import { createActor as createUserActor } from "../../declarations/User";
 import { createActor as createProfessionalActor } from "../../declarations/Professional";
 import { createActor as createFacilityActor } from "../../declarations/Facility";
 import { createActor as createDataAssetActor } from "../../declarations/DataAsset";
-import OnboardingBanner from "./OnboardingBanner";
 import ActorContext from "./ActorContext";
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
-import AdminDashboard from "./AdminDashboard";
+import Home from "./admin/Home";
 import ConnectPage from "./onboarding/ConnectPage";
 
 function App() {
@@ -108,7 +107,8 @@ function App() {
         <Toaster />
         <Router>
           <Routes>
-            <Route path="/admin" element={<AdminDashboard />} />
+            {/* <Route path="/admin" element={<AdminDashboard />} /> */}
+            <Route path="/admin" element={<Home />} />
             <Route path="/" element={<Navigate to="/Connect" />} />
             <Route path="/Connect" element={<ConnectPage />} />
 

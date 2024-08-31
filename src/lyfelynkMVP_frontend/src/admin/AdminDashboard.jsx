@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 
-import ActorContext from "./ActorContext";
+import ActorContext from "../ActorContext";
 
 function AdminDashboard() {
   const { actors, isAuthenticated, login } = useContext(ActorContext);

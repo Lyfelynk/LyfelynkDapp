@@ -113,6 +113,10 @@ function Home() {
   const [message, setMessage] = useState("");
   const [wasmFile, setWasmFile] = useState(null);
 
+  const adminRegister = () => {
+    setMessage(`adminRegister function is not implemented yet`);
+  };
+  
   const handleStatusChange = (type, id, action) => {
     setCurrentAction({ type, id, action });
     setIsDialogOpen(true);
@@ -149,23 +153,6 @@ function Home() {
       denied: "bg-red-500",
     };
     return <Badge className={`${colorMap[status]} text-white`}>{status}</Badge>;
-  };
-
-  const handleWasmFileChange = (event) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setWasmFile(event.target.files[0]);
-    }
-  };
-
-  const handleUpdateWasmModule = (event) => {
-    event.preventDefault();
-    if (wasmFile) {
-      setMessage(
-        `WASM module "${wasmFile.name}" update functionality not implemented`,
-      );
-    } else {
-      setMessage("Please select a WASM file");
-    }
   };
 
   // Table configurations
@@ -468,6 +455,13 @@ function Home() {
   return (
     <section className="container mx-auto py-10">
       <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
+
+      <div className="mb-4">
+        <Button onClick={adminRegister}>
+          Register Admin
+        </Button>
+      </div>
+
       <Tabs defaultValue="professionals" className="space-y-4">
         <TabsList>
           <TabsTrigger value="professionals">Professionals</TabsTrigger>

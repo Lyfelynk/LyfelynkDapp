@@ -10,9 +10,6 @@ import {
 import {
   ArrowUpDown,
   ChevronDown,
-  Upload,
-  RefreshCw,
-  AlertCircle,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -47,7 +44,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Select,
   SelectContent,
@@ -55,6 +51,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import WasmModuleUploader from "./WasmModuleUploader";
 
 function Home() {
   const [professionals, setProfessionals] = useState([
@@ -500,52 +497,7 @@ function Home() {
         </TabsContent>
       </Tabs>
 
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <RefreshCw className="mr-2 h-6 w-6" />
-            Update WASM Module
-          </CardTitle>
-          <CardDescription>
-            Upload and update the WASM module for the application
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleUpdateWasmModule} className="space-y-4">
-            <div className="items-center space-x-4">
-              <div
-                className="flex items-center justify-center w-full h-32 px-4 transition border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none"
-                onClick={() => document.getElementById("file-upload").click()}
-              >
-                <span className="flex items-center space-x-2">
-                  <Upload className="w-6 h-6 text-gray-600" />
-                  <span className="font-medium text-gray-600">
-                    {wasmFile ? wasmFile.name : "Click to upload WASM file"}
-                  </span>
-                </span>
-                <input
-                  id="file-upload"
-                  name="file-upload"
-                  type="file"
-                  accept=".wasm"
-                  className="hidden"
-                  onChange={handleWasmFileChange}
-                />
-              </div>
-              <Button type="submit" className="my-6">
-                Upload
-              </Button>
-            </div>
-          </form>
-          {message && (
-            <Alert className="mt-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Update Status</AlertTitle>
-              <AlertDescription>{message}</AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
+      <WasmModuleUploader/>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>

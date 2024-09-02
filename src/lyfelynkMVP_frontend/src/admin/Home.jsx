@@ -14,12 +14,7 @@ import {
   RefreshCw,
   AlertCircle,
 } from "lucide-react";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -39,7 +34,13 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -47,8 +48,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export default function Component() {
+function Home() {
   const [professionals, setProfessionals] = useState([
     {
       id: 1,
@@ -121,14 +129,14 @@ export default function Component() {
       if (type === "professional") {
         setProfessionals(
           professionals.map((p) =>
-            p.id === id ? { ...p, status: newStatus } : p
-          )
+            p.id === id ? { ...p, status: newStatus } : p,
+          ),
         );
       } else {
         setFacilities(
           facilities.map((f) =>
-            f.id === id ? { ...f, status: newStatus } : f
-          )
+            f.id === id ? { ...f, status: newStatus } : f,
+          ),
         );
       }
 
@@ -156,7 +164,7 @@ export default function Component() {
     event.preventDefault();
     if (wasmFile) {
       setMessage(
-        `WASM module "${wasmFile.name}" update functionality not implemented`
+        `WASM module "${wasmFile.name}" update functionality not implemented`,
       );
     } else {
       setMessage("Please select a WASM file");
@@ -200,6 +208,9 @@ export default function Component() {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
+      filterFn: (row, id, value) => {
+        return value === "all" ? true : row.getValue(id) === value;
+      },
     },
     {
       id: "actions",
@@ -262,6 +273,9 @@ export default function Component() {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
+      filterFn: (row, id, value) => {
+        return value === "all" ? true : row.getValue(id) === value;
+      },
     },
     {
       id: "actions",
@@ -334,14 +348,34 @@ export default function Component() {
   const renderTable = (table) => (
     <div>
       <div className="flex items-center justify-between py-4">
-        <Input
-          placeholder="Filter names..."
-          value={(table.getColumn("name")?.getFilterValue()) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        <div className="flex items-center space-x-2">
+          <Input
+            placeholder="Filter names..."
+            value={table.getColumn("name")?.getFilterValue() ?? ""}
+            onChange={(event) =>
+              table.getColumn("name")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+          <Select
+            value={table.getColumn("status")?.getFilterValue() ?? "all"}
+            onValueChange={(value) =>
+              table
+                .getColumn("status")
+                ?.setFilterValue(value === "all" ? "" : value)
+            }
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="denied">Denied</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -357,9 +391,7 @@ export default function Component() {
                   key={column.id}
                   className="capitalize"
                   checked={column.getIsVisible()}
-                  onCheckedChange={(value) =>
-                    column.toggleVisibility(!!value)
-                  }
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
                 >
                   {column.id}
                 </DropdownMenuCheckboxItem>
@@ -378,7 +410,7 @@ export default function Component() {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -396,7 +428,7 @@ export default function Component() {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -405,7 +437,7 @@ export default function Component() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={professionalColumns.length}
+                  colSpan={table.getAllColumns().length}
                   className="h-24 text-center"
                 >
                   No results.
@@ -448,7 +480,9 @@ export default function Component() {
           <Card>
             <CardHeader>
               <CardTitle>Professional Approval</CardTitle>
-              <CardDescription>Manage and approve professional accounts</CardDescription>
+              <CardDescription>
+                Manage and approve professional accounts
+              </CardDescription>
             </CardHeader>
             <CardContent>{renderTable(professionalTable)}</CardContent>
           </Card>
@@ -457,7 +491,9 @@ export default function Component() {
           <Card>
             <CardHeader>
               <CardTitle>Facility Approval</CardTitle>
-              <CardDescription>Manage and approve facility registrations</CardDescription>
+              <CardDescription>
+                Manage and approve facility registrations
+              </CardDescription>
             </CardHeader>
             <CardContent>{renderTable(facilityTable)}</CardContent>
           </Card>
@@ -470,13 +506,15 @@ export default function Component() {
             <RefreshCw className="mr-2 h-6 w-6" />
             Update WASM Module
           </CardTitle>
-          <CardDescription>Upload and update the WASM module for the application</CardDescription>
+          <CardDescription>
+            Upload and update the WASM module for the application
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleUpdateWasmModule} className="space-y-4">
-            <div className="flex items-center space-x-4">
+            <div className="items-center space-x-4">
               <div
-                className="flex items-center justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none"
+                className="flex items-center justify-center w-full h-32 px-4 transition border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none"
                 onClick={() => document.getElementById("file-upload").click()}
               >
                 <span className="flex items-center space-x-2">
@@ -494,7 +532,7 @@ export default function Component() {
                   onChange={handleWasmFileChange}
                 />
               </div>
-              <Button type="submit" className="px-4 py-2">
+              <Button type="submit" className="my-6">
                 Upload
               </Button>
             </div>
@@ -530,3 +568,5 @@ export default function Component() {
     </section>
   );
 }
+
+export default Home;

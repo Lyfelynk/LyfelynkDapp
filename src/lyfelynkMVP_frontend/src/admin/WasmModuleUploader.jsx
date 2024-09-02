@@ -51,7 +51,7 @@ function WasmModuleUploader() {
   };
 
   return (
-    <Card className="mt-8 mx-auto max-w-lg">
+    <Card className="mt-8">
       <CardHeader>
         <CardTitle className="flex items-center text-lg font-semibold">
           <RefreshCw className="mr-2 h-6 w-6" />
@@ -63,12 +63,12 @@ function WasmModuleUploader() {
           <div className="flex flex-col space-y-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center justify-between w-full">
+                <Button variant="outline" className="flex items-center justify-between w-64">
                   {selectedModule}
                   <ChevronDown className="ml-2 w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
+              <DropdownMenuContent className="w-64">
                 <DropdownMenuLabel>Select Module</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={() => setSelectedModule("User")}>
@@ -90,7 +90,7 @@ function WasmModuleUploader() {
             </DropdownMenu>
 
             <div
-              className="flex items-center justify-center h-32 p-4 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-gray-400 focus:outline-none"
+              className="flex items-center justify-center w-full h-32 p-4 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-gray-400 focus:outline-none"
               onClick={() => document.getElementById("file-upload").click()}
             >
               <span className="flex items-center space-x-2 text-gray-600">

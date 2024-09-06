@@ -2,7 +2,6 @@ import Array "mo:base/Array";
 import Error "mo:base/Error";
 import Cycles "mo:base/ExperimentalCycles";
 import Nat "mo:base/Nat";
-import Nat32 "mo:base/Nat32";
 import Nat8 "mo:base/Nat8";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -19,10 +18,10 @@ actor class ProfessionalShardManager() {
     private stable var shardCount : Nat = 0;
     private let PROFESSIONALS_PER_SHARD : Nat = 20_480;
     private let STARTING_PROFESSIONAL_ID : Nat = 10_000_000_000_000;
-    private stable let shards : BTree.BTree<Text, Principal> = BTree.init<Text, Principal>(null);
-    private stable var professionalShardMap : BTree.BTree<Principal, Text> = BTree.init<Principal, Text>(null);
-
-    private stable var professionalShardWasmModule : [Nat8] = [];
+    private stable let shards : BTree.BTree<Text, Principal> = BTree.init<Text, Principal>(null); // Map of Shard ID to Shard Principal
+    private stable var professionalShardMap : BTree.BTree<Principal, Text> = BTree.init<Principal, Text>(null); // Map of Professional Principal to Professional ID
+    private stable var reverseProfessionalShardMap : BTree.BTree<Text, Principal> = BTree.init<Text, Principal>(null); // Map of Professional ID to Professional Principal
+    private stable var professionalShardWasmModule : [Nat8] = []; // Wasm Module for Shards
 
     private let IC = "aaaaa-aa";
     private let ic : Interface.Self = actor (IC);
@@ -37,9 +36,9 @@ actor class ProfessionalShardManager() {
         #ok(Nat.toText(STARTING_PROFESSIONAL_ID + totalProfessionalCount));
     };
 
-    public func generateUUID() : async Result.Result<Text, Text> {
+    public func generateUUID() : async Text {
         let g = Source.Source();
-        #ok(UUID.toText(await g.new()));
+        (UUID.toText(await g.new()));
     };
 
     private func getShardID(professionalID : Text) : Text {
@@ -90,6 +89,7 @@ actor class ProfessionalShardManager() {
             };
             case null {
                 ignore BTree.insert(professionalShardMap, Principal.compare, caller, professionalID);
+                ignore BTree.insert(reverseProfessionalShardMap, Text.compare, professionalID, caller);
                 totalProfessionalCount += 1;
                 #ok(());
             };
@@ -107,10 +107,21 @@ actor class ProfessionalShardManager() {
         };
     };
 
+    public func getProfessionalPrincipal(professionalID : Text) : async Result.Result<Principal, Text> {
+        switch (BTree.get(reverseProfessionalShardMap, Text.compare, professionalID)) {
+            case (?principal) {
+                #ok(principal);
+            };
+            case null {
+                #err("Professional not found");
+            };
+        };
+    };
     public func removeProfessional(caller : Principal) : async Result.Result<(), Text> {
         switch (BTree.get(professionalShardMap, Principal.compare, caller)) {
             case (?professionalID) {
                 ignore BTree.delete(professionalShardMap, Principal.compare, caller);
+                ignore BTree.delete(reverseProfessionalShardMap, Text.compare, professionalID);
                 totalProfessionalCount -= 1;
                 #ok(());
             };

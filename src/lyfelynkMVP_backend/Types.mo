@@ -49,9 +49,10 @@ module Types {
     };
 
     public type DataAsset = {
+        assetID : Text;
         title : Text;
         description : Text;
-        data : Blob;
+        data : Text;
         metadata : Metadata;
     };
 
@@ -62,6 +63,7 @@ module Types {
     };
 
     public type sharedActivityInfo = {
+        activityID : Text;
         assetID : Text;
         usedSharedTo : Text;
         time : Nat;
@@ -89,5 +91,21 @@ module Types {
     public type TokenRequestAmounts = {
         currentRequestAmount : Nat;
         approvedTillNow : Nat;
+    };
+
+    public type VETKD_SYSTEM_API = actor {
+        vetkd_public_key : ({
+            canister_id : ?Principal;
+            derivation_path : [Blob];
+            key_id : { curve : { #bls12_381 }; name : Text };
+        }) -> async ({ public_key : Blob });
+
+        vetkd_encrypted_key : ({
+            derivation_id : Blob;
+            public_key_derivation_path : [Blob];
+
+            key_id : { curve : { #bls12_381 }; name : Text };
+            encryption_public_key : Blob;
+        }) -> async ({ encrypted_key : Blob });
     };
 };

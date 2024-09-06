@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -27,7 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BuyDataFunc } from "@/Functions/BuyData";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "../../ActorContext";
 
 const columns = [
   {
@@ -66,13 +66,13 @@ function DataOnSaleTable() {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
+  const { actors } = useContext(ActorContext);
   const [data, setData] = useState([]);
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const result = await lyfelynkMVP_backend.getAllListings();
+        const result = await actors.marketplace.getAllListings();
         if (result.ok) {
           setData(result.ok);
         } else {
@@ -84,7 +84,7 @@ function DataOnSaleTable() {
     };
 
     fetchListings();
-  }, [lyfelynkMVP_backend]);
+  }, [actors]);
 
   const table = useReactTable({
     data: data,
@@ -122,7 +122,10 @@ function DataOnSaleTable() {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button
+              variant="outline"
+              className="ml-auto"
+            >
               Columns <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -159,7 +162,7 @@ function DataOnSaleTable() {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </TableHead>
                   );
@@ -178,7 +181,7 @@ function DataOnSaleTable() {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </TableCell>
                   ))}

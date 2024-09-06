@@ -1,13 +1,13 @@
 import React from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "../ActorContext";
 import * as vetkd from "ic-vetkd-utils";
 
 import { useState } from "react";
 
 const DownloadFile = ({ uniqueID, format, title }) => {
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [downloading, setDownloading] = useState(false);
 
   function downloadData(file) {
@@ -21,7 +21,7 @@ const DownloadFile = ({ uniqueID, format, title }) => {
 
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
     );
 
   const aes_gcm_decrypt = async (encryptedData, rawKey) => {
@@ -32,12 +32,12 @@ const DownloadFile = ({ uniqueID, format, title }) => {
       rawKey,
       "AES-GCM",
       false,
-      ["decrypt"],
+      ["decrypt"]
     );
     const decrypted_buffer = await window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      ciphertext,
+      ciphertext
     );
     return new Uint8Array(decrypted_buffer);
   };
@@ -50,9 +50,9 @@ const DownloadFile = ({ uniqueID, format, title }) => {
       const seed = window.crypto.getRandomValues(new Uint8Array(32));
       const tsk = new vetkd.TransportSecretKey(seed);
       const encryptedKeyResult =
-        await lyfelynkMVP_backend.encrypted_symmetric_key_for_dataAsset(
+        await actors.DataAsset.encrypted_symmetric_key_for_dataAsset(
           uniqueID,
-          Object.values(tsk.public_key()),
+          Object.values(tsk.public_key())
         );
 
       let encryptedKey = "";
@@ -71,20 +71,20 @@ const DownloadFile = ({ uniqueID, format, title }) => {
       }
 
       const pkBytesHex =
-        await lyfelynkMVP_backend.symmetric_key_verification_key();
+        await actors.DataAsset.symmetric_key_verification_key();
       const aesGCMKey = tsk.decrypt_and_hash(
         hex_decode(encryptedKey),
         hex_decode(pkBytesHex),
         new TextEncoder().encode(uniqueID),
         32,
-        new TextEncoder().encode("aes-256-gcm"),
+        new TextEncoder().encode("aes-256-gcm")
       );
       console.log(aesGCMKey);
       // Step 2: Decrypt the data using the AES-GCM key
-      const result = await lyfelynkMVP_backend.downloadDataAssetData(uniqueID);
+      const result = await actors.DataAsset.downloadDataAssetData(uniqueID);
       const decryptedData = await aes_gcm_decrypt(
         new Uint8Array(result.ok),
-        aesGCMKey,
+        aesGCMKey
       );
 
       // Step 3: Create a Blob and File from the decrypted data

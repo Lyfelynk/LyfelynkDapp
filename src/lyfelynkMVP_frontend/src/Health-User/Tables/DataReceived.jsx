@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/table";
 import LoadingScreen from "../../LoadingScreen";
 import DownloadFile from "../../Functions/DownloadFile";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "../../ActorContext";
 
 const columns = [
   {
@@ -72,13 +72,13 @@ export function DataReceivedTable() {
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState([]);
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserDataAssets = async () => {
       try {
-        const result = await lyfelynkMVP_backend.getSharedDataAssets();
+        const result = await actors.dataAsset.getSharedDataAssets();
         console.log(result);
         if (result.ok) {
           const dataAssets = result.ok.map(([id, asset]) => ({
@@ -101,7 +101,7 @@ export function DataReceivedTable() {
     };
 
     fetchUserDataAssets();
-  }, [lyfelynkMVP_backend]);
+  }, [actors]);
 
   const table = useReactTable({
     data: data,
@@ -141,7 +141,10 @@ export function DataReceivedTable() {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button
+              variant="outline"
+              className="ml-auto"
+            >
               Columns <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -178,7 +181,7 @@ export function DataReceivedTable() {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </TableHead>
                   );
@@ -197,7 +200,7 @@ export function DataReceivedTable() {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </TableCell>
                   ))}

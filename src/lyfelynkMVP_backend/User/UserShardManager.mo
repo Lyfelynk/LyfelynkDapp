@@ -18,11 +18,12 @@ actor class UserShardManager() {
     private stable var totalUserCount : Nat = 0;
     private stable var shardCount : Nat = 0;
     private let USERS_PER_SHARD : Nat = 21_000;
-    private let STARTING_USER_ID : Nat = 10_000_000_000_000;
-    private stable let shards : BTree.BTree<Text, Principal> = BTree.init<Text, Principal>(null);
-    private stable var userShardMap : BTree.BTree<Principal, Text> = BTree.init<Principal, Text>(null);
+    private let STARTING_USER_ID : Nat = 10_000_000_000_000; // Starting User ID
+    private stable let shards : BTree.BTree<Text, Principal> = BTree.init<Text, Principal>(null); //Shard Number to Shard Canister ID
+    private stable var userShardMap : BTree.BTree<Principal, Text> = BTree.init<Principal, Text>(null); // Principal to User ID
+    private stable var reverseUserShardMap : BTree.BTree<Text, Principal> = BTree.init<Text, Principal>(null); // User ID to Principal
 
-    private stable var userShardWasmModule : [Nat8] = [];
+    private stable var userShardWasmModule : [Nat8] = []; // Wasm Module for Shard Canister
 
     private let IC = "aaaaa-aa";
     private let ic : Interface.Self = actor (IC);
@@ -91,15 +92,18 @@ actor class UserShardManager() {
                 #err("User already registered");
             };
             case null {
-                ignore BTree.insert(userShardMap, Principal.compare, caller, userID);
+                ignore BTree.insert(userShardMap, Principal.compare, caller, userID); // Insert Principal to UserID Key Value Pair
+                ignore BTree.insert(reverseUserShardMap, Text.compare, userID, caller); // Insert UserID to Principal Key Value Pair
                 totalUserCount += 1;
                 #ok(());
             };
         };
     };
+
     // Function to get the user ID for a given principal
     public func getUserID(caller : Principal) : async Result.Result<Text, Text> {
         switch (BTree.get(userShardMap, Principal.compare, caller)) {
+            // Get UserID from Principal
             case (?userID) {
                 #ok(userID);
             };
@@ -108,17 +112,27 @@ actor class UserShardManager() {
             };
         };
     };
-
-    // Function to remove a user
-    public shared ({ caller }) func removeUser(caller : Principal) : async Result.Result<(), Text> {
-        if (isPermitted(caller)) {
-
-        } else {
-            Debug.trap("You are not permitted");
+    // New function to get Principal by user ID
+    public func getPrincipalByUserID(userID : Text) : async Result.Result<Principal, Text> {
+        switch (BTree.get(reverseUserShardMap, Text.compare, userID)) {
+            // Get Principal from UserID
+            case (?principal) {
+                #ok(principal);
+            };
+            case null {
+                #err("No principal found for user ID: " # userID);
+            };
         };
-        switch (BTree.get(userShardMap, Principal.compare, caller)) {
+    };
+    // Function to remove a user
+    public shared ({ caller }) func removeUser(userToRemove : Principal) : async Result.Result<(), Text> {
+        if (not isPermitted(caller)) {
+            return #err("You are not permitted to remove users");
+        };
+        switch (BTree.get(userShardMap, Principal.compare, userToRemove)) {
             case (?userID) {
-                ignore BTree.delete(userShardMap, Principal.compare, caller);
+                ignore BTree.delete(userShardMap, Principal.compare, userToRemove); //Remove Principal to UserID
+                ignore BTree.delete(reverseUserShardMap, Text.compare, userID); //Remove UserID to Principal
                 totalUserCount -= 1;
                 #ok(());
             };
@@ -192,6 +206,7 @@ actor class UserShardManager() {
             #err("Failed to install or start code on shard: " # Error.message(e));
         };
     };
+
     // Function to update the WASM module
     public shared ({ caller }) func updateWasmModule(wasmModule : [Nat8]) : async Result.Result<(), Text> {
         if (isPermitted(caller)) {
@@ -204,6 +219,7 @@ actor class UserShardManager() {
         userShardWasmModule := wasmModule;
         #ok(());
     };
+
     public shared ({ caller }) func updateExistingShards() : async Result.Result<(), Text> {
 
         if (isPermitted(caller)) {
@@ -263,4 +279,5 @@ actor class UserShardManager() {
     public query func getUsersPerShard() : async Nat {
         USERS_PER_SHARD;
     };
+
 };

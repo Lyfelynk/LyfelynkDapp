@@ -21,6 +21,10 @@
       "candid": "https://raw.githubusercontent.com/dfinity/ic/ff10ea1dba07c0f66c66536a46a97146cf260e90/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/ff10ea1dba07c0f66c66536a46a97146cf260e90/canisters/ic-icrc1-ledger.wasm.gz"
     },
+    "IdentityManager": {
+      "main": "src/lyfelynkMVP_backend/IdentityManager/IdentityManager.mo",
+      "type": "motoko"
+    },
     "User": {
       "main": "src/lyfelynkMVP_backend/User/UserService.mo",
       "type": "motoko"

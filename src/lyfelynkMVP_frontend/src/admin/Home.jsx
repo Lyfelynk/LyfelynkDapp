@@ -7,10 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-} from "lucide-react";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -116,7 +113,7 @@ function Home() {
   const adminRegister = () => {
     setMessage(`adminRegister function is not implemented yet`);
   };
-  
+
   const handleStatusChange = (type, id, action) => {
     setCurrentAction({ type, id, action });
     setIsDialogOpen(true);
@@ -457,9 +454,7 @@ function Home() {
       <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
 
       <div className="mb-4">
-        <Button onClick={adminRegister}>
-          Register Admin
-        </Button>
+        <Button onClick={adminRegister}>Register Admin</Button>
       </div>
 
       <Tabs defaultValue="professionals" className="space-y-4">
@@ -491,7 +486,7 @@ function Home() {
         </TabsContent>
       </Tabs>
 
-      <WasmModuleUploader/>
+      <WasmModuleUploader />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>

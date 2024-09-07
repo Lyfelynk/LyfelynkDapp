@@ -1,5 +1,6 @@
 import Array "mo:base/Array";
 import Nat "mo:base/Nat";
+import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 import BTree "mo:stableheapbtreemap/BTree";
@@ -38,9 +39,7 @@ actor class UserShard() {
 
     // Function to get a user by ID
     public shared ({ caller }) func getUser(userID : Text) : async Result.Result<Types.HealthIDUser, Text> {
-        if (isPermitted(caller)) {
-
-        } else {
+        if (isPermitted(caller)) {} else {
             return #err("You are not permitted");
         };
         switch (BTree.get(userMap, Text.compare, userID)) {
@@ -51,9 +50,7 @@ actor class UserShard() {
 
     // Function to update a user
     public shared ({ caller }) func updateUser(userID : Text, user : Types.HealthIDUser) : async Result.Result<(), Text> {
-        if (isPermitted(caller)) {
-
-        } else {
+        if (isPermitted(caller)) {} else {
             return #err("You are not permitted");
         };
         switch (BTree.get(userMap, Text.compare, userID)) {
@@ -85,7 +82,7 @@ actor class UserShard() {
     private func isPermitted(principal : Principal) : Bool {
         // For example, you could have a list of admin principals:
         let permittedPrincipals : [Principal] = [
-            // Add your admin principals here
+            Principal.fromText("a4tbr-q4aaa-aaaaa-qaafq-cai"),
         ];
 
         for (permittedPrincipal in permittedPrincipals.vals()) {

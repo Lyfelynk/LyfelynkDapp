@@ -23,6 +23,7 @@ import { createActor as createUserActor } from "../../declarations/User";
 import { createActor as createProfessionalActor } from "../../declarations/Professional";
 import { createActor as createFacilityActor } from "../../declarations/Facility";
 import { createActor as createDataAssetActor } from "../../declarations/DataAsset";
+import { createActor as createIdentityManagerActor } from "../../declarations/IdentityManager";
 import ActorContext from "./ActorContext";
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
@@ -76,12 +77,16 @@ function App() {
         process.env.CANISTER_ID_DATAASSET,
         { agent },
       );
-
+      const identityManagerActor = createIdentityManagerActor(
+        process.env.CANISTER_ID_IDENTITY_MANAGER,
+        { agent },
+      );
       setActors({
         user: userActor,
         professional: professionalActor,
         facility: facilityActor,
         dataAsset: dataAssetActor,
+        identityManager: identityManagerActor,
       });
     } catch (error) {
       console.error("Error initializing actors:", error);

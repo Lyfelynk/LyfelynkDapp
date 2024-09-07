@@ -17,7 +17,7 @@ actor class DataAssetShardManager() {
     private stable var shardCount : Nat = 0;
     private let ASSETS_PER_SHARD : Nat = 200_000;
     private stable let shards : BTree.BTree<Text, Principal> = BTree.init<Text, Principal>(null);
-    private let identityManager : IdentityManager.IdentityManager = actor ("ddddd-dd"); // Replace with actual IdentityManager canister ID
+    private let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
     private stable var userShardMap : BTree.BTree<Text, [Text]> = BTree.init<Text, [Text]>(null);
     private stable var dataAssetShardWasmModule : [Nat8] = [];
 
@@ -104,9 +104,9 @@ actor class DataAssetShardManager() {
     };
 
     public shared ({ caller }) func updateWasmModule(wasmModule : [Nat8]) : async Result.Result<(), Text> {
-        if (not isAdmin(caller)) {
-            return #err("You are not permitted to update the WASM module");
-        };
+        // if (not isAdmin(caller)) {
+        //     return #err("You are not permitted to update the WASM module");
+        // };
         if (Array.size(wasmModule) < 8) {
             return #err("Invalid WASM module: too small");
         };

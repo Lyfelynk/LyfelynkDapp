@@ -15,9 +15,9 @@ actor ProfessionalService {
     type HealthIDProfessional = Types.HealthIDProfessional;
     type ProfessionalShardManager = ProfessionalShardManager.ProfessionalShardManager;
 
-    let ShardManager : ProfessionalShardManager = actor ("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Professional Shard Manager Canister ID
-    let identityManager : IdentityManager.IdentityManager = actor ("ddddd-dd"); // Replace with actual IdentityManager canister ID
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("asrmz-lmaaa-aaaaa-qaaeq-cai");
+    let ShardManager : ProfessionalShardManager = actor ("a3shf-5eaaa-aaaaa-qaafa-cai"); // Professional Shard Manager Canister ID
+    let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
+    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("c2lt4-zmaaa-aaaaa-qaaiq-cai");
 
     private stable var pendingRequests : Map.Map<Principal, HealthIDProfessional> = Map.new<Principal, HealthIDProfessional>(); // Map of Pending Requests of Professionals Registered
     private stable var adminPrincipal = ""; // Admin Principal
@@ -262,6 +262,25 @@ actor ProfessionalService {
 
     };
 
+    public shared ({ caller }) func updateProfessionalShardWasmModule(wasmModule : [Nat8]) : async Result.Result<(), Text> {
+
+        // if (isAdmin(caller)) {
+        // Call the updateWasmModule function of the ProfessionalShardManager
+        let result = await ShardManager.updateWasmModule(wasmModule);
+
+        switch (result) {
+            case (#ok(())) {
+                #ok(());
+            };
+            case (#err(e)) {
+                #err("Failed to update WASM module: " # e);
+            };
+        };
+        // } else {
+        //     #err("You don't have permission to perform this action");
+        // };
+
+    };
     //VetKey Section
 
     public func symmetric_key_verification_key() : async Text {

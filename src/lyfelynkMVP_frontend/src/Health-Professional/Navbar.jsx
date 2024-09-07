@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Menu } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
-import { ConnectButton, ConnectDialog } from "@connect2ic/react";
-import "../connect2ic/connect2ic.css";
+
 import { useLocation } from "react-router-dom";
 
 const Navbar = ({ toggleSidebar }) => {
@@ -29,10 +28,7 @@ const Navbar = ({ toggleSidebar }) => {
             </div>
             <div className="flex items-center gap-2">
               <ModeToggle />
-              <div className="auth-section">
-                <ConnectButton />
-              </div>
-              <ConnectDialog />
+              <div className="auth-section"></div>
             </div>
           </div>
         </header>

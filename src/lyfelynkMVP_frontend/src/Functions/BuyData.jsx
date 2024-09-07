@@ -23,7 +23,7 @@ export function BuyDataFunc({ listingID, seller }) {
     try {
       const result = await actors.marketplace.purchaseListing(
         listingID,
-        seller
+        seller,
       );
       if (result.ok) {
         toast({
@@ -49,15 +49,9 @@ export function BuyDataFunc({ listingID, seller }) {
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          className="p-2 text-white"
-          onClick={() => setOpen(true)}
-        >
+        <Button className="p-2 text-white" onClick={() => setOpen(true)}>
           <ShoppingCart />
         </Button>
       </DialogTrigger>

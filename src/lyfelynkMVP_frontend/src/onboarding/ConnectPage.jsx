@@ -1,12 +1,13 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useContext } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import OnboardingBanner from "../OnboardingBanner";
-import { ChevronLeft } from "lucide-react";
+import ActorContext from "../ActorContext";
 
 export default function ConnectPage() {
   const navigate = useNavigate();
-
-  const handleConnectClick = () => {
+  const { login } = useContext(ActorContext);
+  const handleConnectClick = async () => {
+    await login();
     navigate("/Register");
   };
 

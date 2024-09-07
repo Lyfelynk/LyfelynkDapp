@@ -10,9 +10,9 @@ import Types "../Types";
 import Hex "../utility/Hex";
 
 actor class DataAssetShard() {
-    private stable var dataAssetStorage = BTree.init<Text, BTree.BTree<Text, Types.DataAsset>>(?0);
-    private stable var dataAccessTP = BTree.init<Text, [Principal]>(?0);
-    private stable var dataAccessPT = BTree.init<Principal, [Text]>(?0);
+    private stable var dataAssetStorage = BTree.init<Text, BTree.BTree<Text, Types.DataAsset>>(null);
+    private stable var dataAccessTP = BTree.init<Text, [Principal]>(null);
+    private stable var dataAccessPT = BTree.init<Principal, [Text]>(null);
 
     let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("ck7s6-qyaaa-aaaag-ak43a-cai");
     // List of permitted principals (e.g., DataAssetShardManager)

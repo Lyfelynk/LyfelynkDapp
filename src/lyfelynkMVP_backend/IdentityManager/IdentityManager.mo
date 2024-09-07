@@ -20,6 +20,13 @@ actor class IdentityManager() {
         };
     };
 
+    public shared query ({ caller }) func checkRegistration() : async Result.Result<Text, Text> {
+        switch (identityMap.get(caller)) {
+            case (?identity) { #ok(identity.1) };
+            case null { #err("Identity not found") };
+        };
+    };
+
     public query func getPrincipalByID(id : Text) : async Result.Result<Principal, Text> {
         switch (reverseIdentityMap.get(id)) {
             case (?principal) { #ok(principal) };

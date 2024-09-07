@@ -16,9 +16,9 @@ actor class UserService() {
 
     private var adminPrincipal = ""; //Admin Principal
     private var isAdminRegistered = false; //Admin Registration Status
-    let ShardManager : UserShardManager = actor ("bw4dl-smaaa-aaaaa-qaacq-cai"); // User Shard Manager Canister ID
-    let identityManager : IdentityManager.IdentityManager = actor ("ddddd-dd"); // Replace with actual IdentityManager canister ID
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("asrmz-lmaaa-aaaaa-qaaeq-cai");
+    let ShardManager : UserShardManager = actor ("aovwi-4maaa-aaaaa-qaagq-cai"); // User Shard Manager Canister ID
+    let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
+    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("c2lt4-zmaaa-aaaaa-qaaiq-cai");
 
     // Function to create a new user
     public shared ({ caller }) func createUser(demoInfo : Blob, basicHealthPara : Blob, bioMData : ?Blob, familyData : ?Blob) : async Result.Result<Text, Text> {
@@ -45,18 +45,35 @@ actor class UserService() {
                         let identityResult = await identityManager.registerIdentity(caller, userID, "User");
                         switch (identityResult) {
                             case (#ok(())) {
-                                #ok(userID);
+                                // Insert user data into the shard
+                                let shardResult = await ShardManager.getShard(userID);
+                                switch (shardResult) {
+                                    case (#ok(shard)) {
+                                        let insertResult = await shard.insertUser(userID, tempID);
+                                        switch (insertResult) {
+                                            case (#ok(())) {
+                                                #ok(userID);
+                                            };
+                                            case (#err(e)) {
+                                                #err("Failed to insert user data: " # e);
+                                            };
+                                        };
+                                    };
+                                    case (#err(e)) {
+                                        #err("Failed to get shard: " # e);
+                                    };
+                                };
                             };
                             case (#err(e)) {
-                                #err(e);
+                                #err("Failed to register identity: " # e);
                             };
                         };
                     };
-                    case (#err(e)) { #err(e) };
+                    case (#err(e)) { #err("Failed to register user: " # e) };
                 };
             };
-            case (#err(e), _) { #err(e) };
-            case (_, #err(e)) { #err(e) };
+            case (#err(e), _) { #err("Failed to generate user ID: " # e) };
+            case (_, #err(e)) { #err("Failed to generate UUID: " # e) };
         };
     };
 

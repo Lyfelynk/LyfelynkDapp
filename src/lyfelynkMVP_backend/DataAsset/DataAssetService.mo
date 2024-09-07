@@ -16,8 +16,8 @@ actor DataAssetService {
     type sharedActivityInfo = Types.sharedActivityInfo;
     type DataAssetShardManager = DataAssetShardManager.DataAssetShardManager;
     type IdentityManager = IdentityManager.IdentityManager;
-    let ShardManager : DataAssetShardManager = actor ("r7inp-6aaaa-aaaaa-aaabq-cai"); // Replace with actual canister ID
-    let identityManager : IdentityManager = actor ("r7inp-6aaaa-aaaaa-aaabq-cai"); // Replace with actual canister ID
+    let ShardManager : DataAssetShardManager = actor ("be2us-64aaa-aaaaa-qaabq-cai"); // Replace with actual canister ID
+    let identityManager : IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual canister ID
 
     public shared ({ caller }) func uploadDataAsset(asset : DataAsset) : async Result.Result<Text, Text> {
         let userIDResult = await getUserID(caller);
@@ -201,6 +201,19 @@ actor DataAssetService {
         switch (identityResult) {
             case (#ok((id, _))) { #ok(id) };
             case (#err(e)) { #err(e) };
+        };
+    };
+
+    public shared ({ caller }) func updateDataAssetShardWasmModule(wasmModule : [Nat8]) : async Result.Result<(), Text> {
+        let result = await ShardManager.updateWasmModule(wasmModule);
+
+        switch (result) {
+            case (#ok(())) {
+                #ok(());
+            };
+            case (#err(e)) {
+                #err("Failed to update WASM module: " # e);
+            };
         };
     };
 

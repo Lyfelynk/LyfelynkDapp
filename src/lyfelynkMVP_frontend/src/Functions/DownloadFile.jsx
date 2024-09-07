@@ -21,7 +21,7 @@ const DownloadFile = ({ uniqueID, format, title }) => {
 
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
     );
 
   const aes_gcm_decrypt = async (encryptedData, rawKey) => {
@@ -32,12 +32,12 @@ const DownloadFile = ({ uniqueID, format, title }) => {
       rawKey,
       "AES-GCM",
       false,
-      ["decrypt"]
+      ["decrypt"],
     );
     const decrypted_buffer = await window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      ciphertext
+      ciphertext,
     );
     return new Uint8Array(decrypted_buffer);
   };
@@ -52,7 +52,7 @@ const DownloadFile = ({ uniqueID, format, title }) => {
       const encryptedKeyResult =
         await actors.DataAsset.encrypted_symmetric_key_for_dataAsset(
           uniqueID,
-          Object.values(tsk.public_key())
+          Object.values(tsk.public_key()),
         );
 
       let encryptedKey = "";
@@ -77,14 +77,14 @@ const DownloadFile = ({ uniqueID, format, title }) => {
         hex_decode(pkBytesHex),
         new TextEncoder().encode(uniqueID),
         32,
-        new TextEncoder().encode("aes-256-gcm")
+        new TextEncoder().encode("aes-256-gcm"),
       );
       console.log(aesGCMKey);
       // Step 2: Decrypt the data using the AES-GCM key
       const result = await actors.DataAsset.downloadDataAssetData(uniqueID);
       const decryptedData = await aes_gcm_decrypt(
         new Uint8Array(result.ok),
-        aesGCMKey
+        aesGCMKey,
       );
 
       // Step 3: Create a Blob and File from the decrypted data

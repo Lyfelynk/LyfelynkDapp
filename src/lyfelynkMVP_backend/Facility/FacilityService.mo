@@ -14,9 +14,9 @@ import FacilityShardManager "FacilityShardManager";
 actor FacilityService {
     type HealthIDFacility = Types.HealthIDFacility;
     type FacilityShardManager = FacilityShardManager.FacilityShardManager;
-    let identityManager : IdentityManager.IdentityManager = actor ("ddddd-dd"); // Replace with actual IdentityManager canister ID
-    let ShardManager : FacilityShardManager = actor ("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // Facility Shard Manager Canister ID
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("bkyz2-fmaaa-aaaaa-qaaaq-cai"); // VetKey System API Canister ID
+    let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
+    let ShardManager : FacilityShardManager = actor ("b77ix-eeaaa-aaaaa-qaada-cai"); // Facility Shard Manager Canister ID
+    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("c2lt4-zmaaa-aaaaa-qaaiq-cai"); // VetKey System API Canister ID
 
     private stable var pendingRequests : Map.Map<Principal, HealthIDFacility> = Map.new<Principal, HealthIDFacility>(); // Map of pending requests
     private stable var adminPrincipal = ""; // Admin Principal
@@ -253,6 +253,26 @@ actor FacilityService {
     // Function to get the caller's principal ID
     public shared query ({ caller }) func whoami() : async Text {
         Principal.toText(caller);
+    };
+
+    public shared ({ caller }) func updateFacilityShardWasmModule(wasmModule : [Nat8]) : async Result.Result<(), Text> {
+
+        // if (isAdmin(caller)) {
+        // Call the updateWasmModule function of the FacilityShardManager
+        let result = await ShardManager.updateWasmModule(wasmModule);
+
+        switch (result) {
+            case (#ok(())) {
+                #ok(());
+            };
+            case (#err(e)) {
+                #err("Failed to update WASM module: " # e);
+            };
+        };
+        // } else {
+        //     #err("You don't have permission to perform this action");
+        // };
+
     };
 
     //VetKey Section

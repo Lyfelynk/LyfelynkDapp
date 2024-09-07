@@ -21,7 +21,7 @@
       "candid": "https://raw.githubusercontent.com/dfinity/ic/ff10ea1dba07c0f66c66536a46a97146cf260e90/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/ff10ea1dba07c0f66c66536a46a97146cf260e90/canisters/ic-icrc1-ledger.wasm.gz"
     },
-    "IdentityManager": {
+    "Identity_Manager": {
       "main": "src/lyfelynkMVP_backend/IdentityManager/IdentityManager.mo",
       "type": "motoko"
     },
@@ -29,8 +29,12 @@
       "main": "src/lyfelynkMVP_backend/User/UserService.mo",
       "type": "motoko"
     },
-    "UserShard": {
+    "UserShardManager": {
       "main": "src/lyfelynkMVP_backend/User/UserShardManager.mo",
+      "type": "motoko"
+    },
+    "UserShard": {
+      "main": "src/lyfelynkMVP_backend/User/UserShard.mo",
       "type": "motoko"
     },
 
@@ -38,12 +42,36 @@
       "main": "src/lyfelynkMVP_backend/Professional/ProfessionalService.mo",
       "type": "motoko"
     },
+    "ProfessionalShardManager": {
+      "main": "src/lyfelynkMVP_backend/Professional/ProfessionalShardManager.mo",
+      "type": "motoko"
+    },
+    "ProfessionalShard": {
+      "main": "src/lyfelynkMVP_backend/Professional/ProfessionalShard.mo",
+      "type": "motoko"
+    },
     "Facility": {
       "main": "src/lyfelynkMVP_backend/Facility/FacilityService.mo",
       "type": "motoko"
     },
+    "FacilityShardManager": {
+      "main": "src/lyfelynkMVP_backend/Facility/FacilityShardManager.mo",
+      "type": "motoko"
+    },
+    "FacilityShard": {
+      "main": "src/lyfelynkMVP_backend/Facility/FacilityShard.mo",
+      "type": "motoko"
+    },
     "DataAsset": {
       "main": "src/lyfelynkMVP_backend/DataAsset/DataAssetService.mo",
+      "type": "motoko"
+    },
+    "DataAssetShardManager": {
+      "main": "src/lyfelynkMVP_backend/DataAsset/DataAssetShardManager.mo",
+      "type": "motoko"
+    },
+    "DataAssetShard": {
+      "main": "src/lyfelynkMVP_backend/DataAsset/DataAssetShard.mo",
       "type": "motoko"
     },
     "lyfelynkMVP_frontend": {

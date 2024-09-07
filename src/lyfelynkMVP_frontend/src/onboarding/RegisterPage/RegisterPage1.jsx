@@ -45,7 +45,7 @@ const formSchema = z.object({
 export default function RegisterPage1Content() {
   const navigate = useNavigate();
 
-  const { actors, isAuthenticated, login } = useContext(ActorContext);
+  const { actors } = useContext(ActorContext);
   const [formData, setFormData] = useState({
     name: "",
     dob: "",

@@ -1,16 +1,59 @@
-import { useNavigate, useContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
+import { useState, useContext, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import OnboardingBanner from "../OnboardingBanner";
 import ActorContext from "../ActorContext";
+import LoadingScreen from "../LoadingScreen";
 
 export default function ConnectPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [c, setc] = useState(false);
+
   const navigate = useNavigate();
-  const { login } = useContext(ActorContext);
+  const { actors, isAuthenticated, login } = useContext(ActorContext);
+
+  useEffect(() => {
+    const checkRegistration = async () => {
+      if (isAuthenticated && actors.identityManager) {
+        setIsLoading(true);
+        try {
+          let resultOfRegistration =
+            await actors.identityManager.checkRegistration();
+          if (resultOfRegistration.ok) {
+            navigate(`/Health-${resultOfRegistration.ok}/Home`);
+          } else {
+            navigate(`/Register`);
+          }
+          // Your navigation logic here based on the registration status and type
+        } catch (error) {
+          setIsLoading(false);
+          console.error("Error checking registration:", error);
+          toast({
+            title: "Error",
+            description: "Failed to check registration status",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+    checkRegistration();
+  }, [isAuthenticated, actors.identityManager]);
+
   const handleConnectClick = async () => {
-    await login();
-    navigate("/Register");
+    setIsLoading(true);
+    try {
+      login();
+      // The useEffect will handle the rest
+    } catch (error) {
+      console.error("Error during signing process:", error);
+      setIsLoading(false);
+    }
   };
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
   return (
     <section className="bg-[conic-gradient(at_bottom_right,_var(--tw-gradient-stops))] from-blue-700 via-blue-800 to-gray-900 h-screen flex justify-center items-center">
       <OnboardingBanner />

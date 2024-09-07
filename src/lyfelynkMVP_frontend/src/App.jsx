@@ -23,7 +23,7 @@ import { createActor as createUserActor } from "../../declarations/User";
 import { createActor as createProfessionalActor } from "../../declarations/Professional";
 import { createActor as createFacilityActor } from "../../declarations/Facility";
 import { createActor as createDataAssetActor } from "../../declarations/DataAsset";
-import { createActor as createIdentityManagerActor } from "../../declarations/IdentityManager";
+import { createActor as createIdentityManagerActor } from "../../declarations/Identity_Manager";
 import ActorContext from "./ActorContext";
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";

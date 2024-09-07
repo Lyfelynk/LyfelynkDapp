@@ -75,7 +75,13 @@
       "type": "motoko"
     },
     "lyfelynkMVP_frontend": {
-      "dependencies": ["User", "Professional", "Facility", "DataAsset"],
+      "dependencies": [
+        "User",
+        "Professional",
+        "Facility",
+        "DataAsset",
+        "Identity_Manager"
+      ],
       "source": ["src/lyfelynkMVP_frontend/dist"],
       "type": "assets",
       "workspace": "lyfelynkMVP_frontend"

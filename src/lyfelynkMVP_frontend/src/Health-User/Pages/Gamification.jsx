@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle } from "lucide-react";
+import AvatarDesc from "../sub/AvatarDesc";
 
 const INITIAL_TOKENS = 100;
 const INITIAL_HP = 100;

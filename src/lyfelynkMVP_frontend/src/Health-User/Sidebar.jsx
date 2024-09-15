@@ -9,7 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Upload,
-  Gamepad,
+  Gamepad2,
   FileText,
   Share2,
   ChevronDown,
@@ -56,7 +56,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     },
     {
       to: "/Health-User/Gamification",
-      icon: <ShoppingCart />,
+      icon: <Gamepad2 />,
       text: "Gamification",
     },
     { to: "/Health-User/Profile", icon: <User />, text: "Profile" },

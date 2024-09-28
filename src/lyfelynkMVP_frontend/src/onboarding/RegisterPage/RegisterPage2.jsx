@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,7 +13,7 @@ import { ChevronLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import LoadingScreen from "../../LoadingScreen";
 import OnboardingBanner from "../../OnboardingBanner";
-import * as vetkd from "ic-vetkd-utils";
+// import * as vetkd from "ic-vetkd-utils";
 import { z } from "zod";
 import ActorContext from "../../ActorContext";
 
@@ -131,61 +131,61 @@ export default function RegisterPage2Content() {
         certificationInfoJson,
       );
 
-      // Fetch the encrypted key
-      const seed = window.crypto.getRandomValues(new Uint8Array(32));
-      const tsk = new vetkd.TransportSecretKey(seed);
-      const encryptedKeyResult =
-        await actors.professional.encrypted_symmetric_key_for_professional(
-          Object.values(tsk.public_key()),
-        );
+      // // Fetch the encrypted key
+      // const seed = window.crypto.getRandomValues(new Uint8Array(32));
+      // const tsk = new vetkd.TransportSecretKey(seed);
+      // const encryptedKeyResult =
+      //   await actors.professional.encrypted_symmetric_key_for_professional(
+      //     Object.values(tsk.public_key())
+      //   );
 
-      let encryptedKey = "";
+      // let encryptedKey = "";
 
-      Object.keys(encryptedKeyResult).forEach((key) => {
-        if (key === "err") {
-          toast({
-            title: "Error",
-            description: encryptedKeyResult[key],
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-        if (key === "ok") {
-          encryptedKey = encryptedKeyResult[key];
-        }
-      });
+      // Object.keys(encryptedKeyResult).forEach((key) => {
+      //   if (key === "err") {
+      //     toast({
+      //       title: "Error",
+      //       description: encryptedKeyResult[key],
+      //       variant: "destructive",
+      //     });
+      //     setLoading(false);
+      //     return;
+      //   }
+      //   if (key === "ok") {
+      //     encryptedKey = encryptedKeyResult[key];
+      //   }
+      // });
 
-      if (!encryptedKey) {
-        setLoading(false);
-        return;
-      }
+      // if (!encryptedKey) {
+      //   setLoading(false);
+      //   return;
+      // }
 
-      const pkBytesHex =
-        await actors.professional.symmetric_key_verification_key();
-      const principal = await actors.professional.whoami();
-      const aesGCMKey = tsk.decrypt_and_hash(
-        hex_decode(encryptedKey),
-        hex_decode(pkBytesHex),
-        new TextEncoder().encode(principal),
-        32,
-        new TextEncoder().encode("aes-256-gcm"),
-      );
+      // const pkBytesHex =
+      //   await actors.professional.symmetric_key_verification_key();
+      // const principal = await actors.professional.whoami();
+      // const aesGCMKey = tsk.decrypt_and_hash(
+      //   hex_decode(encryptedKey),
+      //   hex_decode(pkBytesHex),
+      //   new TextEncoder().encode(principal),
+      //   32,
+      //   new TextEncoder().encode("aes-256-gcm")
+      // );
 
-      const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
-      const encryptedDataOccupation = await aes_gcm_encrypt(
-        occupationInfoArray,
-        aesGCMKey,
-      );
-      const encryptedDataCertification = await aes_gcm_encrypt(
-        certificationInfoArray,
-        aesGCMKey,
-      );
+      // const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
+      // const encryptedDataOccupation = await aes_gcm_encrypt(
+      //   occupationInfoArray,
+      //   aesGCMKey
+      // );
+      // const encryptedDataCertification = await aes_gcm_encrypt(
+      //   certificationInfoArray,
+      //   aesGCMKey
+      // );
 
       const result = await actors.professional.createProfessionalRequest(
-        Object.values(encryptedDataDemo),
-        Object.values(encryptedDataOccupation),
-        Object.values(encryptedDataCertification),
+        demoInfoArray,
+        occupationInfoArray,
+        certificationInfoArray,
       );
 
       Object.keys(result).forEach((key) => {
@@ -221,31 +221,31 @@ export default function RegisterPage2Content() {
     }
   };
 
-  const aes_gcm_encrypt = async (data, rawKey) => {
-    const iv = window.crypto.getRandomValues(new Uint8Array(12));
-    const aes_key = await window.crypto.subtle.importKey(
-      "raw",
-      rawKey,
-      "AES-GCM",
-      false,
-      ["encrypt"],
-    );
-    const ciphertext_buffer = await window.crypto.subtle.encrypt(
-      { name: "AES-GCM", iv: iv },
-      aes_key,
-      data,
-    );
-    const ciphertext = new Uint8Array(ciphertext_buffer);
-    const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
-    iv_and_ciphertext.set(iv, 0);
-    iv_and_ciphertext.set(ciphertext, iv.length);
-    return iv_and_ciphertext;
-  };
+  // const aes_gcm_encrypt = async (data, rawKey) => {
+  //   const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  //   const aes_key = await window.crypto.subtle.importKey(
+  //     "raw",
+  //     rawKey,
+  //     "AES-GCM",
+  //     false,
+  //     ["encrypt"],
+  //   );
+  //   const ciphertext_buffer = await window.crypto.subtle.encrypt(
+  //     { name: "AES-GCM", iv: iv },
+  //     aes_key,
+  //     data,
+  //   );
+  //   const ciphertext = new Uint8Array(ciphertext_buffer);
+  //   const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
+  //   iv_and_ciphertext.set(iv, 0);
+  //   iv_and_ciphertext.set(ciphertext, iv.length);
+  //   return iv_and_ciphertext;
+  // };
 
-  const hex_decode = (hexString) =>
-    Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
-    );
+  // const hex_decode = (hexString) =>
+  //   Uint8Array.from(
+  //     hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
+  //   );
 
   if (loading) {
     return <LoadingScreen />;

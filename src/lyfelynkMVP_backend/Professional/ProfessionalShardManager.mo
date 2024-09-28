@@ -47,7 +47,7 @@ actor class ProfessionalShardManager() {
                 if (value >= STARTING_PROFESSIONAL_ID) {
 
                     let shardIndex = (value - STARTING_PROFESSIONAL_ID) / PROFESSIONALS_PER_SHARD;
-                    return Nat.toText(shardIndex);
+                    return "professional-shard-" # Nat.toText(shardIndex);
                 };
                 return ("not a valid Professional ID");
             };

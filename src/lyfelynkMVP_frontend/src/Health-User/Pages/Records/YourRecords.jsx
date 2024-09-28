@@ -1,5 +1,5 @@
 import React from "react";
-import { ShareSellTable } from "../../../Health-Service/Tables/ShareSellData";
+import { ShareSellTable } from "../../../Health-User/Tables/ShareSellData";
 import YourRecordsFiles from "../../sub/YourRecordsFiles";
 
 export default function YourRecords() {
@@ -13,8 +13,8 @@ export default function YourRecords() {
           </p>
 
           <div className="mt-4 w-full">
-            {/* <ShareSellTable shareMode /> */}
-            <YourRecordsFiles />
+            <ShareSellTable shareMode />
+            {/* <YourRecordsFiles /> */}
           </div>
         </div>
       </div>

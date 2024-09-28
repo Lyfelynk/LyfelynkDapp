@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -59,7 +59,8 @@ const columns = [
     header: "",
     cell: ({ row }) => (
       <DownloadFile
-        uniqueID={row.original.userID + "-" + row.original.timestamp}
+        data={row.original.data}
+        uniqueID={row.original.assetid}
         title={row.original.title}
         format={row.original.format}
       />
@@ -89,15 +90,16 @@ export function ShareSellTable() {
   useEffect(() => {
     const fetchUserDataAssets = async () => {
       try {
-        const userId = await actors.User.getID();
         const result = await actors.dataAsset.getUserDataAssets();
+        console.log(result);
         if (result.ok) {
           const dataAssets = result.ok.map(([timestamp, asset]) => ({
-            userID: userId.ok,
+            assetid: asset.assetID,
             timestamp,
             title: asset.title,
             description: asset.description,
             format: asset.metadata.format,
+            data: asset.data,
           }));
           setData(dataAssets);
           setLoading(false);

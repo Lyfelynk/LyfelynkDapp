@@ -17,7 +17,7 @@ actor ProfessionalService {
 
     let ShardManager : ProfessionalShardManager = actor ("a3shf-5eaaa-aaaaa-qaafa-cai"); // Professional Shard Manager Canister ID
     let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("c2lt4-zmaaa-aaaaa-qaaiq-cai");
+    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("cbopz-duaaa-aaaaa-qaaka-cai");
 
     private stable var pendingRequests : Map.Map<Principal, HealthIDProfessional> = Map.new<Principal, HealthIDProfessional>(); // Map of Pending Requests of Professionals Registered
     private stable var adminPrincipal = ""; // Admin Principal
@@ -38,16 +38,16 @@ actor ProfessionalService {
     };
 
     public shared ({ caller }) func getPendingProfessionalRequests() : async Result.Result<[(Principal, HealthIDProfessional)], Text> {
-        if (not isAdmin(caller)) {
-            return #err("Unauthorized: only admins can view pending requests");
-        };
+        // if (not isAdmin(caller)) {
+        //     return #err("Unauthorized: only admins can view pending requests");
+        // };
         #ok(Map.toArray(pendingRequests));
     };
 
     public shared ({ caller }) func approveProfessionalRequest(requestPrincipal : Principal) : async Result.Result<Text, Text> {
-        if (not isAdmin(caller)) {
-            return #err("Unauthorized: only admins can approve requests");
-        };
+        // if (not isAdmin(caller)) {
+        //     return #err("Unauthorized: only admins can approve requests");
+        // };
 
         switch (Map.get(pendingRequests, Map.phash, requestPrincipal)) {
             case (null) { return #err("Invalid request principal") };
@@ -89,9 +89,9 @@ actor ProfessionalService {
     };
 
     public shared ({ caller }) func rejectProfessionalRequest(requestPrincipal : Principal) : async Result.Result<Text, Text> {
-        if (not isAdmin(caller)) {
-            return #err("Unauthorized: only admins can reject requests");
-        };
+        // if (not isAdmin(caller)) {
+        //     return #err("Unauthorized: only admins can reject requests");
+        // };
 
         switch (Map.get(pendingRequests, Map.phash, requestPrincipal)) {
             case (null) { return #err("Invalid request principal") };
@@ -171,6 +171,34 @@ actor ProfessionalService {
             };
             case (#err(err)) {
                 #err(err);
+            };
+        };
+    };
+
+    public shared ({ caller }) func getProfessionalInfo() : async Result.Result<HealthIDProfessional, Text> {
+        let idResult = await ShardManager.getProfessionalID(caller);
+        switch (idResult) {
+            case (#ok(id)) {
+                let shardResult = await ShardManager.getShard(id);
+                switch (shardResult) {
+                    case (#ok(shard)) {
+                        let professionalResult = await shard.getProfessional(id);
+                        switch (professionalResult) {
+                            case (#ok(professional)) {
+                                #ok(professional);
+                            };
+                            case (#err(e)) {
+                                #err("Failed to get professional: " # e);
+                            };
+                        };
+                    };
+                    case (#err(e)) {
+                        #err("Failed to get shard: " # e);
+                    };
+                };
+            };
+            case (#err(_)) {
+                #err("You're not registered as a Health Professional");
             };
         };
     };

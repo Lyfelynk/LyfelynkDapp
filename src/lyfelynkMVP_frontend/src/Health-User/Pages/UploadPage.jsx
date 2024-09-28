@@ -22,6 +22,7 @@ import FileUpload from "../../Functions/file-upload";
 import { DatePicker } from "@/Functions/DatePicker";
 import { jsPDF } from "jspdf";
 import lighthouse from "@lighthouse-web3/sdk";
+
 import { useState, useContext } from "react";
 
 import LoadingScreen from "../../LoadingScreen";
@@ -60,9 +61,13 @@ export default function UploadContent() {
     };
 
     try {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      const fileList = dataTransfer.files;
+      console.log(fileList);
       const output = await lighthouse.upload(
-        file,
-        process.env.LIGHTHOUSE_API_KEY,
+        fileList,
+        process.env.LIGHTHOUSEAPI,
         null,
         progressCallback,
       );
@@ -106,7 +111,8 @@ export default function UploadContent() {
           uniqueID = result[key];
         }
       });
-
+      console.log(uniqueID);
+      console.log("This is unique ID: : " + uniqueID);
       if (!uniqueID) {
         throw new Error("Failed to get unique ID");
       }
@@ -130,20 +136,37 @@ export default function UploadContent() {
           encryptedKey = encryptedKeyResult[key];
         }
       });
-
+      console.log(encryptedKey);
       if (!encryptedKey) {
         throw new Error("Failed to get encrypted key");
       }
 
       const pkBytesHex =
         await actors.dataAsset.getSymmetricKeyVerificationKey(uniqueID);
+
+      let symmetricVerificiationKey = "";
+
+      Object.keys(pkBytesHex).forEach((key) => {
+        if (key === "err") {
+          throw new Error(pkBytesHex[key]);
+        }
+        if (key === "ok") {
+          symmetricVerificiationKey = pkBytesHex[key];
+        }
+      });
+      console.log(symmetricVerificiationKey);
+      if (!symmetricVerificiationKey) {
+        throw new Error("Failed to get encrypted key");
+      }
+
       const aesGCMKey = tsk.decrypt_and_hash(
         hex_decode(encryptedKey),
-        hex_decode(pkBytesHex),
+        hex_decode(symmetricVerificiationKey),
         new TextEncoder().encode(uniqueID),
         32,
         new TextEncoder().encode("aes-256-gcm"),
       );
+      console.log(aesGCMKey);
 
       // Step 3: Encrypt the user's file using the AES-GCM key
       // Generate PDF

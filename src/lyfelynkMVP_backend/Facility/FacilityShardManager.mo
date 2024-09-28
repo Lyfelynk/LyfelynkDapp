@@ -56,6 +56,21 @@ actor class FacilityShardManager() {
     };
 
     public func getShard(facilityID : Text) : async Result.Result<FacilityShard.FacilityShard, Text> {
+        if (shardCount == 0 or totalFacilityCount >= shardCount * FACILITIES_PER_SHARD) {
+            let newShardResult = await createShard();
+            switch (newShardResult) {
+                case (#ok(newShardPrincipal)) {
+                    let newShardID = getShardID(facilityID);
+                    ignore BTree.insert(shards, Text.compare, newShardID, newShardPrincipal);
+                    shardCount += 1;
+                    return #ok(actor (Principal.toText(newShardPrincipal)) : FacilityShard.FacilityShard);
+                };
+                case (#err(e)) {
+                    return #err(e);
+                };
+            };
+        };
+
         let shardID = getShardID(facilityID);
         switch (BTree.get(shards, Text.compare, shardID)) {
             case (?principal) {

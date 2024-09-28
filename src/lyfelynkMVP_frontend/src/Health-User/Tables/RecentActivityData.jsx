@@ -67,7 +67,7 @@ function RecentActivityTable() {
   useEffect(() => {
     const fetchSharedFilesList = async () => {
       try {
-        const result = await actors.DataAsset.getSharedFileList();
+        const result = await actors.sharedActivity.getSharedActivities();
         console.log(result);
         if (result.ok) {
           setData(result.ok);

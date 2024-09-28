@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { ShoppingCart } from "lucide-react";
-import { useCanister } from "@connect2ic/react";
+
 import ActorContext from "../ActorContext";
 
 export function BuyDataFunc({ listingID, seller }) {

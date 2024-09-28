@@ -8,14 +8,14 @@ import {
   Select,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useCanister } from "@connect2ic/react";
-import { useState, useEffect } from "react";
+import ActorContext from "../../ActorContext";
+import { useState, useEffect, useContext } from "react";
 import LoadingScreen from "../../LoadingScreen";
 import * as vetkd from "ic-vetkd-utils";
 import { toast } from "@/components/ui/use-toast";
 
 export default function ProfileContent() {
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [professionalData, setProfessionalData] = useState(null);
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
@@ -76,7 +76,8 @@ export default function ProfileContent() {
   useEffect(() => {
     const fetchProfessionalData = async () => {
       try {
-        const result = await lyfelynkMVP_backend.readProfessional();
+        const result = await actors.professional.getProfessionalInfo();
+        console.log(result);
         if (result.ok) {
           const { IDNum, UUID, MetaData } = result.ok;
           const {
@@ -85,68 +86,78 @@ export default function ProfileContent() {
             CertificationInformation,
           } = MetaData;
 
-          // Step 1: Retrieve the encrypted key using encrypted_symmetric_key_for_dataAsset
+          // // Step 1: Retrieve the encrypted key using encrypted_symmetric_key_for_dataAsset
 
-          const seed = window.crypto.getRandomValues(new Uint8Array(32));
-          const tsk = new vetkd.TransportSecretKey(seed);
-          const encryptedKeyResult =
-            await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-              Object.values(tsk.public_key()),
-            );
+          // const seed = window.crypto.getRandomValues(new Uint8Array(32));
+          // const tsk = new vetkd.TransportSecretKey(seed);
+          // const encryptedKeyResult =
+          //   await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
+          //     Object.values(tsk.public_key())
+          //   );
 
-          let encryptedKey = "";
+          // let encryptedKey = "";
 
-          Object.keys(encryptedKeyResult).forEach((key) => {
-            if (key === "err") {
-              alert(encryptedKeyResult[key]);
-              setLoading(false);
-              return;
-            }
-            if (key === "ok") {
-              encryptedKey = encryptedKeyResult[key];
-            }
-          });
+          // Object.keys(encryptedKeyResult).forEach((key) => {
+          //   if (key === "err") {
+          //     alert(encryptedKeyResult[key]);
+          //     setLoading(false);
+          //     return;
+          //   }
+          //   if (key === "ok") {
+          //     encryptedKey = encryptedKeyResult[key];
+          //   }
+          // });
 
-          if (!encryptedKey) {
-            setLoading(false);
-            return;
-          }
+          // if (!encryptedKey) {
+          //   setLoading(false);
+          //   return;
+          // }
 
-          const pkBytesHex =
-            await lyfelynkMVP_backend.symmetric_key_verification_key();
-          const principal = await lyfelynkMVP_backend.whoami();
-          console.log(pkBytesHex);
-          console.log(encryptedKey);
-          const aesGCMKey = tsk.decrypt_and_hash(
-            hex_decode(encryptedKey),
-            hex_decode(pkBytesHex),
-            new TextEncoder().encode(principal),
-            32,
-            new TextEncoder().encode("aes-256-gcm"),
-          );
-          console.log(aesGCMKey);
+          // const pkBytesHex =
+          //   await lyfelynkMVP_backend.symmetric_key_verification_key();
+          // const principal = await lyfelynkMVP_backend.whoami();
+          // console.log(pkBytesHex);
+          // console.log(encryptedKey);
+          // const aesGCMKey = tsk.decrypt_and_hash(
+          //   hex_decode(encryptedKey),
+          //   hex_decode(pkBytesHex),
+          //   new TextEncoder().encode(principal),
+          //   32,
+          //   new TextEncoder().encode("aes-256-gcm")
+          // );
+          // console.log(aesGCMKey);
 
-          const decryptedDataDemographic = await aes_gcm_decrypt(
-            DemographicInformation,
-            aesGCMKey,
-          );
-          const decryptedDataOccupation = await aes_gcm_decrypt(
-            OccupationInformation,
-            aesGCMKey,
-          );
-          const decryptedDataCertification = await aes_gcm_decrypt(
-            CertificationInformation,
-            aesGCMKey,
-          );
+          // const decryptedDataDemographic = await aes_gcm_decrypt(
+          //   DemographicInformation,
+          //   aesGCMKey
+          // );
+          // const decryptedDataOccupation = await aes_gcm_decrypt(
+          //   OccupationInformation,
+          //   aesGCMKey
+          // );
+          // const decryptedDataCertification = await aes_gcm_decrypt(
+          //   CertificationInformation,
+          //   aesGCMKey
+          // );
+
+          // const parsedDemographicInfo = JSON.parse(
+          //   String.fromCharCode.apply(null, decryptedDataDemographic)
+          // );
+          // const parsedOccupationInfo = JSON.parse(
+          //   String.fromCharCode.apply(null, decryptedDataOccupation)
+          // );
+          // const parsedCertificationInfo = JSON.parse(
+          //   String.fromCharCode.apply(null, decryptedDataCertification)
+          // );
 
           const parsedDemographicInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataDemographic),
+            new TextDecoder().decode(DemographicInformation),
           );
           const parsedOccupationInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataOccupation),
+            new TextDecoder().decode(OccupationInformation),
           );
           const parsedCertificationInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataCertification),
+            new TextDecoder().decode(CertificationInformation),
           );
 
           setProfessionalData({
@@ -165,7 +176,7 @@ export default function ProfileContent() {
     };
 
     fetchProfessionalData();
-  }, [lyfelynkMVP_backend]);
+  }, [actors]);
 
   useEffect(() => {
     if (professionalData) {

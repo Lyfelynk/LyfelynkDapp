@@ -1,13 +1,14 @@
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useCanister } from "@connect2ic/react";
-import { useState, useEffect } from "react";
+
+import ActorContext from "../../ActorContext";
+import { useState, useEffect, useContext } from "react";
 import LoadingScreen from "../../LoadingScreen";
 import * as vetkd from "ic-vetkd-utils";
 import { toast } from "@/components/ui/use-toast";
 export default function ProfileContent() {
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [facilityData, setFacilityData] = useState(null);
   const [facultyName, setFacultyName] = useState("");
   const [registrationId, setRegistrationId] = useState("");
@@ -65,7 +66,7 @@ export default function ProfileContent() {
   useEffect(() => {
     const fetchFacilityData = async () => {
       try {
-        const result = await lyfelynkMVP_backend.readFacility();
+        const result = await actors.facility.getFacilityInfo();
         if (result.ok) {
           const { IDNum, UUID, MetaData } = result.ok;
           const {
@@ -74,66 +75,76 @@ export default function ProfileContent() {
             LicenseInformation,
           } = MetaData;
 
-          // Step 1: Retrieve the encrypted key using encrypted_symmetric_key_for_dataAsset
+          // // Step 1: Retrieve the encrypted key using encrypted_symmetric_key_for_dataAsset
 
-          const seed = window.crypto.getRandomValues(new Uint8Array(32));
-          const tsk = new vetkd.TransportSecretKey(seed);
-          const encryptedKeyResult =
-            await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-              Object.values(tsk.public_key()),
-            );
+          // const seed = window.crypto.getRandomValues(new Uint8Array(32));
+          // const tsk = new vetkd.TransportSecretKey(seed);
+          // const encryptedKeyResult =
+          //   await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
+          //     Object.values(tsk.public_key())
+          //   );
 
-          let encryptedKey = "";
+          // let encryptedKey = "";
 
-          Object.keys(encryptedKeyResult).forEach((key) => {
-            if (key === "err") {
-              alert(encryptedKeyResult[key]);
-              setLoading(false);
-              return;
-            }
-            if (key === "ok") {
-              encryptedKey = encryptedKeyResult[key];
-            }
-          });
+          // Object.keys(encryptedKeyResult).forEach((key) => {
+          //   if (key === "err") {
+          //     alert(encryptedKeyResult[key]);
+          //     setLoading(false);
+          //     return;
+          //   }
+          //   if (key === "ok") {
+          //     encryptedKey = encryptedKeyResult[key];
+          //   }
+          // });
 
-          if (!encryptedKey) {
-            setLoading(false);
-            return;
-          }
+          // if (!encryptedKey) {
+          //   setLoading(false);
+          //   return;
+          // }
 
-          const pkBytesHex =
-            await lyfelynkMVP_backend.symmetric_key_verification_key();
-          const principal = await lyfelynkMVP_backend.whoami();
-          console.log(pkBytesHex);
-          console.log(encryptedKey);
-          const aesGCMKey = tsk.decrypt_and_hash(
-            hex_decode(encryptedKey),
-            hex_decode(pkBytesHex),
-            new TextEncoder().encode(principal),
-            32,
-            new TextEncoder().encode("aes-256-gcm"),
-          );
-          console.log(aesGCMKey);
-          const decryptedDataDemo = await aes_gcm_decrypt(
-            DemographicInformation,
-            aesGCMKey,
-          );
-          const decryptedDataService = await aes_gcm_decrypt(
-            ServicesOfferedInformation,
-            aesGCMKey,
-          );
-          const decryptedDataLicense = await aes_gcm_decrypt(
-            LicenseInformation,
-            aesGCMKey,
-          );
+          // const pkBytesHex =
+          //   await lyfelynkMVP_backend.symmetric_key_verification_key();
+          // const principal = await lyfelynkMVP_backend.whoami();
+          // console.log(pkBytesHex);
+          // console.log(encryptedKey);
+          // const aesGCMKey = tsk.decrypt_and_hash(
+          //   hex_decode(encryptedKey),
+          //   hex_decode(pkBytesHex),
+          //   new TextEncoder().encode(principal),
+          //   32,
+          //   new TextEncoder().encode("aes-256-gcm")
+          // );
+          // console.log(aesGCMKey);
+          // const decryptedDataDemo = await aes_gcm_decrypt(
+          //   DemographicInformation,
+          //   aesGCMKey
+          // );
+          // const decryptedDataService = await aes_gcm_decrypt(
+          //   ServicesOfferedInformation,
+          //   aesGCMKey
+          // );
+          // const decryptedDataLicense = await aes_gcm_decrypt(
+          //   LicenseInformation,
+          //   aesGCMKey
+          // );
+          // const parsedDemographicInfo = JSON.parse(
+          //   String.fromCharCode.apply(null, decryptedDataDemo)
+          // );
+          // const parsedServicesOfferedInfo = JSON.parse(
+          //   String.fromCharCode.apply(null, decryptedDataService)
+          // );
+          // const parsedLicenseInfo = JSON.parse(
+          //   String.fromCharCode.apply(null, decryptedDataLicense)
+          // );
+
           const parsedDemographicInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataDemo),
+            new TextDecoder().decode(DemographicInformation),
           );
           const parsedServicesOfferedInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataService),
+            new TextDecoder().decode(ServicesOfferedInformation),
           );
           const parsedLicenseInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataLicense),
+            new TextDecoder().decode(LicenseInformation),
           );
 
           setFacilityData({

@@ -26,8 +26,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useState } from "react";
-import { useCanister } from "@connect2ic/react";
+import { useEffect, useState, useContext } from "react";
+import ActorContext from "../../ActorContext";
 
 const columns = [
   {
@@ -61,7 +61,7 @@ function RecentActivityTable() {
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState([]);
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -83,7 +83,7 @@ function RecentActivityTable() {
     };
 
     fetchSharedFilesList();
-  }, [lyfelynkMVP_backend]);
+  }, [actors]);
 
   const table = useReactTable({
     data: data,

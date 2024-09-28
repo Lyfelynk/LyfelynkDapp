@@ -10,9 +10,9 @@ import IdentityManager "../IdentityManager/IdentityManager";
 import Types "../Types";
 import SharedActivityShardManager "SharedActivityShardManager";
 
-actor ShardedActivityService {
-    private let shardManager : SharedActivityShardManager.SharedActivityShardManager = actor ("..."); // Replace with actual canister ID
-    private let identityManager : IdentityManager.IdentityManager = actor ("..."); // Replace with actual canister ID
+actor class SharedActivityService() {
+    private let shardManager : SharedActivityShardManager.SharedActivityShardManager = actor ("ajuq4-ruaaa-aaaaa-qaaga-cai"); // Replace with actual canister ID
+    private let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual canister ID
 
     public shared func recordSharedActivity(caller : Principal, assetID : Text, recipientID : Text, sharedType : Types.SharedType) : async Result.Result<(), Text> {
         let senderIDResult = await identityManager.getIdentity(caller);
@@ -50,16 +50,15 @@ actor ShardedActivityService {
         };
     };
 
-    public shared func getSharedActivities(caller : Principal) : async Result.Result<[Types.sharedActivityInfo], Text> {
+    public shared ({ caller }) func getSharedActivities() : async Result.Result<[Types.sharedActivityInfo], Text> {
         let userIDResult = await identityManager.getIdentity(caller);
         switch (userIDResult) {
             case (#ok((userID, _))) {
-                var allActivities : [Types.sharedActivityInfo] = [];
-                var currentShard = 1;
-                label l loop {
-                    let shardResult = await shardManager.getShard(Nat.toText(currentShard));
-                    switch (shardResult) {
-                        case (#ok(shard)) {
+                let userShardsResult = await shardManager.getUserShards(userID);
+                switch (userShardsResult) {
+                    case (#ok(userShards)) {
+                        var allActivities : [Types.sharedActivityInfo] = [];
+                        for (shard in userShards.vals()) {
                             let activitiesResult = await shard.getUserSharedActivities(userID);
                             switch (activitiesResult) {
                                 case (#ok(activities)) {
@@ -67,12 +66,11 @@ actor ShardedActivityService {
                                 };
                                 case (#err(_)) {}; // Skip if error
                             };
-                            currentShard += 1;
                         };
-                        case (#err(_)) { break l };
+                        #ok(allActivities);
                     };
+                    case (#err(e)) { #err("Error getting user shards: " # e) };
                 };
-                #ok(allActivities);
             };
             case (#err(e)) { #err("Error getting user ID: " # e) };
         };

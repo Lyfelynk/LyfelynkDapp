@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "../ActorContext";
 
 export function SellDataFunc({ assetID }) {
   const [title, setTitle] = useState("");
@@ -22,12 +22,12 @@ export function SellDataFunc({ assetID }) {
   const [category, setCategory] = useState("");
   const [selling, setSelling] = useState(false);
   const [open, setOpen] = useState(false); // Managing dialog's open state
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
 
   const handleSell = async () => {
     try {
       setSelling(true);
-      const result = await lyfelynkMVP_backend.addListing(
+      const result = await actors.marketplace.addListing(
         title,
         description,
         parseInt(price),

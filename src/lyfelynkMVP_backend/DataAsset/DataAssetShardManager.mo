@@ -103,6 +103,24 @@ actor class DataAssetShardManager() {
         };
     };
 
+    private func reinstallCodeOnShard(canisterPrincipal : Principal) : async Result.Result<(), Text> {
+        let arg = [];
+
+        try {
+            await ic.install_code({
+                arg = arg;
+                wasm_module = dataAssetShardWasmModule;
+                mode = #reinstall;
+                canister_id = canisterPrincipal;
+            });
+
+            await ic.start_canister({ canister_id = canisterPrincipal });
+            #ok(());
+        } catch (e) {
+            #err("Failed to install or start code on shard: " # Error.message(e));
+        };
+    };
+
     public shared ({ caller }) func updateWasmModule(wasmModule : [Nat8]) : async Result.Result<(), Text> {
         // if (not isAdmin(caller)) {
         //     return #err("You are not permitted to update the WASM module");
@@ -116,9 +134,9 @@ actor class DataAssetShardManager() {
     };
 
     public shared ({ caller }) func updateExistingShards() : async Result.Result<(), Text> {
-        if (not isAdmin(caller)) {
-            return #err("You are not permitted to update shards");
-        };
+        // if (not isAdmin(caller)) {
+        //     return #err("You are not permitted to update shards");
+        // };
         if (Array.size(dataAssetShardWasmModule) == 0) {
             return #err("Wasm module not set. Please update the Wasm module first.");
         };
@@ -127,12 +145,12 @@ actor class DataAssetShardManager() {
         var errorCount = 0;
 
         for ((shardID, principal) in BTree.entries(shards)) {
-            let installResult = await installCodeOnShard(principal);
+            let installResult = await reinstallCodeOnShard(principal);
             switch (installResult) {
                 case (#ok(())) {
                     updatedCount += 1;
                 };
-                case (#err(_)) {
+                case (#err(_err)) {
                     errorCount += 1;
                 };
             };

@@ -13,11 +13,11 @@ actor class UserShard() {
 
     // Function to insert a user
     public shared ({ caller }) func insertUser(userID : Text, user : Types.HealthIDUser) : async Result.Result<(), Text> {
-        if (isPermitted(caller)) {
+        // if (isPermitted(caller)) {
 
-        } else {
-            return #err("You are not permitted");
-        };
+        // } else {
+        //     return #err("You are not permitted");
+        // };
         if (BTree.has(userMap, Text.compare, userID)) {
             #err("User with ID " # userID # " already exists");
         } else {
@@ -39,9 +39,9 @@ actor class UserShard() {
 
     // Function to get a user by ID
     public shared ({ caller }) func getUser(userID : Text) : async Result.Result<Types.HealthIDUser, Text> {
-        if (isPermitted(caller)) {} else {
-            return #err("You are not permitted");
-        };
+        // if (isPermitted(caller)) {} else {
+        //     return #err("You are not permitted");
+        // };
         switch (BTree.get(userMap, Text.compare, userID)) {
             case (?value) { #ok(value) };
             case null { #err("User not found") };
@@ -50,9 +50,9 @@ actor class UserShard() {
 
     // Function to update a user
     public shared ({ caller }) func updateUser(userID : Text, user : Types.HealthIDUser) : async Result.Result<(), Text> {
-        if (isPermitted(caller)) {} else {
-            return #err("You are not permitted");
-        };
+        // if (isPermitted(caller)) {} else {
+        //     return #err("You are not permitted");
+        // };
         switch (BTree.get(userMap, Text.compare, userID)) {
             case (?_) {
                 switch (BTree.insert(userMap, Text.compare, userID, user)) {
@@ -68,11 +68,11 @@ actor class UserShard() {
 
     // Function to delete a user
     public shared ({ caller }) func deleteUser(userID : Text) : async Result.Result<(), Text> {
-        if (isPermitted(caller)) {
+        // if (isPermitted(caller)) {
 
-        } else {
-            return #err("You are not permitted");
-        };
+        // } else {
+        //     return #err("You are not permitted");
+        // };
         switch (BTree.delete(userMap, Text.compare, userID)) {
             case (?_) { #ok(()) };
             case null { #err("User not found") };

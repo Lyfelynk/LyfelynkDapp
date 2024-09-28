@@ -1,12 +1,15 @@
 import Blob "mo:base/Blob";
 import Buffer "mo:base/Buffer";
 import Int "mo:base/Int";
+import Nat "mo:base/Nat";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
 import IdentityManager "../IdentityManager/IdentityManager";
+import SharedActivityService "../SharedActivitySystem/SharedActivityService";
 import Types "../Types";
+import XPRewardSystem "../XPSystem/XPRewardSystem";
 import DataAssetShardManager "DataAssetShardManager";
 
 actor DataAssetService {
@@ -15,9 +18,14 @@ actor DataAssetService {
     type SharedType = Types.SharedType;
     type sharedActivityInfo = Types.sharedActivityInfo;
     type DataAssetShardManager = DataAssetShardManager.DataAssetShardManager;
+    type SharedActivityService = SharedActivityService.SharedActivityService;
     type IdentityManager = IdentityManager.IdentityManager;
-    let ShardManager : DataAssetShardManager = actor ("be2us-64aaa-aaaaa-qaabq-cai"); // Replace with actual canister ID
-    let identityManager : IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual canister ID
+    type XPRewardSystem = XPRewardSystem.XPRewardSystem;
+
+    let ShardManager : DataAssetShardManager = actor ("be2us-64aaa-aaaaa-qaabq-cai");
+    let sharedActivityService : SharedActivityService = actor ("aovwi-4maaa-aaaaa-qaagq-cai");
+    let identityManager : IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); //
+    let xpRewardSystem : XPRewardSystem = actor ("c2lt4-zmaaa-aaaaa-qaaiq-cai"); // Replace with actual canister ID
 
     public shared ({ caller }) func uploadDataAsset(asset : DataAsset) : async Result.Result<Text, Text> {
         let userIDResult = await getUserID(caller);
@@ -32,16 +40,26 @@ actor DataAssetService {
                         let updatedAsset = {
                             asset with assetID = assetID # "-" # userID # "-" # timestamp
                         };
-                        let result = await shard.insertDataAsset(userID, timestamp, updatedAsset);
+                        let result = await shard.insertDataAsset(userID, timestamp, updatedAsset, caller);
                         switch (result) {
-                            case (#ok(_)) {
+                            case (#ok(insertDataAssetResult)) {
                                 let shardID = await ShardManager.getShardIDFromAssetID(assetID);
                                 switch (shardID) {
                                     case (#ok(id)) {
                                         let updateResult = await ShardManager.updateUserShardMap(userID, id);
                                         switch (updateResult) {
                                             case (#ok(_)) {
-                                                return #ok(updatedAsset.assetID);
+                                                // Reward XP for the upload
+                                                let xpResult = await xpRewardSystem.rewardXPForUpload(userID);
+                                                switch (xpResult) {
+                                                    case (#ok(xp)) {
+                                                        return #ok(insertDataAssetResult);
+                                                    };
+                                                    case (#err(e)) {
+                                                        // XP reward failed, but asset upload was successful
+                                                        return #ok(insertDataAssetResult);
+                                                    };
+                                                };
                                             };
                                             case (#err(e)) {
                                                 return #err("Failed to update user shard map: " # e);
@@ -122,62 +140,76 @@ actor DataAssetService {
         let userIDResult = await getUserID(caller);
         switch (userIDResult) {
             case (#ok(userID)) {
-                let shardResult = await ShardManager.getShard(assetID);
-                switch (shardResult) {
-                    case (#ok(shard)) {
-                        let parts = Text.split(assetID, #text("-"));
-                        switch (parts.next(), parts.next(), parts.next()) {
-                            case (?_assetNum, ?assetUserID, ?timestamp) {
-                                if (userID == assetUserID) {
-                                    let updateResult = await shard.updateDataAsset(userID, timestamp, updatedAsset);
-                                    switch (updateResult) {
-                                        case (#ok(_)) { return #ok(()) };
-                                        case (#err(e)) { return #err(e) };
+                let parts = Text.split(assetID, #text("-"));
+                switch (parts.next(), parts.next(), parts.next()) {
+                    case (?assetNum, ?assetUserID, ?timestamp) {
+                        let shardResult = await ShardManager.getShard(assetNum);
+                        switch (shardResult) {
+                            case (#ok(shard)) {
+                                let parts = Text.split(assetID, #text("-"));
+                                switch (parts.next(), parts.next(), parts.next()) {
+                                    case (?_assetNum, ?assetUserID, ?timestamp) {
+                                        if (userID == assetUserID) {
+                                            let updateResult = await shard.updateDataAsset(userID, timestamp, updatedAsset);
+                                            switch (updateResult) {
+                                                case (#ok(_)) { return #ok(()) };
+                                                case (#err(e)) {
+                                                    return #err(e);
+                                                };
+                                            };
+                                        } else {
+                                            return #err("Only the owner can update this asset");
+                                        };
                                     };
-                                } else {
-                                    return #err("Only the owner can update this asset");
+                                    case _ {
+                                        return #err("Invalid asset ID format");
+                                    };
                                 };
                             };
-                            case _ { return #err("Invalid asset ID format") };
+                            case (#err(e)) { return #err(e) };
                         };
                     };
-                    case (#err(e)) { return #err(e) };
+                    case _ { return #err("Invalid asset ID format") };
                 };
+
             };
             case (#err(e)) { return #err("Error getting caller ID: " # e) };
         };
     };
 
-    public shared ({ caller }) func shareDataAsset(assetID : Text, recipientID : Text, sharedType : SharedType) : async Result.Result<(), Text> {
-        let userIDResult = await ShardManager.getUserID(caller);
+    public shared ({ caller }) func shareDataAsset(assetID : Text, recipientID : Text, sharedType : SharedType) : async Result.Result<Text, Text> {
+        let userIDResult = await getUserID(caller);
         switch (userIDResult) {
             case (#ok(callerID)) {
                 let parts = Text.split(assetID, #text("-"));
                 switch (parts.next(), parts.next(), parts.next()) {
-                    case (?assetNum, ?ownerID, ?timestamp) {
+                    case (?assetNum, ?ownerID, ?_timestamp) {
                         if (callerID != ownerID) {
                             return #err("Only the owner can share this asset");
                         };
                         let shardResult = await ShardManager.getShard(assetNum);
                         switch (shardResult) {
                             case (#ok(shard)) {
-                                let recipientPrincipal = await ShardManager.getPrincipal(recipientID);
-                                switch (recipientPrincipal) {
-                                    case (#ok(principal)) {
-                                        let grantResult = await shard.grantAccess(assetID, principal);
+                                let recipientPrincipalResult = await identityManager.getPrincipalByID(recipientID);
+                                switch (recipientPrincipalResult) {
+                                    case (#ok(recipientPrincipal)) {
+                                        let grantResult = await shard.grantAccess(assetID, recipientPrincipal);
                                         switch (grantResult) {
                                             case (#ok(_)) {
-                                                let sharedInfo : sharedActivityInfo = {
-                                                    activityID = "";
-                                                    assetID = assetID;
-                                                    usedSharedTo = recipientID;
-                                                    time = Int.abs(Time.now());
-                                                    sharedType = sharedType;
-                                                };
 
-                                                #ok(());
+                                                let recordResult = await sharedActivityService.recordSharedActivity(caller, assetID, recipientID, sharedType);
+                                                switch (recordResult) {
+                                                    case (#ok(_)) {
+                                                        #ok("Shared successfully");
+                                                    };
+                                                    case (#err(e)) {
+                                                        #err("Failed to record shared activity: " # e);
+                                                    };
+                                                };
                                             };
-                                            case (#err(e)) { #err(e) };
+                                            case (#err(e)) {
+                                                #err("Failed to grant access: " # e);
+                                            };
                                         };
                                     };
                                     case (#err(e)) {
@@ -185,7 +217,7 @@ actor DataAssetService {
                                     };
                                 };
                             };
-                            case (#err(e)) { #err(e) };
+                            case (#err(e)) { #err("Failed to get shard: " # e) };
                         };
                     };
                     case _ { #err("Invalid asset ID format") };
@@ -194,6 +226,92 @@ actor DataAssetService {
             case (#err(e)) { #err("Error getting caller ID: " # e) };
         };
     };
+
+    public shared ({ caller }) func getReceivedDataAssets() : async Result.Result<[(Text, DataAsset)], Text> {
+        let userIDResult = await getUserID(caller);
+        switch (userIDResult) {
+            case (#ok(userID)) {
+
+                let receivedActivitiesResult = await sharedActivityService.getReceivedActivities(caller);
+                switch (receivedActivitiesResult) {
+                    case (#ok(activities)) {
+                        let receivedAssets = Buffer.Buffer<(Text, DataAsset)>(0);
+                        for (activity in activities.vals()) {
+                            let assetResult = await getDataAsset(activity.assetID);
+                            switch (assetResult) {
+                                case (#ok(asset)) {
+                                    receivedAssets.add((activity.assetID, asset));
+                                };
+                                case (#err(_)) { /* Skip if error */ };
+                            };
+                        };
+                        #ok(Buffer.toArray(receivedAssets));
+                    };
+                    case (#err(e)) {
+                        #err("Failed to get received activities: " # e);
+                    };
+                };
+            };
+            case (#err(e)) { #err("Error getting user ID: " # e) };
+        };
+    };
+
+    // By Facility & Professional
+    public shared ({ caller }) func uploadDataAssetForUser(asset : DataAsset, userID : Text) : async Result.Result<Text, Text> {
+        let callerIDResult = await getUserID(caller);
+        switch (callerIDResult) {
+            case (#ok(callerID)) {
+                let callerTypeResult = await identityManager.checkRegistrationByPrincipal(caller);
+                switch (callerTypeResult) {
+                    case (#ok(callerType)) {
+                        if (callerType != "Professional" and callerType != "Facility") {
+                            return #err("Only professionals or facilities can upload data for users");
+                        };
+
+                        let assetID = await ShardManager.getNextAssetID();
+                        let timestamp = Int.toText(Time.now());
+
+                        let shardResult = await ShardManager.getShard(assetID);
+                        switch (shardResult) {
+                            case (#ok(shard)) {
+                                let updatedAsset = {
+                                    asset with
+                                    assetID = assetID # "-" # userID # "-" # timestamp;
+                                };
+                                let result = await shard.insertDataAsset(userID, timestamp, updatedAsset, caller);
+                                switch (result) {
+                                    case (#ok(_)) {
+                                        let shardID = await ShardManager.getShardIDFromAssetID(assetID);
+                                        switch (shardID) {
+                                            case (#ok(id)) {
+                                                let updateResult = await ShardManager.updateUserShardMap(userID, id);
+                                                switch (updateResult) {
+                                                    case (#ok(_)) {
+                                                        return #ok(updatedAsset.assetID);
+                                                    };
+                                                    case (#err(e)) {
+                                                        return #err("Failed to update user shard map: " # e);
+                                                    };
+                                                };
+                                            };
+                                            case (#err(e)) { return #err(e) };
+                                        };
+                                    };
+                                    case (#err(e)) { return #err(e) };
+                                };
+                            };
+                            case (#err(e)) { return #err(e) };
+                        };
+                    };
+                    case (#err(e)) {
+                        return #err("Error checking caller type: " # e);
+                    };
+                };
+            };
+            case (#err(e)) { return #err("Error getting caller ID: " # e) };
+        };
+    };
+    //
 
     // Utility functions
     public shared func getUserID(principal : Principal) : async Result.Result<Text, Text> {
@@ -218,26 +336,50 @@ actor DataAssetService {
     };
 
     public shared ({ caller }) func getSymmetricKeyVerificationKey(assetID : Text) : async Result.Result<Text, Text> {
-        let shardResult = await ShardManager.getShard(assetID);
-        switch (shardResult) {
-            case (#ok(shard)) {
-                #ok(await shard.getSymmetricKeyVerificationKey());
+        let parts = Text.split(assetID, #text("-"));
+        switch (parts.next(), parts.next(), parts.next()) {
+            case (?assetNum, ?userID, ?timestamp) {
+                let shardResult = await ShardManager.getShard(assetNum);
+                switch (shardResult) {
+                    case (#ok(shard)) {
+                        #ok(await shard.getSymmetricKeyVerificationKey());
+                    };
+                    case (#err(e)) {
+                        #err("Error getting shard: " # e);
+                    };
+                };
             };
-            case (#err(e)) {
-                #err("Error getting shard: " # e);
-            };
+            case _ { return #err("Invalid asset ID format") };
         };
+
     };
 
     public shared ({ caller }) func getEncryptedSymmetricKeyForAsset(assetID : Text, encryption_public_key : Blob) : async Result.Result<Text, Text> {
-        let shardResult = await ShardManager.getShard(assetID);
-        switch (shardResult) {
-            case (#ok(shard)) {
-                await shard.encrypted_symmetric_key_for_asset(caller, assetID, encryption_public_key);
+        let parts = Text.split(assetID, #text("-"));
+        switch (parts.next(), parts.next(), parts.next()) {
+            case (?assetNum, ?userID, ?timestamp) {
+                let shardResult = await ShardManager.getShard(assetNum);
+                switch (shardResult) {
+                    case (#ok(shard)) {
+                        await shard.encrypted_symmetric_key_for_asset(caller, assetID, encryption_public_key);
+                    };
+                    case (#err(e)) {
+                        #err("Error getting shard: " # e);
+                    };
+                };
             };
-            case (#err(e)) {
-                #err("Error getting shard: " # e);
+            case _ { return #err("Invalid asset ID format") };
+        };
+
+    };
+
+    public shared ({ caller }) func getUserXP() : async Result.Result<Nat, Text> {
+        let userIDResult = await getUserID(caller);
+        switch (userIDResult) {
+            case (#ok(userID)) {
+                await xpRewardSystem.getUserXP(userID);
             };
+            case (#err(e)) { #err("Error getting user ID: " # e) };
         };
     };
 };

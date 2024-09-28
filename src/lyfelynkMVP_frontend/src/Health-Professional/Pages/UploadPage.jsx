@@ -21,12 +21,13 @@ import { toast } from "@/components/ui/use-toast";
 import FileUpload from "../../Functions/file-upload";
 import { DatePicker } from "@/Functions/DatePicker";
 import { jsPDF } from "jspdf";
-import { useState } from "react";
-import { useCanister } from "@connect2ic/react";
+import { useState, useContext } from "react";
+import ActorContext from "../../ActorContext";
 import LoadingScreen from "../../LoadingScreen";
 import * as vetkd from "ic-vetkd-utils";
+
 export default function UploadContent() {
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [formData, setFormData] = useState({
     dateOfCheckup: "",
     typeOfCheckup: "",
@@ -65,7 +66,7 @@ export default function UploadContent() {
       },
     };
 
-    const result = await lyfelynkMVP_backend.linkHealthData(emptyDataAsset);
+    const result = await actors.dataAsset.uploadDataAsset(emptyDataAsset);
     let uniqueID = "";
 
     Object.keys(result).forEach((key) => {

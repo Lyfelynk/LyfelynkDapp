@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -29,7 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DownloadFile from "@/Functions/DownloadFile";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "@/ActorContext";
 
 const columns = [
   {
@@ -80,13 +80,13 @@ function DataPurchasedTable() {
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState([]);
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPurchasedDataAssets = async () => {
       try {
-        const result = await lyfelynkMVP_backend.getPurchasedDataAssets();
+        const result = await actors.dataAsset.getPurchasedDataAssets();
         if (result.ok) {
           const purchasedAssets = result.ok.map(
             ([dataAsset, purchasedInfo]) => ({
@@ -106,7 +106,7 @@ function DataPurchasedTable() {
     };
 
     fetchPurchasedDataAssets();
-  }, [lyfelynkMVP_backend]);
+  }, [actors]);
 
   const table = useReactTable({
     data,

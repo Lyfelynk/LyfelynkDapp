@@ -3,9 +3,6 @@ import {
   CarouselContent,
   Carousel,
 } from "@/components/ui/carousel";
-import { Card } from "@/components/ui/card";
-import RecentActivityTable from "../Tables/RecentActivityData";
-import DataPurchasedTable from "../Tables/DataPurchased";
 
 export default function DashboardContent() {
   return (

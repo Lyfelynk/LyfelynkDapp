@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useCanister } from "@connect2ic/react";
+import React, { useState, useContext } from "react";
+import ActorContext from "../ActorContext";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,12 +19,12 @@ export function ShareDataFunc({ assetID }) {
   const [userId, setUserId] = useState("");
   const [open, setOpen] = useState(false);
   const [sharing, setSharing] = useState(false);
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
 
   const handleShare = async () => {
     try {
       setSharing(true);
-      const result = await lyfelynkMVP_backend.grantDataAccess(userId, assetID);
+      const result = await actors.dataAsset.shareDataAsset(userId, assetID);
       if (result.ok) {
         toast({
           title: "Access Granted!",

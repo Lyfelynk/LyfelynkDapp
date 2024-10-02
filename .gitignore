@@ -19,9 +19,12 @@ target/
 # frontend code
 node_modules/
 dist/
+src/.env
 .svelte-kit/
 
 # environment variables
 .env
 
 .mops
+
+src/lyfelynkMVP_frontend/.env

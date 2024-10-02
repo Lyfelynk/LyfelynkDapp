@@ -23,6 +23,7 @@ export default defineConfig({
     emptyOutDir: true,
   },
   optimizeDeps: {
+    include: ["date-fns"],
     esbuildOptions: {
       define: {
         global: "globalThis",
@@ -55,11 +56,18 @@ export default defineConfig({
     "process.env.CANISTER_ID_DATAASSET": JSON.stringify(
       process.env.CANISTER_ID_DATAASSET,
     ),
+    "process.env.CANISTER_ID_IDENTITY_MANAGER": JSON.stringify(
+      process.env.CANISTER_ID_IDENTITY_MANAGER,
+    ),
+    "process.env.CANISTER_ID_SHARED_ACTIVITY": JSON.stringify(
+      process.env.CANISTER_ID_SHARED_ACTIVITY,
+    ),
     "process.env.II_URL": JSON.stringify(
       process.env.DFX_NETWORK === "local"
         ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943/`
         : "https://identity.ic0.app/",
     ),
+    "process.env.LIGHTHOUSEAPI": JSON.stringify(process.env.LIGHTHOUSEAPI),
   },
   resolve: {
     alias: [

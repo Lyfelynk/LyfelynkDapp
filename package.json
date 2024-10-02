@@ -21,6 +21,7 @@
     "vite-plugin-wasm-esm": "^1.0.1"
   },
   "dependencies": {
+    "date-fns": "^3.6.0",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
     "recharts": "^2.12.7",

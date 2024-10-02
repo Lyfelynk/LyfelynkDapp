@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { ChevronLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "../../ActorContext";
 import LoadingScreen from "../../LoadingScreen";
 import OnboardingBanner from "../../OnboardingBanner";
 import * as vetkd from "ic-vetkd-utils";
@@ -23,7 +23,7 @@ const formSchema = z.object({
 });
 
 export default function RegisterPage3Content() {
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     facultyName: "",
@@ -81,7 +81,7 @@ export default function RegisterPage3Content() {
       const seed = window.crypto.getRandomValues(new Uint8Array(32));
       const tsk = new vetkd.TransportSecretKey(seed);
       const encryptedKeyResult =
-        await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
+        await actors.facility.encrypted_symmetric_key_for_facility(
           Object.values(tsk.public_key()),
         );
 
@@ -107,9 +107,8 @@ export default function RegisterPage3Content() {
         return;
       }
 
-      const pkBytesHex =
-        await lyfelynkMVP_backend.symmetric_key_verification_key();
-      const principal = await lyfelynkMVP_backend.whoami();
+      const pkBytesHex = await actors.facility.symmetric_key_verification_key();
+      const principal = await actors.facility.whoami();
       const aesGCMKey = tsk.decrypt_and_hash(
         hex_decode(encryptedKey),
         hex_decode(pkBytesHex),
@@ -128,7 +127,7 @@ export default function RegisterPage3Content() {
         aesGCMKey,
       );
 
-      const result = await lyfelynkMVP_backend.createFacility(
+      const result = await actors.facility.createFacilityRequest(
         Object.values(encryptedDataDemo),
         Object.values(encryptedDataService),
         Object.values(encryptedDataLicense),

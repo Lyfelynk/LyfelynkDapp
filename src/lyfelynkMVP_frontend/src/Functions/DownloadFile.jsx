@@ -1,13 +1,25 @@
 import React from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "../ActorContext";
 import * as vetkd from "ic-vetkd-utils";
+import { useState, useContext } from "react";
 
-import { useState } from "react";
+// Helper to download file from Lighthouse
+const downloadFromLighthouse = async (hash) => {
+  const response = await fetch(
+    `https://gateway.lighthouse.storage/ipfs/${hash}`,
+  );
+  console.log(response);
+  if (!response) {
+    throw new Error("Failed to download file from Lighthouse");
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  return new Uint8Array(arrayBuffer);
+};
 
-const DownloadFile = ({ uniqueID, format, title }) => {
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+const DownloadFile = ({ data, uniqueID, format, title }) => {
+  const { actors } = useContext(ActorContext);
   const [downloading, setDownloading] = useState(false);
 
   function downloadData(file) {
@@ -45,12 +57,16 @@ const DownloadFile = ({ uniqueID, format, title }) => {
   const downloadFile = async () => {
     try {
       setDownloading(true);
+      console.log(data);
+      // Step 1: Download encrypted file from Lighthouse using the hash
+      const encryptedData = await downloadFromLighthouse(data);
+      console.log(encryptedData);
 
-      // Step 1: Retrieve the encrypted key using encrypted_symmetric_key_for_dataAsset
+      // Step 2: Retrieve the encrypted key using encrypted_symmetric_key_for_dataAsset
       const seed = window.crypto.getRandomValues(new Uint8Array(32));
       const tsk = new vetkd.TransportSecretKey(seed);
       const encryptedKeyResult =
-        await lyfelynkMVP_backend.encrypted_symmetric_key_for_dataAsset(
+        await actors.dataAsset.getEncryptedSymmetricKeyForAsset(
           uniqueID,
           Object.values(tsk.public_key()),
         );
@@ -71,23 +87,36 @@ const DownloadFile = ({ uniqueID, format, title }) => {
       }
 
       const pkBytesHex =
-        await lyfelynkMVP_backend.symmetric_key_verification_key();
+        await actors.dataAsset.getSymmetricKeyVerificationKey(uniqueID);
+
+      let symmetricVerificiationKey = "";
+
+      Object.keys(pkBytesHex).forEach((key) => {
+        if (key === "err") {
+          throw new Error(pkBytesHex[key]);
+        }
+        if (key === "ok") {
+          symmetricVerificiationKey = pkBytesHex[key];
+        }
+      });
+
+      if (!symmetricVerificiationKey) {
+        throw new Error("Failed to get encrypted key");
+      }
+
+      // Step 3: Decrypt the key using tsk.decrypt_and_hash
       const aesGCMKey = tsk.decrypt_and_hash(
         hex_decode(encryptedKey),
-        hex_decode(pkBytesHex),
+        hex_decode(symmetricVerificiationKey),
         new TextEncoder().encode(uniqueID),
         32,
         new TextEncoder().encode("aes-256-gcm"),
       );
-      console.log(aesGCMKey);
-      // Step 2: Decrypt the data using the AES-GCM key
-      const result = await lyfelynkMVP_backend.downloadDataAssetData(uniqueID);
-      const decryptedData = await aes_gcm_decrypt(
-        new Uint8Array(result.ok),
-        aesGCMKey,
-      );
 
-      // Step 3: Create a Blob and File from the decrypted data
+      // Step 4: Decrypt the file data using the AES-GCM key
+      const decryptedData = await aes_gcm_decrypt(encryptedData, aesGCMKey);
+
+      // Step 5: Create a Blob and File from the decrypted data
       const decryptedFileBlob = new Blob([decryptedData], {
         type: format,
       });
@@ -95,12 +124,13 @@ const DownloadFile = ({ uniqueID, format, title }) => {
         type: format,
       });
 
-      // Step 4: Download the decrypted file
+      // Step 6: Download the decrypted file
       downloadData(decryptedFile);
       setDownloading(false);
     } catch (error) {
       console.error("Error downloading file:", error);
       alert("Failed to download the file. Please try again.");
+      setDownloading(false);
     }
   };
 
@@ -111,6 +141,7 @@ const DownloadFile = ({ uniqueID, format, title }) => {
       disabled={downloading}
     >
       <Download />
+      {downloading ? "Downloading..." : "Download"}
     </Button>
   );
 };

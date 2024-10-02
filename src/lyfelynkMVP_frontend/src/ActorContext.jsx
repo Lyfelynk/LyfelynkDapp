@@ -6,6 +6,8 @@ const ActorContext = React.createContext({
     professional: null,
     facility: null,
     dataAsset: null,
+    identityManager: null,
+    sharedActivity: null,
   },
   isAuthenticated: false,
   login: () => {},

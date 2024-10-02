@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,15 +12,16 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { ShoppingCart } from "lucide-react";
-import { useCanister } from "@connect2ic/react";
+
+import ActorContext from "../ActorContext";
 
 export function BuyDataFunc({ listingID, seller }) {
   const [open, setOpen] = useState(false);
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
 
   const handleConfirmPurchase = async () => {
     try {
-      const result = await lyfelynkMVP_backend.purchaseListing(
+      const result = await actors.marketplace.purchaseListing(
         listingID,
         seller,
       );

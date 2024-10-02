@@ -1,19 +1,14 @@
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthClient } from "@dfinity/auth-client";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import LoadingScreen from "../LoadingScreen";
 import OnboardingBanner from "../OnboardingBanner";
 import { ChevronRight, User, BriefcaseMedical, Building } from "lucide-react";
 import ActorContext from "../ActorContext";
 
 export default function FirstPageContent() {
   const navigate = useNavigate();
-  const { actors, isAuthenticated, login } = useContext(ActorContext);
-
-  // const [registrationStatus, setRegistrationStatus] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated } = useContext(ActorContext);
 
   const checkRegistration = async (type) => {
     if (!isAuthenticated) {
@@ -24,27 +19,8 @@ export default function FirstPageContent() {
       });
       return;
     }
-
-    try {
-      let resultOfRegistration = await actors.user.whoami();
-      console.log(resultOfRegistration);
-      console.log(type);
-      navigate("/Register/Health-User"); //For Demo only
-
-      // Your navigation logic here based on the registration status and type
-    } catch (error) {
-      console.error("Error checking registration:", error);
-      toast({
-        title: "Error",
-        description: "Failed to check registration status",
-        variant: "destructive",
-      });
-    }
+    navigate(`/Register/${type}`);
   };
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
 
   return (
     <section className="bg-[conic-gradient(at_bottom_right,_var(--tw-gradient-stops))] from-blue-700 via-blue-800 to-gray-900">
@@ -65,13 +41,6 @@ export default function FirstPageContent() {
               <h2 className="text-xl md:text-2xl font-bold text-black">
                 Get Started
               </h2>
-              <div className="auth-section">
-                {!isAuthenticated ? (
-                  <Button onClick={login}>Login</Button>
-                ) : (
-                  <Button disabled>Logged In</Button>
-                )}
-              </div>
             </div>
             <p className="text-sm text-gray-500 mb-4">Login/Register As</p>
             <div>

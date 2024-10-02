@@ -22,6 +22,7 @@ actor class ProfessionalShard() {
                         #err("Failed to insert professional with ID " # professionalID);
                     };
                 };
+
                 case (?_) {
                     #err("Unexpected result: Professional already existed");
                 };

@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import { Dna, Footprints, GlassWater, Heart, User, Weight } from "lucide-react";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "../ActorContext";
 import LoadingScreen from "../LoadingScreen";
 
 import * as vetkd from "ic-vetkd-utils";
 
 function HealthAnalyticsOld() {
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [loading, setLoading] = useState(false);
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
@@ -42,7 +42,7 @@ function HealthAnalyticsOld() {
 
     if (userCategory == "User") {
       try {
-        const result = await lyfelynkMVP_backend.readUser();
+        const result = await actors.user.readUser();
         if (result.ok) {
           const { IDNum, UUID, MetaData } = result.ok;
           const {
@@ -56,7 +56,7 @@ function HealthAnalyticsOld() {
           const seed = window.crypto.getRandomValues(new Uint8Array(32));
           const tsk = new vetkd.TransportSecretKey(seed);
           const encryptedKeyResult =
-            await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
+            await actors.user.encrypted_symmetric_key_for_user(
               Object.values(tsk.public_key()),
             );
 
@@ -78,9 +78,8 @@ function HealthAnalyticsOld() {
             return;
           }
 
-          const pkBytesHex =
-            await lyfelynkMVP_backend.symmetric_key_verification_key();
-          const principal = await lyfelynkMVP_backend.whoami();
+          const pkBytesHex = await actors.user.symmetric_key_verification_key();
+          const principal = await actors.user.whoami();
           console.log(pkBytesHex);
           console.log(encryptedKey);
           const aesGCMKey = tsk.decrypt_and_hash(

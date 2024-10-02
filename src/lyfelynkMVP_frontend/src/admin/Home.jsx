@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -48,35 +48,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Principal } from "@dfinity/principal";
+import ActorContext from "../ActorContext";
 import WasmModuleUploader from "./WasmModuleUploader";
 
 function Home() {
-  const [professionals, setProfessionals] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      occupation: "Doctor",
-      certificationId: "DOC123",
-      company: "City Hospital",
-      status: "pending",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      occupation: "Nurse",
-      certificationId: "NUR456",
-      company: "County Clinic",
-      status: "pending",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      occupation: "Therapist",
-      certificationId: "THE789",
-      company: "Mind Wellness",
-      status: "pending",
-    },
-  ]);
+  const { actors } = useContext(ActorContext);
+  const [professionals, setProfessionals] = useState([]);
 
   const [facilities, setFacilities] = useState([
     {
@@ -110,13 +88,68 @@ function Home() {
   const [message, setMessage] = useState("");
   const [wasmFile, setWasmFile] = useState(null);
 
+  useEffect(() => {
+    const fetchPendingRequests = async () => {
+      try {
+        const result =
+          await actors.professional.getPendingProfessionalRequests();
+        if (result.ok) {
+          const formattedRequests = result.ok.map(([principal, data]) => ({
+            id: principal,
+            name: JSON.parse(
+              new TextDecoder().decode(data.MetaData.DemographicInformation),
+            ).name,
+            occupation: JSON.parse(
+              new TextDecoder().decode(data.MetaData.OccupationInformation),
+            ).occupation,
+            certificationId: JSON.parse(
+              new TextDecoder().decode(data.MetaData.CertificationInformation),
+            ).certificationId,
+            company: JSON.parse(
+              new TextDecoder().decode(data.MetaData.OccupationInformation),
+            ).company,
+            status: "pending",
+          }));
+          setProfessionals(formattedRequests);
+        } else {
+          console.error("Error fetching pending requests:", result.err);
+        }
+      } catch (error) {
+        console.error("Error fetching pending requests:", error);
+      }
+      setLoading(false);
+    };
+
+    fetchPendingRequests();
+  }, [actors]);
+
   const adminRegister = () => {
     setMessage(`adminRegister function is not implemented yet`);
   };
 
-  const handleStatusChange = (type, id, action) => {
-    setCurrentAction({ type, id, action });
-    setIsDialogOpen(true);
+  const handleStatusChange = async (type, id, action) => {
+    try {
+      let result;
+      if (action === "approve") {
+        console.log("approve");
+        result = await actors.professional.approveProfessionalRequest(id);
+        console.log(result);
+      } else {
+        console.log("reject");
+        result = await actors.professional.rejectProfessionalRequest(id);
+        console.log(result);
+      }
+
+      if (result.ok) {
+        setProfessionals(professionals.filter((p) => p.id !== id));
+        setMessage(`Professional ${action}d successfully`);
+      } else {
+        setMessage(`Error ${action}ing professional: ${result.err}`);
+      }
+    } catch (error) {
+      console.error(`Error ${action}ing professional:`, error);
+      setMessage(`Error ${action}ing professional`);
+    }
   };
 
   const confirmStatusChange = () => {
@@ -189,9 +222,6 @@ function Home() {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
-      filterFn: (row, id, value) => {
-        return value === "all" ? true : row.getValue(id) === value;
-      },
     },
     {
       id: "actions",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -10,7 +10,6 @@ import {
 import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -27,7 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BuyDataFunc } from "@/Functions/BuyData";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "../../ActorContext";
 
 const columns = [
   {
@@ -66,13 +65,13 @@ function DataOnSaleTable() {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
+  const { actors } = useContext(ActorContext);
   const [data, setData] = useState([]);
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const result = await lyfelynkMVP_backend.getAllListings();
+        const result = await actors.marketplace.getAllListings();
         if (result.ok) {
           setData(result.ok);
         } else {
@@ -84,7 +83,7 @@ function DataOnSaleTable() {
     };
 
     fetchListings();
-  }, [lyfelynkMVP_backend]);
+  }, [actors]);
 
   const table = useReactTable({
     data: data,

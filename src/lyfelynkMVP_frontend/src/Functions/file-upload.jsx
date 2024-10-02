@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import Papa from "papaparse";
 import jsPDF from "jspdf";
@@ -16,11 +16,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { CircleX } from "lucide-react";
 import LoadingScreen from "../LoadingScreen";
-import { useCanister } from "@connect2ic/react";
+import ActorContext from "../ActorContext";
 import * as vetkd from "ic-vetkd-utils";
 
 const FileUpload = () => {
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [file, setFile] = useState(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [description, setDescription] = useState("");
@@ -119,9 +119,11 @@ const FileUpload = () => {
 
       // Step 1: Upload/link an empty file to get a unique ID
       const emptyDataAsset = {
+        assetID: "",
         title: "Empty File",
         description: "Placeholder for encryption",
-        data: [],
+        data: "[]",
+
         metadata: {
           category: "",
           tags: [],
@@ -129,7 +131,7 @@ const FileUpload = () => {
         },
       };
 
-      const result = await lyfelynkMVP_backend.linkHealthData(emptyDataAsset);
+      const result = await actors.dataAsset.uploadDataAsset(emptyDataAsset);
       let uniqueID = "";
 
       Object.keys(result).forEach((key) => {
@@ -152,7 +154,7 @@ const FileUpload = () => {
       const seed = window.crypto.getRandomValues(new Uint8Array(32));
       const tsk = new vetkd.TransportSecretKey(seed);
       const encryptedKeyResult =
-        await lyfelynkMVP_backend.encrypted_symmetric_key_for_dataAsset(
+        await actors.dataAsset.getEncryptedSymmetricKeyForAsset(
           uniqueID,
           Object.values(tsk.public_key()),
         );
@@ -176,7 +178,7 @@ const FileUpload = () => {
       }
 
       const pkBytesHex =
-        await lyfelynkMVP_backend.symmetric_key_verification_key();
+        await actors.dataAsset.getSymmetricKeyVerificationKey(uniqueID);
       console.log(pkBytesHex);
       console.log(encryptedKey);
       const aesGCMKey = tsk.decrypt_and_hash(
@@ -201,6 +203,7 @@ const FileUpload = () => {
         };
 
         const dataAsset = {
+          assetID: uniqueID,
           title: file.file.name,
           description: description,
           data: Object.values(encryptedData),
@@ -208,8 +211,8 @@ const FileUpload = () => {
         };
 
         // Step 4: Update the data asset with the encrypted file
-        const updateResult = await lyfelynkMVP_backend.updateDataAsset(
-          uniqueID.split("-")[1],
+        const updateResult = await actors.dataAsset.updateDataAsset(
+          uniqueID,
           dataAsset,
         );
 

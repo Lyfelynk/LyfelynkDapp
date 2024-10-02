@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState, useContext } from "react";
 import { Upload, RefreshCw, AlertCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,10 +13,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import ActorContext from "../ActorContext";
+
 function WasmModuleUploader() {
+  const { actors, login } = useContext(ActorContext);
   const [wasmFile, setWasmFile] = useState(null);
   const [selectedModule, setSelectedModule] = useState("User");
   const [message, setMessage] = useState("");
+
+  const readFile = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => resolve(event.target.result);
+      reader.onerror = (error) => reject(error);
+      reader.readAsArrayBuffer(file);
+    });
+  };
 
   const handleWasmFileChange = (event) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -23,46 +36,61 @@ function WasmModuleUploader() {
     }
   };
 
-  const handleUpdateWasmModule = (event) => {
+  const handleUpdateWasmModule = async (event) => {
     event.preventDefault();
-    if (wasmFile) {
+    if (!wasmFile) {
+      setMessage("Please select a WASM file first.");
+      return;
+    }
+
+    try {
+      const arrayBuffer = await readFile(wasmFile);
+      const byteArray = [...new Uint8Array(arrayBuffer)];
+
+      let result;
       switch (selectedModule) {
         case "User":
-          setMessage(
-            `WASM module "${wasmFile.name}" update for User is not implemented`,
-          );
+          result = await actors.user.updateUserShardWasmModule(byteArray);
           break;
         case "Professional":
-          setMessage(
-            `WASM module "${wasmFile.name}" update for Professional is not implemented`,
-          );
+          result =
+            await actors.professional.updateProfessionalShardWasmModule(
+              byteArray,
+            );
           break;
         case "Facility":
-          setMessage(
-            `WASM module "${wasmFile.name}" update for Facility is not implemented`,
-          );
+          result =
+            await actors.facility.updateFacilityShardWasmModule(byteArray);
           break;
         case "DataAsset":
-          setMessage(
-            `WASM module "${wasmFile.name}" update for DataAsset is not implemented`,
-          );
+          result =
+            await actors.dataAsset.updateDataAssetShardWasmModule(byteArray);
           break;
         case "Marketplace":
-          setMessage(
-            `WASM module "${wasmFile.name}" update for Marketplace is not implemented`,
-          );
+          // Assuming there's a marketplace actor with an updateWasmModule function
+          result = await actors.marketplace.updateWasmModule(byteArray);
           break;
         default:
           setMessage("Unknown module selected");
+          return;
       }
-    } else {
-      setMessage("Please select a WASM file");
+
+      if ("ok" in result) {
+        setMessage(`WASM module for ${selectedModule} updated successfully.`);
+      } else {
+        setMessage(
+          `Error updating ${selectedModule} WASM module: ${result.err}`,
+        );
+      }
+    } catch (error) {
+      setMessage(`Error: ${error.message}`);
     }
   };
 
   return (
     <Card className="mt-8">
       <CardHeader>
+        <Button onClick={login}>Login</Button>
         <CardTitle className="flex items-center text-lg font-semibold">
           <RefreshCw className="mr-2 h-6 w-6" />
           Update WASM Module

@@ -6,74 +6,89 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 
+import IdentityManager "../IdentityManager/IdentityManager";
 import Types "../Types";
 import Hex "../utility/Hex";
 import UserShardManager "UserShardManager";
-
-actor UserService {
+actor class UserService() {
     type HealthIDUser = Types.HealthIDUser;
     type UserShardManager = UserShardManager.UserShardManager;
 
-    let ShardManager : UserShardManager = actor ("bw4dl-smaaa-aaaaa-qaacq-cai"); // Replace with actual canister ID
+    private var adminPrincipal = ""; //Admin Principal
+    private var isAdminRegistered = false; //Admin Registration Status
+    let ShardManager : UserShardManager = actor ("c5kvi-uuaaa-aaaaa-qaaia-cai"); // User Shard Manager Canister ID
+    let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
+    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("cgpjn-omaaa-aaaaa-qaakq-cai");
 
     // Function to create a new user
     public shared ({ caller }) func createUser(demoInfo : Blob, basicHealthPara : Blob, bioMData : ?Blob, familyData : ?Blob) : async Result.Result<Text, Text> {
-        let userIDResult = await ShardManager.generateUserID();
-        let uuidResult = await ShardManager.generateUUID();
+        let userIDResult = await ShardManager.generateUserID(); // Generate User ID via UserShardManager
+        let uuidResult = await ShardManager.generateUUID(); // Generate UUID via UserShardManager
 
         switch (userIDResult, uuidResult) {
             case (#ok(userID), #ok(uuid)) {
                 let tempID : HealthIDUser = {
+                    // Temporary User ID Data Structure
                     IDNum = userID;
                     UUID = uuid;
                     MetaData = {
+                        // User Metadata
                         DemographicInformation = demoInfo;
                         BasicHealthParameters = basicHealthPara;
                         BiometricData = bioMData;
                         FamilyInformation = familyData;
                     };
                 };
-
-                let shardResult = await ShardManager.getShard(userID);
-                switch (shardResult) {
-                    case (#ok(shard)) {
-                        let result = await shard.insertUser(userID, tempID);
-                        switch (result) {
-                            case (#ok(_)) {
-                                ignore await ShardManager.registerUser(caller, userID);
-                                #ok(userID);
+                let registerResult = await ShardManager.registerUser(caller, userID);
+                switch (registerResult) {
+                    case (#ok(())) {
+                        let identityResult = await identityManager.registerIdentity(caller, userID, "User");
+                        switch (identityResult) {
+                            case (#ok(())) {
+                                // Insert user data into the shard
+                                let shardResult = await ShardManager.getShard(userID);
+                                switch (shardResult) {
+                                    case (#ok(shard)) {
+                                        let insertResult = await shard.insertUser(userID, tempID);
+                                        switch (insertResult) {
+                                            case (#ok(())) {
+                                                #ok(userID);
+                                            };
+                                            case (#err(e)) {
+                                                #err("Failed to insert user data: " # e);
+                                            };
+                                        };
+                                    };
+                                    case (#err(e)) {
+                                        #err("Failed to get shard: " # e);
+                                    };
+                                };
                             };
-                            case (#err(err)) {
-                                #err(err);
+                            case (#err(e)) {
+                                #err("Failed to register identity: " # e);
                             };
                         };
                     };
-                    case (#err(err)) {
-                        #err(err);
-                    };
+                    case (#err(e)) { #err("Failed to register user: " # e) };
                 };
             };
-            case (#err(err), _) {
-                #err("Failed to generate user ID: " # err);
-            };
-            case (_, #err(err)) {
-                #err("Failed to generate UUID: " # err);
-            };
+            case (#err(e), _) { #err("Failed to generate user ID: " # e) };
+            case (_, #err(e)) { #err("Failed to generate UUID: " # e) };
         };
     };
 
     // Function to read user data
     public shared ({ caller }) func readUser() : async Result.Result<HealthIDUser, Text> {
-        let userIDResult = await ShardManager.getUserID(caller);
+        let userIDResult = await ShardManager.getUserID(caller); // Get User ID via UserShardManager
         switch (userIDResult) {
             case (#ok(id)) {
-                let shardResult = await ShardManager.getShard(id);
+                let shardResult = await ShardManager.getShard(id); // Get Shard via UserShardManager
                 switch (shardResult) {
                     case (#ok(shard)) {
-                        let userResult = await shard.getUser(id);
+                        let userResult = await shard.getUser(id); // Get User via Shard
                         switch (userResult) {
                             case (#ok(user)) {
-                                #ok(user);
+                                #ok(user); // Return User
                             };
                             case (#err(e)) {
                                 #err("Failed to get user: " # e);
@@ -133,7 +148,7 @@ actor UserService {
     };
 
     // Function to delete a user
-    public shared ({ caller }) func deleteUser() : async Result.Result<(), Text> {
+    public shared ({ caller }) func deleteUser() : async Result.Result<Text, Text> {
         let userIDResult = await ShardManager.getUserID(caller);
         switch (userIDResult) {
             case (#ok(id)) {
@@ -143,8 +158,23 @@ actor UserService {
                         let deleteResult = await shard.deleteUser(id);
                         switch (deleteResult) {
                             case (#ok(_)) {
-                                ignore await ShardManager.removeUser(caller);
-                                #ok(());
+                                let removeIdentityResult = await identityManager.removeIdentity(id);
+                                switch (removeIdentityResult) {
+                                    case (#ok(())) {
+                                        let removeUserResult = await ShardManager.removeUser(caller);
+                                        switch (removeUserResult) {
+                                            case (#ok(())) {
+                                                #ok("User deleted successfully");
+                                            };
+                                            case (#err(e)) {
+                                                #err(e);
+                                            };
+                                        };
+                                    };
+                                    case (#err(e)) {
+                                        #err(e);
+                                    };
+                                };
                             };
                             case (#err(e)) {
                                 #err(e);
@@ -204,25 +234,23 @@ actor UserService {
         };
     };
 
-    // Helper function to check if a principal is an admin
-    private func isAdmin(principal : Principal) : Bool {
-
-        // For example, you could have a list of admin principals:
-        let adminPrincipals : [Principal] = [
-            // Add your admin principals here
-        ];
-
-        for (adminPrincipal in adminPrincipals.vals()) {
-            if (principal == adminPrincipal) {
-                return true;
-            };
-        };
-
-        false;
-    };
     // Function to get the user ID of the caller
     public shared ({ caller }) func getID() : async Result.Result<Text, Text> {
         await ShardManager.getUserID(caller);
+    };
+
+    public func getUserIDPrincipal(userID : Text) : async Result.Result<Principal, Text> {
+
+        let result = await ShardManager.getPrincipalByUserID(userID);
+        switch (result) {
+            case (#ok(principal)) {
+                #ok(principal);
+            };
+            case (#err(message)) {
+                #err((message));
+            };
+        };
+
     };
 
     // Function to get the total number of users
@@ -230,25 +258,24 @@ actor UserService {
         await ShardManager.getTotalUserCount();
     };
 
+    public shared ({ caller }) func registerAdmin() : async Bool {
+        if (Principal.isAnonymous(caller) or isAdminRegistered) {
+            return false;
+        };
+        adminPrincipal := Principal.toText(caller);
+        isAdminRegistered := true;
+        return true;
+    };
+    // Helper function to check if a principal is an admin
+    private func isAdmin(principal : Principal) : Bool {
+        // Check if the provided principal matches the admin principal
+        Principal.toText(principal) == adminPrincipal;
+
+    };
+
     //VetKey
 
     //VetKey Section
-
-    type VETKD_SYSTEM_API = actor {
-        vetkd_public_key : ({
-            canister_id : ?Principal;
-            derivation_path : [Blob];
-            key_id : { curve : { #bls12_381 }; name : Text };
-        }) -> async ({ public_key : Blob });
-        vetkd_encrypted_key : ({
-            public_key_derivation_path : [Blob];
-            derivation_id : Blob;
-            key_id : { curve : { #bls12_381 }; name : Text };
-            encryption_public_key : Blob;
-        }) -> async ({ encrypted_key : Blob });
-    };
-
-    let vetkd_system_api : VETKD_SYSTEM_API = actor ("asrmz-lmaaa-aaaaa-qaaeq-cai");
 
     public func symmetric_key_verification_key() : async Text {
         let { public_key } = await vetkd_system_api.vetkd_public_key({
@@ -277,4 +304,5 @@ actor UserService {
 
         #ok(Hex.encode(Blob.toArray(encrypted_key)));
     };
+
 };

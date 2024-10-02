@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Brain, Heart, Syringe, Activity, Apple, Moon } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Brain, Heart, Syringe, Activity, Apple, Moon } from "lucide-react";
 
 const healthSystems = [
-  { icon: Brain, name: 'Cognitive', color: 'text-purple-500' },
-  { icon: Heart, name: 'Cardiovascular', color: 'text-red-500' },
-  { icon: Syringe, name: 'Respiratory', color: 'text-blue-500' },
-  { icon: Activity, name: 'Fitness', color: 'text-green-500' },
-  { icon: Apple, name: 'Nutrition', color: 'text-yellow-500' },
-  { icon: Moon, name: 'Sleep', color: 'text-indigo-500' },
+  { icon: Brain, name: "Cognitive", color: "text-purple-500" },
+  { icon: Heart, name: "Cardiovascular", color: "text-red-500" },
+  { icon: Syringe, name: "Respiratory", color: "text-blue-500" },
+  { icon: Activity, name: "Fitness", color: "text-green-500" },
+  { icon: Apple, name: "Nutrition", color: "text-yellow-500" },
+  { icon: Moon, name: "Sleep", color: "text-indigo-500" },
 ];
 
 function Loading() {
@@ -60,12 +60,15 @@ function Loading() {
 
           {/* Percentage in the middle */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-3xl font-bold text-blue-600">{progress}%</span>
+            <span className="text-3xl font-bold text-blue-600">
+              {progress}%
+            </span>
           </div>
 
           {/* Health system icons */}
           {healthSystems.map((system, index) => {
-            const angle = (index / healthSystems.length) * 2 * Math.PI - Math.PI / 2;
+            const angle =
+              (index / healthSystems.length) * 2 * Math.PI - Math.PI / 2;
             const x = 50 + 48 * Math.cos(angle);
             const y = 50 + 48 * Math.sin(angle);
             const IconComponent = system.icon; // Assign the icon component dynamically
@@ -73,7 +76,7 @@ function Loading() {
             return (
               <div
                 key={system.name}
-                className={`absolute w-12 h-12 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center ${system.color} transition-all duration-300 ease-in-out ${activeSystem === system.name ? 'scale-125' : 'scale-100'}`}
+                className={`absolute w-12 h-12 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center ${system.color} transition-all duration-300 ease-in-out ${activeSystem === system.name ? "scale-125" : "scale-100"}`}
                 style={{ left: `${x}%`, top: `${y}%` }}
                 onMouseEnter={() => setActiveSystem(system.name)}
                 onMouseLeave={() => setActiveSystem(null)}
@@ -86,7 +89,9 @@ function Loading() {
 
         {/* Info text */}
         <p className="mt-8 text-lg text-gray-700 h-8">
-          {activeSystem ? `Loading ${activeSystem} data...` : 'Taking care of your health...'}
+          {activeSystem
+            ? `Loading ${activeSystem} data...`
+            : "Taking care of your health..."}
         </p>
       </div>
     </div>

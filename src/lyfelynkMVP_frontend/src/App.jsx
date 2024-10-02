@@ -126,9 +126,8 @@ function App() {
             {/* <Route path="/dev" element={<Dev />} /> */}
 
             <Route path="/" element={<Navigate to="/Connect" />} />
-             
-            <Route path="/Connect" element={<ConnectPage />} />
 
+            <Route path="/Connect" element={<ConnectPage />} />
 
             <Route path="/Register" element={<FirstPageContent />} />
             <Route path="/Register">

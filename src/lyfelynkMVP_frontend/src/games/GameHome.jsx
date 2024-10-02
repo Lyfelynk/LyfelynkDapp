@@ -1,14 +1,28 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Zap, Grid3X3 } from "lucide-react"
-import ReflexGame from './ReflexGame'
-import MatchCards from './MatchCards'
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Zap, Grid3X3 } from "lucide-react";
+import ReflexGame from "./ReflexGame";
+import MatchCards from "./MatchCards";
 
 export default function GameHome() {
-  const [openReflexGame, setOpenReflexGame] = useState(false)
-  const [openMatchCards, setOpenMatchCards] = useState(false)
+  const [openReflexGame, setOpenReflexGame] = useState(false);
+  const [openMatchCards, setOpenMatchCards] = useState(false);
 
   return (
     <div className="container mx-auto p-4">
@@ -32,7 +46,9 @@ export default function GameHome() {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Reflex Game</DialogTitle>
-              <DialogDescription>Click when the light turns green!</DialogDescription>
+              <DialogDescription>
+                Click when the light turns green!
+              </DialogDescription>
             </DialogHeader>
             <ReflexGame />
           </DialogContent>
@@ -63,5 +79,5 @@ export default function GameHome() {
         </Dialog>
       </div>
     </div>
-  )
+  );
 }

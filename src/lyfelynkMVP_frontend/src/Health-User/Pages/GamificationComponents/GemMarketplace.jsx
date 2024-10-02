@@ -5,7 +5,9 @@ import { INITIAL_ATTRIBUTES } from "./constants";
 const GemMarketplace = ({ gems, tokens, onBuyGem, onUseGem }) => {
   return (
     <div className="bg-gray-800 border border-gray-700 text-white p-4 rounded-lg mb-6">
-      <h2 className="text-xl font-semibold mb-4 text-blue-400">Gem Marketplace</h2>
+      <h2 className="text-xl font-semibold mb-4 text-blue-400">
+        Gem Marketplace
+      </h2>
       <p className="mb-2">Gems: {gems}</p>
       <p className="mb-4">Tokens: {tokens}</p>
       <Button

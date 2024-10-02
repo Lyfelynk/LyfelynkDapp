@@ -5,10 +5,30 @@ import { User } from "lucide-react";
 
 const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP }) => {
   const stats = [
-    { name: "Energy", value: avatar.attributes.energy, max: 20, color: "bg-blue-400" },
-    { name: "Focus", value: avatar.attributes.focus, max: 20, color: "bg-purple-400" },
-    { name: "Vitality", value: avatar.attributes.vitality, max: 20, color: "bg-green-400" },
-    { name: "Resilience", value: avatar.attributes.resilience, max: 20, color: "bg-yellow-400" },
+    {
+      name: "Energy",
+      value: avatar.attributes.energy,
+      max: 20,
+      color: "bg-blue-400",
+    },
+    {
+      name: "Focus",
+      value: avatar.attributes.focus,
+      max: 20,
+      color: "bg-purple-400",
+    },
+    {
+      name: "Vitality",
+      value: avatar.attributes.vitality,
+      max: 20,
+      color: "bg-green-400",
+    },
+    {
+      name: "Resilience",
+      value: avatar.attributes.resilience,
+      max: 20,
+      color: "bg-yellow-400",
+    },
   ];
 
   const maxHP = 100 + (avatar.level - 1) * 10;
@@ -29,7 +49,9 @@ const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP }) => {
         </div>
         <div>
           <p className="text-lg font-semibold">{avatar.type}</p>
-          <p className="text-sm text-gray-400 mb-2">Quality: {avatar.quality}</p>
+          <p className="text-sm text-gray-400 mb-2">
+            Quality: {avatar.quality}
+          </p>
           <p className="text-sm">Level: {avatar.level}</p>
           <p className="text-sm">Tokens: {avatar.tokens}</p>
           <p className="text-sm">Gems: {avatar.gems}</p>
@@ -39,7 +61,9 @@ const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP }) => {
       <div className="space-y-2 mb-4">
         <div className="flex justify-between items-center">
           <span>HP</span>
-          <span className="text-sm text-blue-400">{avatar.hp} / {maxHP}</span>
+          <span className="text-sm text-blue-400">
+            {avatar.hp} / {maxHP}
+          </span>
         </div>
         <Progress value={(avatar.hp / maxHP) * 100} className="w-full" />
       </div>
@@ -53,7 +77,10 @@ const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP }) => {
                 {stat.value} / {stat.max}
               </span>
             </div>
-            <Progress value={(stat.value / stat.max) * 100} className={`w-full ${stat.color}`} />
+            <Progress
+              value={(stat.value / stat.max) * 100}
+              className={`w-full ${stat.color}`}
+            />
           </div>
         ))}
       </div>

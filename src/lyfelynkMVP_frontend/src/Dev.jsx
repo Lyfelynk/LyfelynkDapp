@@ -1,12 +1,12 @@
-import React from 'react'
-import GameHome from './games/GameHome'
+import React from "react";
+import GameHome from "./games/GameHome";
 
 function Dev() {
   return (
     <div>
-        <GameHome/>
+      <GameHome />
     </div>
-  )
+  );
 }
 
-export default Dev
+export default Dev;

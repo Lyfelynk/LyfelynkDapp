@@ -1,6 +1,11 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { QUALITY_TIERS } from "./constants";
 
 const NFTCard = ({ nft, onVisit, isPending, showManage = false, onManage }) => {

@@ -28,19 +28,29 @@ function WasmModuleUploader() {
     if (wasmFile) {
       switch (selectedModule) {
         case "User":
-          setMessage(`WASM module "${wasmFile.name}" update for User is not implemented`);
+          setMessage(
+            `WASM module "${wasmFile.name}" update for User is not implemented`,
+          );
           break;
         case "Professional":
-          setMessage(`WASM module "${wasmFile.name}" update for Professional is not implemented`);
+          setMessage(
+            `WASM module "${wasmFile.name}" update for Professional is not implemented`,
+          );
           break;
         case "Facility":
-          setMessage(`WASM module "${wasmFile.name}" update for Facility is not implemented`);
+          setMessage(
+            `WASM module "${wasmFile.name}" update for Facility is not implemented`,
+          );
           break;
         case "DataAsset":
-          setMessage(`WASM module "${wasmFile.name}" update for DataAsset is not implemented`);
+          setMessage(
+            `WASM module "${wasmFile.name}" update for DataAsset is not implemented`,
+          );
           break;
         case "Marketplace":
-          setMessage(`WASM module "${wasmFile.name}" update for Marketplace is not implemented`);
+          setMessage(
+            `WASM module "${wasmFile.name}" update for Marketplace is not implemented`,
+          );
           break;
         default:
           setMessage("Unknown module selected");
@@ -63,7 +73,10 @@ function WasmModuleUploader() {
           <div className="flex flex-col space-y-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center justify-between w-64">
+                <Button
+                  variant="outline"
+                  className="flex items-center justify-between w-64"
+                >
                   {selectedModule}
                   <ChevronDown className="ml-2 w-4 h-4" />
                 </Button>
@@ -74,16 +87,24 @@ function WasmModuleUploader() {
                 <DropdownMenuItem onSelect={() => setSelectedModule("User")}>
                   User
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSelectedModule("Professional")}>
+                <DropdownMenuItem
+                  onSelect={() => setSelectedModule("Professional")}
+                >
                   Professional
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSelectedModule("Facility")}>
+                <DropdownMenuItem
+                  onSelect={() => setSelectedModule("Facility")}
+                >
                   Facility
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSelectedModule("DataAsset")}>
+                <DropdownMenuItem
+                  onSelect={() => setSelectedModule("DataAsset")}
+                >
                   DataAsset
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSelectedModule("Marketplace")}>
+                <DropdownMenuItem
+                  onSelect={() => setSelectedModule("Marketplace")}
+                >
                   Marketplace
                 </DropdownMenuItem>
               </DropdownMenuContent>

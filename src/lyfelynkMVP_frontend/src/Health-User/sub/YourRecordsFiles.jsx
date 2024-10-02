@@ -7,31 +7,13 @@ export default function Component() {
   const [searchTerm, setSearchTerm] = useState("");
   const records = [
     {
-      id: 1,
-      type: "genetic",
-      title: "Genome Sequence Analysis",
-      description: "Detailed analysis of genetic data",
-      date: "2023-04-15",
-      format: "FASTQ",
-      image: "/placeholder.svg",
-    },
-    {
       id: 2,
       type: "image",
       title: "Brain MRI Scan",
       description: "High-resolution medical image data",
-      date: "2023-06-01",
+      date: "2024-09-04",
       format: "DICOM",
-      image: "/placeholder.svg",
-    },
-    {
-      id: 3,
-      type: "statistics",
-      title: "Clinical Trial Metrics",
-      description: "Comprehensive medical statistics",
-      date: "2023-08-20",
-      format: "CSV",
-      image: "/placeholder.svg",
+      image: "/brain.jpeg",
     },
     {
       id: 4,
@@ -40,34 +22,16 @@ export default function Component() {
       description: "AI-powered medical diagnosis tool",
       date: "2023-11-12",
       format: "TensorFlow",
-      image: "/placeholder.svg",
-    },
-    {
-      id: 5,
-      type: "genetic",
-      title: "Epigenetic Profiling",
-      description: "Detailed analysis of epigenetic data",
-      date: "2023-03-30",
-      format: "FASTQ",
-      image: "/placeholder.svg",
+      image: "/tumor.jpg",
     },
     {
       id: 6,
       type: "image",
       title: "Chest X-Ray Scans",
       description: "High-quality medical imaging data",
-      date: "2023-07-10",
+      date: "2024-08-27",
       format: "DICOM",
-      image: "/placeholder.svg",
-    },
-    {
-      id: 7,
-      type: "statistics",
-      title: "Cardiovascular Metrics",
-      description: "Comprehensive medical statistics",
-      date: "2023-09-05",
-      format: "CSV",
-      image: "/placeholder.svg",
+      image: "/chest.jpeg",
     },
     {
       id: 8,
@@ -76,7 +40,7 @@ export default function Component() {
       description: "AI-powered medical diagnosis tool",
       date: "2023-12-01",
       format: "TensorFlow",
-      image: "/placeholder.svg",
+      image: "/diabetes.jpeg",
     },
   ];
 
@@ -107,9 +71,9 @@ export default function Component() {
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="relative w-full p-3 pl-10 mb-4 border border-gray-300 rounded-lg shadow-sm bg-foreground focus:ring-2 focus:ring-blue-500"
+            className="relative w-full p-3 pl-10 mb-4 border border-gray-300 rounded-lg shadow-sm text-background bg-foreground focus:ring-2 focus:ring-blue-500"
           />
-          <Search className=" text-gray-500" />
+          <Search className="absolute top-3 left-3 text-gray-500" />
         </div>
         <div className="flex flex-wrap gap-2">
           <button

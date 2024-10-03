@@ -37,11 +37,9 @@ actor class GamificationSystem() {
     type Value = ICRC7.Value;
 
     private let wellnessAvatarNFT : WellnessAvatarNFT.WellnessAvatarNFT = actor (Types.wellnessAvatarNFTCanisterID);
-    private let visitManager : VisitManager.VisitManager = actor ("VISIT_MANAGER_CANISTER_ID");
+    private let visitManager : VisitManager.VisitManager = actor (Types.visitManagerCanisterID);
 
     private let userTokens = HashMap.HashMap<Text, Nat>(0, Text.equal, Text.hash);
-    private let userAchievements = HashMap.HashMap<Text, [Text]>(0, Text.equal, Text.hash);
-    private let userSocialScores = HashMap.HashMap<Text, Nat>(0, Text.equal, Text.hash);
 
     private let avatarAttributes = HashMap.HashMap<Nat, AvatarAttributes>(
         0,
@@ -71,14 +69,6 @@ actor class GamificationSystem() {
 
     private let MAX_HP = 100;
     private let BASE_TOKENS_PER_VISIT = 10;
-    private let QUALITY_MULTIPLIERS = [
-        ("Common", 1),
-        ("Uncommon", 2),
-        ("Rare", 3),
-        ("Epic", 4),
-        ("Legendary", 5),
-        ("Mythic", 6),
-    ];
 
     // Default avatar attributes
     private func defaultAttributes(avatarType : Text) : AvatarAttributes {
@@ -280,36 +270,6 @@ actor class GamificationSystem() {
         };
     };
 
-    // Achievement system
-    public func unlockAchievement(userId : Text, achievementId : Text) : async Result.Result<(), Text> {
-        switch (userAchievements.get(userId)) {
-            case (?achievements) {
-                if (Array.find(achievements, func(a : Text) : Bool { a == achievementId }) != null) {
-                    #err("Achievement already unlocked");
-                } else {
-                    userAchievements.put(userId, Array.append(achievements, [achievementId]));
-                    await updateSocialScore(userId);
-                    #ok(());
-                };
-            };
-            case (null) {
-                userAchievements.put(userId, [achievementId]);
-                await updateSocialScore(userId);
-                #ok(());
-            };
-        };
-    };
-
-    private func updateSocialScore(userId : Text) : async () {
-        switch (userAchievements.get(userId)) {
-            case (?achievements) {
-                let newScore = achievements.size() * 10; // Simple scoring: 10 points per achievement
-                userSocialScores.put(userId, newScore);
-            };
-            case (null) {};
-        };
-    };
-
     // Query functions for frontend integration
     public query func getUserTokens(userId : Text) : async ?Nat {
         userTokens.get(userId);
@@ -333,30 +293,16 @@ actor class GamificationSystem() {
         };
     };
 
-    public query func getUserAchievements(userId : Text) : async [Text] {
-        switch (userAchievements.get(userId)) {
-            case (?achievements) { achievements };
-            case (null) { [] };
-        };
-    };
-
-    public query func getSocialScore(userId : Text) : async Nat {
-        switch (userSocialScores.get(userId)) {
-            case (?score) { score };
-            case (null) { 0 };
-        };
-    };
-
     public shared query ({ caller }) func whoami() : async Text {
         Principal.toText(caller);
     };
 
-    public shared ({ caller }) func initiateVisit(professionalId : ?Text, facilityId : ?Text) : async Result.Result<Nat, Text> {
-        await visitManager.initiateVisit(professionalId, facilityId);
+    public shared ({ caller }) func initiateVisit(idToVisit : Text) : async Result.Result<Nat, Text> {
+        await visitManager.initiateVisit(caller, idToVisit);
     };
 
     public shared ({ caller }) func completeVisit(visitId : Nat, avatarId : Nat) : async Result.Result<(), Text> {
-        let result = await visitManager.completeVisit(visitId);
+        let result = await visitManager.updateVisitStatus(caller, visitId, #Completed);
         switch (result) {
             case (#ok(_)) {
                 await updateAvatarAfterVisit(avatarId, Principal.toText(caller));
@@ -366,6 +312,14 @@ actor class GamificationSystem() {
             };
         };
         #ok(());
+    };
+
+    public shared ({ caller }) func rejectVisit(visitId : Nat) : async Result.Result<(), Text> {
+        let result = await visitManager.updateVisitStatus(caller, visitId, #Rejected);
+        switch (result) {
+            case (#ok(_)) { #ok(()) };
+            case (#err(e)) { #err(e) };
+        };
     };
 
     private func updateAvatarAfterVisit(avatarId : Nat, userId : Text) : async () {

@@ -91,22 +91,7 @@
       "main": "src/lyfelynkMVP_backend/XPSystem/XPRewardSystem.mo",
       "type": "motoko"
     },
-    "AchievementSystem": {
-      "main": "src/lyfelynkMVP_backend/Gamification/AchievementSystem.mo",
-      "type": "motoko"
-    },
-    "HPSystem": {
-      "main": "src/lyfelynkMVP_backend/Gamification/HPSystem.mo",
-      "type": "motoko"
-    },
-    "TokenManager": {
-      "main": "src/lyfelynkMVP_backend/Gamification/TokenManager.mo",
-      "type": "motoko"
-    },
-    "WellnessActivity": {
-      "main": "src/lyfelynkMVP_backend/Gamification/WellnessActivity.mo",
-      "type": "motoko"
-    },
+
     "WellnessAvatarNFT": {
       "main": "src/lyfelynkMVP_backend/Gamification/WellnessAvatarNFT.mo",
       "type": "motoko"
@@ -115,8 +100,36 @@
       "main": "src/lyfelynkMVP_backend/Gamification/GamificationSystem.mo",
       "type": "motoko"
     },
+    "VisitManager": {
+      "main": "src/lyfelynkMVP_backend/Gamification/VisitManager.mo",
+      "type": "motoko"
+    },
     "lyfelynkMVP_frontend": {
-      "dependencies": [],
+      "dependencies": [
+        "internet_identity",
+        "icrc1_ledger_canister",
+        "vetkd_system_api",
+        "Identity_Manager",
+        "User",
+        "UserShardManager",
+        "UserShard",
+        "Professional",
+        "ProfessionalShardManager",
+        "ProfessionalShard",
+        "Facility",
+        "FacilityShardManager",
+        "FacilityShard",
+        "DataAsset",
+        "DataAssetShardManager",
+        "DataAssetShard",
+        "Shared_Activity",
+        "SharedActivityShardManager",
+        "SharedActivityShard",
+        "XPRewardSystem",
+        "WellnessAvatarNFT",
+        "GamificationSystem",
+        "VisitManager"
+      ],
       "source": ["src/lyfelynkMVP_frontend/dist"],
       "type": "assets",
       "workspace": "lyfelynkMVP_frontend"

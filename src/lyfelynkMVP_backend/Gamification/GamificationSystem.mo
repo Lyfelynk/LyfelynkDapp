@@ -2,7 +2,9 @@
 
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
+import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Nat "mo:base/Nat";
 import Nat32 "mo:base/Nat32";
 import Principal "mo:base/Principal";
@@ -12,7 +14,9 @@ import CandyTypesLib "mo:candy_0_3_0/types";
 import ICRC7 "mo:icrc7-mo";
 
 import Types "../Types";
+import VisitManager "./VisitManager";
 import WellnessAvatarNFT "./WellnessAvatarNFT";
+
 actor class GamificationSystem() {
     type Account = ICRC7.Account;
     type NFT = ICRC7.NFT;
@@ -33,8 +37,8 @@ actor class GamificationSystem() {
     type Value = ICRC7.Value;
 
     private let wellnessAvatarNFT : WellnessAvatarNFT.WellnessAvatarNFT = actor (Types.wellnessAvatarNFTCanisterID);
+    private let visitManager : VisitManager.VisitManager = actor ("VISIT_MANAGER_CANISTER_ID");
 
-    private let userHP = HashMap.HashMap<Text, Nat>(0, Text.equal, Text.hash);
     private let userTokens = HashMap.HashMap<Text, Nat>(0, Text.equal, Text.hash);
     private let userAchievements = HashMap.HashMap<Text, [Text]>(0, Text.equal, Text.hash);
     private let userSocialScores = HashMap.HashMap<Text, Nat>(0, Text.equal, Text.hash);
@@ -46,6 +50,8 @@ actor class GamificationSystem() {
             Nat32.fromNat(n);
         },
     );
+
+    private let avatarHP = HashMap.HashMap<Nat, Nat>(0, Nat.equal, func(n : Nat) : Nat32 { Nat32.fromNat(n) });
 
     private type AvatarAttributes = {
         energy : Nat;
@@ -63,62 +69,36 @@ actor class GamificationSystem() {
         attributes : AvatarAttributes;
     };
 
+    private let MAX_HP = 100;
+    private let BASE_TOKENS_PER_VISIT = 10;
+    private let QUALITY_MULTIPLIERS = [
+        ("Common", 1),
+        ("Uncommon", 2),
+        ("Rare", 3),
+        ("Epic", 4),
+        ("Legendary", 5),
+        ("Mythic", 6),
+    ];
+
     // Default avatar attributes
     private func defaultAttributes(avatarType : Text) : AvatarAttributes {
-        switch (avatarType) {
-            case "User" {
-                {
-                    energy = 100;
-                    focus = 100;
-                    vitality = 100;
-                    resilience = 100;
-                    quality = "Common";
-                    avatarType = "User";
-                    level = 1;
-                };
-            };
-            case "Professional" {
-                {
-                    energy = 100;
-                    focus = 100;
-                    vitality = 100;
-                    resilience = 100;
-                    quality = "Common";
-                    avatarType = "Professional";
-                    level = 1;
-                };
-            };
-            case "Facility" {
-                {
-                    energy = 100;
-                    focus = 100;
-                    vitality = 100;
-                    resilience = 100;
-                    quality = "Common";
-                    avatarType = "Facility";
-                    level = 1;
-                };
-            };
-            case _ {
-                {
-                    energy = 100;
-                    focus = 100;
-                    vitality = 100;
-                    resilience = 100;
-                    quality = "Common";
-                    avatarType = "User";
-                    level = 1;
-                };
-            };
+        {
+            energy = 100;
+            focus = 100;
+            vitality = 100;
+            resilience = 100;
+            quality = "Common";
+            avatarType = avatarType;
+            level = 1;
         };
     };
 
     // Minting function with default values
-    public shared ({ caller }) func mintWellnessAvatar(mintNFTPrincipal : Text, memo : ?Blob, avatarType : Text) : async [SetNFTResult] {
+    public shared ({ caller }) func mintWellnessAvatar(mintNFTPrincipal : Text, memo : ?Blob, avatarType : Text, imageURL : Text) : async [SetNFTResult] {
         let currentTokenId = await wellnessAvatarNFT.icrc7_total_supply();
         let tokenId = currentTokenId + 1;
 
-        let defaultMetadata = createDefaultMetadata(tokenId, avatarType, defaultAttributes(avatarType));
+        let defaultMetadata = createDefaultMetadata(tokenId, avatarType, defaultAttributes(avatarType), imageURL);
 
         let request : SetNFTRequest = [{
             owner = ?{ owner = caller; subaccount = null };
@@ -129,11 +109,12 @@ actor class GamificationSystem() {
             created_at_time = null;
         }];
         avatarAttributes.put(tokenId, defaultAttributes(avatarType));
+        avatarHP.put(tokenId, MAX_HP);
         await wellnessAvatarNFT.icrcX_mint(Principal.fromText(mintNFTPrincipal), request);
     };
 
     // Helper function to create default metadata
-    private func createDefaultMetadata(tokenId : Nat, avatarType : Text, attributes : AvatarAttributes) : CandyTypesLib.CandyShared {
+    private func createDefaultMetadata(tokenId : Nat, avatarType : Text, attributes : AvatarAttributes, imageURL : Text) : CandyTypesLib.CandyShared {
         #Class([
             {
                 immutable = false;
@@ -144,6 +125,11 @@ actor class GamificationSystem() {
                 immutable = false;
                 name = "description";
                 value = #Text("A " # avatarType # " Avatar in the Lyfelynk ecosystem");
+            },
+            {
+                immutable = false;
+                name = "image";
+                value = #Text(imageURL);
             },
             {
                 immutable = false;
@@ -224,31 +210,44 @@ actor class GamificationSystem() {
     };
 
     // HP System functions
-    public func depleteHP(userId : Text, amount : Nat) : async Result.Result<(), Text> {
-        switch (userHP.get(userId)) {
-            case (?currentHP) {
-                let newHP = Nat.max(0, currentHP - amount);
-                userHP.put(userId, newHP);
-                #ok(());
+    public func depleteHP(avatarId : Text, amount : Nat) : async Result.Result<(), Text> {
+        switch (Nat.fromText(avatarId)) {
+            case (?id) {
+                switch (avatarHP.get(id)) {
+                    case (?currentHP) {
+                        let newHP = Nat.max(0, currentHP - amount);
+                        avatarHP.put(id, newHP);
+                        #ok(());
+                    };
+                    case null { return #err("Avatar HP not found") };
+                };
             };
-            case (null) {
-                userHP.put(userId, 100 - amount);
-                #ok(());
-            };
+            case null { return #err("Invalid avatar ID") };
         };
     };
 
-    public shared ({ caller = _caller }) func restoreHP(userId : Text, amount : Nat) : async Result.Result<(), Text> {
-        switch (userHP.get(userId)) {
-            case (?currentHP) {
-                let newHP = Nat.min(100, currentHP + amount);
-                userHP.put(userId, newHP);
-                #ok(());
+    public shared ({ caller = _caller }) func restoreHP(avatarId : Text, amount : Nat) : async Result.Result<(), Text> {
+        switch (Nat.fromText(avatarId)) {
+            case (?id) {
+                switch (avatarHP.get(id)) {
+                    case (?currentHP) {
+                        let tokensRequired = amount;
+                        let result = await spendTokens(avatarId, tokensRequired);
+                        switch (result) {
+                            case (#ok(_)) {
+                                let newHP = Nat.min(MAX_HP, currentHP + amount);
+                                avatarHP.put(id, newHP);
+                                #ok(());
+                            };
+                            case (#err(e)) {
+                                #err(e);
+                            };
+                        };
+                    };
+                    case null { return #err("Avatar HP not found") };
+                };
             };
-            case (null) {
-                userHP.put(userId, Nat.min(100, amount));
-                #ok(());
-            };
+            case null { return #err("Invalid avatar ID") };
         };
     };
 
@@ -312,10 +311,6 @@ actor class GamificationSystem() {
     };
 
     // Query functions for frontend integration
-    public query func getUserHP(userId : Text) : async ?Nat {
-        userHP.get(userId);
-    };
-
     public query func getUserTokens(userId : Text) : async ?Nat {
         userTokens.get(userId);
     };
@@ -331,10 +326,10 @@ actor class GamificationSystem() {
         Array.tabulate<(Nat, ?[(Text, ICRC7.Value)])>(tokenIds.size(), func(i) { (tokenIds[i], metadata[i]) });
     };
 
-    public query func getAvatarAttributes(tokenId : Nat) : async Result.Result<AvatarAttributes, Text> {
-        switch (avatarAttributes.get(tokenId)) {
-            case (?attributes) { #ok(attributes) };
-            case (null) { #err("Avatar not found") };
+    public query func getAvatarAttributes(tokenId : Nat) : async Result.Result<(AvatarAttributes, Nat), Text> {
+        switch (avatarAttributes.get(tokenId), avatarHP.get(tokenId)) {
+            case (?attributes, ?hp) { #ok((attributes, hp)) };
+            case (_, _) { #err("Avatar not found") };
         };
     };
 
@@ -354,5 +349,55 @@ actor class GamificationSystem() {
 
     public shared query ({ caller }) func whoami() : async Text {
         Principal.toText(caller);
+    };
+
+    public shared ({ caller }) func initiateVisit(professionalId : ?Text, facilityId : ?Text) : async Result.Result<Nat, Text> {
+        await visitManager.initiateVisit(professionalId, facilityId);
+    };
+
+    public shared ({ caller }) func completeVisit(visitId : Nat, avatarId : Nat) : async Result.Result<(), Text> {
+        let result = await visitManager.completeVisit(visitId);
+        switch (result) {
+            case (#ok(_)) {
+                await updateAvatarAfterVisit(avatarId, Principal.toText(caller));
+            };
+            case (#err(e)) {
+                return #err(e);
+            };
+        };
+        #ok(());
+    };
+
+    private func updateAvatarAfterVisit(avatarId : Nat, userId : Text) : async () {
+        switch (avatarAttributes.get(avatarId)) {
+            case (?attributes) {
+                let tokensEarned = calculateTokensForVisit(attributes.quality, avatarId);
+                ignore await earnTokens(userId, tokensEarned);
+                ignore await depleteHP(Nat.toText(avatarId), 10);
+            };
+            case (null) {};
+        };
+    };
+
+    private func calculateTokensForVisit(quality : Text, avatarId : Nat) : Nat {
+        let qualityMultiplier = switch (quality) {
+            case "Common" 1;
+            case "Uncommon" 2;
+            case "Rare" 3;
+            case "Epic" 4;
+            case "Legendary" 5;
+            case "Mythic" 6;
+            case _ 1;
+        };
+        let currentHP = switch (avatarHP.get(avatarId)) {
+            case (?hp) hp;
+            case null MAX_HP;
+        };
+        let hpFactor = Float.fromInt(currentHP) / Float.fromInt(MAX_HP);
+        Int.abs(Float.toInt((Float.fromInt(BASE_TOKENS_PER_VISIT * qualityMultiplier) * hpFactor)));
+    };
+
+    public func getVisitCount(userId : Text) : async Nat {
+        await visitManager.getVisitCount(userId);
     };
 };

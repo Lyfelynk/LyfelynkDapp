@@ -14,9 +14,9 @@ import FacilityShardManager "FacilityShardManager";
 actor FacilityService {
     type HealthIDFacility = Types.HealthIDFacility;
     type FacilityShardManager = FacilityShardManager.FacilityShardManager;
-    let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
-    let ShardManager : FacilityShardManager = actor ("b77ix-eeaaa-aaaaa-qaada-cai"); // Facility Shard Manager Canister ID
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("cbopz-duaaa-aaaaa-qaaka-cai"); // VetKey System API Canister ID
+    let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID); // Replace with actual IdentityManager canister ID
+    let ShardManager : FacilityShardManager = actor (Types.facilityShardManagerCanisterID); // Facility Shard Manager Canister ID
+    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor (Types.vetkdSystemCanisterID); // VetKey System API Canister ID
 
     private stable var pendingRequests : Map.Map<Principal, HealthIDFacility> = Map.new<Principal, HealthIDFacility>(); // Map of pending requests
     private stable var adminPrincipal = ""; // Admin Principal

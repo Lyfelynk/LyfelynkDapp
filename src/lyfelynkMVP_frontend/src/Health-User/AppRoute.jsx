@@ -7,7 +7,7 @@ import MarketplaceContent from "./Pages/Marketplace";
 import ProfileContent from "./Pages/Profile";
 import UploadContent from "./Pages/UploadPage";
 import AnalyticsContent from "./Pages/Analytics";
-// import Gamification from "./Pages/Gamification";
+import Gamification from "./Pages/Gamification";
 import YourRecords from "./Pages/Records/YourRecords";
 import SharedWithYou from "./Pages/Records/SharedWithYou";
 
@@ -45,7 +45,7 @@ export default function AppRoute1() {
             <Route path="/Analytics" element={<AnalyticsContent />} />
             <Route path="/Upload" element={<UploadContent />} />
             <Route path="/Marketplace" element={<MarketplaceContent />} />
-            {/* <Route path="/Gamification" element={<Gamification />} /> */}
+            <Route path="/Gamification" element={<Gamification />} />
             <Route path="/Profile" element={<ProfileContent />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

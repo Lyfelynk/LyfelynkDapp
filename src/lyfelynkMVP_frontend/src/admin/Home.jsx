@@ -48,13 +48,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Principal } from "@dfinity/principal";
+import LoadingScreen from "../LoadingScreen";
 import ActorContext from "../ActorContext";
 import WasmModuleUploader from "./WasmModuleUploader";
+import MintNFTForm from "./MintNFTForm";
 
 function Home() {
   const { actors } = useContext(ActorContext);
   const [professionals, setProfessionals] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [facilities, setFacilities] = useState([
     {
@@ -479,6 +481,10 @@ function Home() {
     </div>
   );
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <section className="container mx-auto py-10">
       <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
@@ -491,6 +497,7 @@ function Home() {
         <TabsList>
           <TabsTrigger value="professionals">Professionals</TabsTrigger>
           <TabsTrigger value="facilities">Facilities</TabsTrigger>
+          <TabsTrigger value="mint-nft">Mint NFT</TabsTrigger>
         </TabsList>
         <TabsContent value="professionals">
           <Card>
@@ -513,6 +520,9 @@ function Home() {
             </CardHeader>
             <CardContent>{renderTable(facilityTable)}</CardContent>
           </Card>
+        </TabsContent>
+        <TabsContent value="mint-nft">
+          <MintNFTForm />
         </TabsContent>
       </Tabs>
 

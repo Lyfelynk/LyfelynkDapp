@@ -4,7 +4,10 @@ import CertifiedData "mo:base/CertifiedData";
 import D "mo:base/Debug";
 import Nat "mo:base/Nat";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
+import Text "mo:base/Text";
 import Time "mo:base/Time";
+import CandyTypesLib "mo:candy_0_3_0/types";
 import CertTree "mo:cert/CertTree";
 import ICRC3 "mo:icrc3-mo";
 import ICRC37 "mo:icrc37-mo";
@@ -15,7 +18,7 @@ import ICRC3Default "./initial_state/icrc3";
 import ICRC37Default "./initial_state/icrc37";
 import ICRC7Default "./initial_state/icrc7";
 
-shared (_init_msg) actor class Example(
+shared (_init_msg) actor class WellnessAvatarNFT(
     _args : {
         icrc7_args : ?ICRC7.InitArgs;
         icrc37_args : ?ICRC37.InitArgs;
@@ -54,6 +57,18 @@ shared (_init_msg) actor class Example(
     type RevokeTokenApprovalResult = ICRC37.Service.RevokeTokenApprovalResult;
     type RevokeCollectionApprovalResult = ICRC37.Service.RevokeCollectionApprovalResult;
 
+    //
+    private type AvatarAttributes = {
+        energy : Nat;
+        focus : Nat;
+        vitality : Nat;
+        resilience : Nat;
+        quality : Text;
+        avatarType : Text;
+        level : Nat;
+    };
+
+    //
     stable var init_msg = _init_msg; //preserves original initialization;
 
     stable var icrc7_migration_state = ICRC7.init(
@@ -451,12 +466,34 @@ shared (_init_msg) actor class Example(
     // one might deploy an NFT.
     /////////
 
-    public shared (msg) func icrcX_mint(tokens : ICRC7.SetNFTRequest) : async [ICRC7.SetNFTResult] {
+    public shared func icrcX_mint(mintNFTPrincipal : Principal, tokens : ICRC7.SetNFTRequest) : async [ICRC7.SetNFTResult] {
 
         //for now we require an owner to mint.
-        switch (icrc7().set_nfts<system>(msg.caller, tokens, true)) {
+        switch (icrc7().set_nfts<system>(mintNFTPrincipal, tokens, true)) {
             case (#ok(val)) val;
             case (#err(err)) D.trap(err);
+        };
+    };
+
+    // Helper function to create metadata from attributes
+    public shared func icrcX_update(adminPrincipal : Principal, tokenId : Nat, attributes : AvatarAttributes) : async Result.Result<[ICRC7.UpdateNFTResult], Text> {
+        let updateRequest : ICRC7.UpdateNFTRequest = [{
+            memo = null;
+            created_at_time = null;
+            token_id = tokenId;
+            updates = [{
+                name = "attributes";
+                mode = #Set(
+                    CandyTypesLib.unshare(#Class([{ immutable = false; name = "energy"; value = #Nat(attributes.energy) }, { immutable = false; name = "focus"; value = #Nat(attributes.focus) }, { immutable = false; name = "vitality"; value = #Nat(attributes.vitality) }, { immutable = false; name = "resilience"; value = #Nat(attributes.resilience) }, { immutable = false; name = "quality"; value = #Text(attributes.quality) }, { immutable = false; name = "avatarType"; value = #Text(attributes.avatarType) }, { immutable = false; name = "level"; value = #Nat(attributes.level) }]))
+                );
+            }];
+        }];
+
+        switch (icrc7().update_nfts<system>(adminPrincipal, updateRequest)) {
+            case (#ok(val)) {
+                #ok(val);
+            };
+            case (#err(err)) { #err(err) };
         };
     };
 

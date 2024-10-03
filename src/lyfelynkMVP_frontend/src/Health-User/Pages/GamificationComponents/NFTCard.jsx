@@ -14,7 +14,7 @@ const NFTCard = ({ nft, onVisit, isPending, showManage = false, onManage }) => {
   return (
     <Card className="bg-gray-800 text-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
       <CardHeader className="border-b border-gray-700">
-        <h2 className="text-2xl font-bold">{nft.type}</h2>
+        <h2 className="text-2xl font-bold">{nft.avatarType}</h2>
       </CardHeader>
 
       <CardContent className="p-4">

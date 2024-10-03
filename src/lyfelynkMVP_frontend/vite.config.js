@@ -62,6 +62,9 @@ export default defineConfig({
     "process.env.CANISTER_ID_SHARED_ACTIVITY": JSON.stringify(
       process.env.CANISTER_ID_SHARED_ACTIVITY,
     ),
+    "process.env.CANISTER_ID_GAMIFICATIONSYSTEM": JSON.stringify(
+      process.env.CANISTER_ID_GAMIFICATIONSYSTEM,
+    ),
     "process.env.II_URL": JSON.stringify(
       process.env.DFX_NETWORK === "local"
         ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943/`

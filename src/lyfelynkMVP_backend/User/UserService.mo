@@ -14,11 +14,11 @@ actor class UserService() {
     type HealthIDUser = Types.HealthIDUser;
     type UserShardManager = UserShardManager.UserShardManager;
 
-    private var adminPrincipal = ""; //Admin Principal
+    private var adminPrincipal = Types.admin; //Admin Principal
     private var isAdminRegistered = false; //Admin Registration Status
-    let ShardManager : UserShardManager = actor ("c5kvi-uuaaa-aaaaa-qaaia-cai"); // User Shard Manager Canister ID
-    let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("cgpjn-omaaa-aaaaa-qaakq-cai");
+    let ShardManager : UserShardManager = actor (Types.userShardManagerCanisterID); // User Shard Manager Canister ID
+    let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID); // Replace with actual IdentityManager canister ID
+    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor (Types.vetkdSystemCanisterID);
 
     // Function to create a new user
     public shared ({ caller }) func createUser(demoInfo : Blob, basicHealthPara : Blob, bioMData : ?Blob, familyData : ?Blob) : async Result.Result<Text, Text> {

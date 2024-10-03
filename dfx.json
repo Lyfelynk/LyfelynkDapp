@@ -111,15 +111,12 @@
       "main": "src/lyfelynkMVP_backend/Gamification/WellnessAvatarNFT.mo",
       "type": "motoko"
     },
+    "GamificationSystem": {
+      "main": "src/lyfelynkMVP_backend/Gamification/GamificationSystem.mo",
+      "type": "motoko"
+    },
     "lyfelynkMVP_frontend": {
-      "dependencies": [
-        "User",
-        "Professional",
-        "Facility",
-        "DataAsset",
-        "Identity_Manager",
-        "Shared_Activity"
-      ],
+      "dependencies": [],
       "source": ["src/lyfelynkMVP_frontend/dist"],
       "type": "assets",
       "workspace": "lyfelynkMVP_frontend"

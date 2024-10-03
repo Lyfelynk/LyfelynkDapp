@@ -9,6 +9,7 @@ import Text "mo:base/Text";
 import BTree "mo:stableheapbtreemap/BTree";
 
 import IdentityManager "../IdentityManager/IdentityManager";
+import Types "../Types";
 import Interface "../utility/ic-management-interface";
 import DataAssetShard "DataAssetShard";
 
@@ -17,7 +18,7 @@ actor class DataAssetShardManager() {
     private stable var shardCount : Nat = 0;
     private let ASSETS_PER_SHARD : Nat = 200_000;
     private stable let shards : BTree.BTree<Text, Principal> = BTree.init<Text, Principal>(null);
-    private let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
+    private let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID); // Replace with actual IdentityManager canister ID
     private stable var userShardMap : BTree.BTree<Text, [Text]> = BTree.init<Text, [Text]>(null);
     private stable var dataAssetShardWasmModule : [Nat8] = [];
 

@@ -1,6 +1,7 @@
 import Blob "mo:base/Blob";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
+
 module Types {
 
     public type SharedType = {
@@ -108,4 +109,21 @@ module Types {
             encryption_public_key : Blob;
         }) -> async ({ encrypted_key : Blob });
     };
+
+    public let admin : Text = ("eblrh-umgcj-fl75h-m36cu-lwppj-db6ll-x6emt-apn5e-gri6o-24ou3-pqe");
+    public let vetkdSystemCanisterID : Text = ("dmalx-m4aaa-aaaaa-qaanq-cai");
+    public let identityManagerCanisterID : Text = ("a3shf-5eaaa-aaaaa-qaafa-cai");
+    public let wellnessAvatarNFTCanisterID : Text = ("cpmcr-yeaaa-aaaaa-qaala-cai");
+    public let userServiceCanisterID : Text = ("ctiya-peaaa-aaaaa-qaaja-cai");
+    public let professionalServiceCanisterID : Text = ("a4tbr-q4aaa-aaaaa-qaafq-cai");
+    public let facilityServiceCanisterID : Text = ("bw4dl-smaaa-aaaaa-qaacq-cai");
+    public let dataAssetCanisterID : Text = ("bd3sg-teaaa-aaaaa-qaaba-cai");
+    public let sharedActivityCanisterID : Text = ("c5kvi-uuaaa-aaaaa-qaaia-cai");
+    public let userShardManagerCanisterID : Text = ("cbopz-duaaa-aaaaa-qaaka-cai");
+    public let professionalShardManagerCanisterID : Text = ("aovwi-4maaa-aaaaa-qaagq-cai");
+    public let facilityShardManagerCanisterID : Text = ("by6od-j4aaa-aaaaa-qaadq-cai");
+    public let dataAssetShardManagerCanisterID : Text = ("br5f7-7uaaa-aaaaa-qaaca-cai");
+    public let sharedActivityShardManagerCanisterID : Text = ("aax3a-h4aaa-aaaaa-qaahq-cai");
+    public let xpSystemCanisterID : Text = ("cinef-v4aaa-aaaaa-qaalq-cai");
+    public let gamificationSystemCanisterID : Text = ("avqkn-guaaa-aaaaa-qaaea-cai");
 };

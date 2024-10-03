@@ -22,10 +22,10 @@ actor DataAssetService {
     type IdentityManager = IdentityManager.IdentityManager;
     type XPRewardSystem = XPRewardSystem.XPRewardSystem;
 
-    let ShardManager : DataAssetShardManager = actor ("be2us-64aaa-aaaaa-qaabq-cai");
-    let sharedActivityService : SharedActivityService = actor ("aovwi-4maaa-aaaaa-qaagq-cai");
-    let identityManager : IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); //
-    let xpRewardSystem : XPRewardSystem = actor ("c2lt4-zmaaa-aaaaa-qaaiq-cai"); // Replace with actual canister ID
+    let ShardManager : DataAssetShardManager = actor (Types.dataAssetShardManagerCanisterID);
+    let sharedActivityService : SharedActivityService = actor (Types.sharedActivityCanisterID);
+    let identityManager : IdentityManager = actor (Types.identityManagerCanisterID); //
+    let xpRewardSystem : XPRewardSystem = actor (Types.xpSystemCanisterID); // Replace with actual canister ID
 
     public shared ({ caller }) func uploadDataAsset(asset : DataAsset) : async Result.Result<Text, Text> {
         let userIDResult = await getUserID(caller);

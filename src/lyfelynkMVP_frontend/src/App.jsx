@@ -25,6 +25,7 @@ import { createActor as createFacilityActor } from "../../declarations/Facility"
 import { createActor as createDataAssetActor } from "../../declarations/DataAsset";
 import { createActor as createIdentityManagerActor } from "../../declarations/Identity_Manager";
 import { createActor as createSharedActivityActor } from "../../declarations/SharedActivity";
+import { createActor as createGamificationSystemActor } from "../../declarations/GamificationSystem";
 import ActorContext from "./ActorContext";
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
@@ -40,6 +41,7 @@ function App() {
     dataAsset: null,
     identityManager: null,
     sharedActivity: null,
+    gamificationSystem: null,
   });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authClient, setAuthClient] = useState(null);
@@ -89,6 +91,10 @@ function App() {
         process.env.CANISTER_ID_SHARED_ACTIVITY,
         { agent },
       );
+      const gamificationSystemActor = createGamificationSystemActor(
+        process.env.CANISTER_ID_GAMIFICATIONSYSTEM,
+        { agent },
+      );
       setActors({
         user: userActor,
         professional: professionalActor,
@@ -96,6 +102,7 @@ function App() {
         dataAsset: dataAssetActor,
         identityManager: identityManagerActor,
         sharedActivity: sharedActivityActor,
+        gamificationSystem: gamificationSystemActor,
       });
     } catch (error) {
       console.error("Error initializing actors:", error);

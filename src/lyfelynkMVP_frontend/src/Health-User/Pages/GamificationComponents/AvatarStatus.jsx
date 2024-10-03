@@ -7,25 +7,25 @@ const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP }) => {
   const stats = [
     {
       name: "Energy",
-      value: avatar.attributes.energy,
+      value: avatar.energy,
       max: 20,
       color: "bg-blue-400",
     },
     {
       name: "Focus",
-      value: avatar.attributes.focus,
+      value: avatar.focus,
       max: 20,
       color: "bg-purple-400",
     },
     {
       name: "Vitality",
-      value: avatar.attributes.vitality,
+      value: avatar.vitality,
       max: 20,
       color: "bg-green-400",
     },
     {
       name: "Resilience",
-      value: avatar.attributes.resilience,
+      value: avatar.resilience,
       max: 20,
       color: "bg-yellow-400",
     },

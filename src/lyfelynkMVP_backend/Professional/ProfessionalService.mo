@@ -15,9 +15,9 @@ actor ProfessionalService {
     type HealthIDProfessional = Types.HealthIDProfessional;
     type ProfessionalShardManager = ProfessionalShardManager.ProfessionalShardManager;
 
-    let ShardManager : ProfessionalShardManager = actor ("a3shf-5eaaa-aaaaa-qaafa-cai"); // Professional Shard Manager Canister ID
-    let identityManager : IdentityManager.IdentityManager = actor ("by6od-j4aaa-aaaaa-qaadq-cai"); // Replace with actual IdentityManager canister ID
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("cbopz-duaaa-aaaaa-qaaka-cai");
+    let ShardManager : ProfessionalShardManager = actor (Types.professionalShardManagerCanisterID); // Professional Shard Manager Canister ID
+    let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID); // Replace with actual IdentityManager canister ID
+    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor (Types.vetkdSystemCanisterID);
 
     private stable var pendingRequests : Map.Map<Principal, HealthIDProfessional> = Map.new<Principal, HealthIDProfessional>(); // Map of Pending Requests of Professionals Registered
     private stable var adminPrincipal = ""; // Admin Principal

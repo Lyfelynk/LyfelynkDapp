@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import AvatarStatus from "./GamificationComponents/AvatarStatus";
 import NFTCard from "./GamificationComponents/NFTCard";
-import ActivityLog from "./GamificationComponents/ActivityLog";
 import GemMarketplace from "./GamificationComponents/GemMarketplace";
 import {
   INITIAL_HP,
@@ -21,7 +20,6 @@ const Gamification = () => {
   const [userAvatars, setUserAvatars] = useState([]);
   const [professionals, setProfessionals] = useState([]);
   const [facilities, setFacilities] = useState([]);
-  const [activityLog, setActivityLog] = useState([]);
   const [pendingVisit, setPendingVisit] = useState(null);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [principalId, setPrincipalId] = useState(null);
@@ -131,10 +129,6 @@ const Gamification = () => {
         });
       });
 
-      setActivityLog((prevLog) => [
-        ...prevLog,
-        `Completed ${activity} activity with ${nft.type}`,
-      ]);
     } catch (error) {
       console.error("Error performing activity:", error);
     }
@@ -286,10 +280,6 @@ const Gamification = () => {
       );
       if (result[0].Ok) {
         await fetchUserAvatars();
-        setActivityLog((prevLog) => [
-          ...prevLog,
-          `Visited ${nft.type} professional and acquired a new avatar`,
-        ]);
       }
     } catch (error) {
       console.error("Error visiting professional:", error);
@@ -307,10 +297,7 @@ const Gamification = () => {
       );
       if (result[0].Ok) {
         await fetchUserAvatars();
-        setActivityLog((prevLog) => [
-          ...prevLog,
-          `Visited ${nft.type} facility and acquired a new avatar`,
-        ]);
+
       }
     } catch (error) {
       console.error("Error visiting facility:", error);
@@ -322,6 +309,31 @@ const Gamification = () => {
   const manageAvatar = (avatar) => {
     console.log("avatar", avatar);
     setSelectedAvatar(avatar);
+  };
+
+  const transferAvatar = async (avatarId, principalAddress) => {
+    try {
+      // Implement the logic to transfer the avatar using your actor
+      // For example:
+      // await actors.gamificationSystem.transferAvatar(avatarId, principalAddress);
+      
+      // After successful transfer, update the user avatars
+      await fetchUserAvatars();
+      toast({
+        title: "Avatar Transferred",
+        description: "The avatar has been successfully transferred.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error transferring avatar:", error);
+      toast({
+        title: "Transfer Failed",
+        description: "Failed to transfer the avatar. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      throw error;
+    }
   };
 
   const getPrincipalId = async () => {
@@ -404,6 +416,7 @@ const Gamification = () => {
                       nft={avatar}
                       showManage={true}
                       onManage={manageAvatar}
+                      onTransfer={transferAvatar}
                     />
                   ))}
                 </div>
@@ -440,7 +453,6 @@ const Gamification = () => {
               </div>
             </TabsContent>
           </Tabs>
-          <ActivityLog log={activityLog} />
         </div>
         <div>
           {selectedAvatar && (

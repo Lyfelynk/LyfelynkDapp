@@ -28,6 +28,7 @@ function MintNFTForm() {
         userPrincipal,
         [],
         avatarType,
+        "https://gateway.lighthouse.storage/ipfs/bafkreihhnhf2wasvj7r3gywekm3lpgbiulpov6xwhcv2var2am4c3fn6wm",
       );
       if (result[0].Ok) {
         setMessage(`NFT minted successfully for ${userPrincipal}`);

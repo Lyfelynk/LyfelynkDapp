@@ -1,11 +1,24 @@
+import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 import TrieMap "mo:base/TrieMap";
-
 actor class IdentityManager() {
-    private let identityMap = TrieMap.TrieMap<Principal, (Text, Text)>(Principal.equal, Principal.hash);
-    private let reverseIdentityMap = TrieMap.TrieMap<Text, Principal>(Text.equal, Text.hash);
+    private stable var identityMapEntries : [(Principal, (Text, Text))] = [];
+    private var identityMap = TrieMap.fromEntries<Principal, (Text, Text)>(identityMapEntries.vals(), Principal.equal, Principal.hash);
+
+    private stable var reverseIdentityMapEntries : [(Text, Principal)] = [];
+    private var reverseIdentityMap = TrieMap.fromEntries<Text, Principal>(reverseIdentityMapEntries.vals(), Text.equal, Text.hash);
+
+    system func preupgrade() {
+        identityMapEntries := Iter.toArray(identityMap.entries());
+        reverseIdentityMapEntries := Iter.toArray(reverseIdentityMap.entries());
+    };
+
+    system func postupgrade() {
+        identityMap := TrieMap.fromEntries(identityMapEntries.vals(), Principal.equal, Principal.hash);
+        reverseIdentityMap := TrieMap.fromEntries(reverseIdentityMapEntries.vals(), Text.equal, Text.hash);
+    };
 
     public func registerIdentity(principal : Principal, id : Text, userType : Text) : async Result.Result<(), Text> {
         identityMap.put(principal, (id, userType));

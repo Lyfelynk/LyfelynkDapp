@@ -27,6 +27,7 @@ import { createActor as createDataAssetActor } from "../../declarations/DataAsse
 import { createActor as createIdentityManagerActor } from "../../declarations/Identity_Manager";
 import { createActor as createSharedActivityActor } from "../../declarations/Shared_Activity";
 import { createActor as createGamificationSystemActor } from "../../declarations/GamificationSystem";
+import { createActor as createVisitManagerActor } from "../../declarations/VisitManager";
 import ActorContext from "./ActorContext";
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
@@ -43,6 +44,7 @@ function App() {
     identityManager: null,
     sharedActivity: null,
     gamificationSystem: null,
+    visitManager: null,
   });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authClient, setAuthClient] = useState(null);
@@ -96,6 +98,10 @@ function App() {
         process.env.CANISTER_ID_GAMIFICATIONSYSTEM,
         { agent }
       );
+      const visitManagerActor = createVisitManagerActor(
+        process.env.CANISTER_ID_VISITMANAGER,
+        { agent }
+      );
       setActors({
         user: userActor,
         professional: professionalActor,
@@ -104,6 +110,7 @@ function App() {
         identityManager: identityManagerActor,
         sharedActivity: sharedActivityActor,
         gamificationSystem: gamificationSystemActor,
+        visitManager: visitManagerActor,
       });
     } catch (error) {
       console.error("Error initializing actors:", error);
@@ -123,8 +130,24 @@ function App() {
     }
   }
 
+  async function logout() {
+    setActors({
+      user: null,
+      professional: null,
+      facility: null,
+      dataAsset: null,
+      identityManager: null,
+      sharedActivity: null,
+      gamificationSystem: null,
+      visitManager: null,
+    });
+    setIsAuthenticated(false);
+    if (authClient) {
+      await authClient.logout(); // Optional: If you want to call the logout method from the auth client
+    }
+  }
   return (
-    <ActorContext.Provider value={{ actors, isAuthenticated, login }}>
+    <ActorContext.Provider value={{ actors, isAuthenticated, login, logout }}>
       <ThemeProvider>
         <Toaster />
         <Router>

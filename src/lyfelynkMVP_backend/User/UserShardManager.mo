@@ -207,6 +207,20 @@ actor class UserShardManager() {
         };
     };
 
+    private func reinstallCodeOnShard(canisterPrincipal : Principal) : async Result.Result<(), Text> {
+        try {
+            await ic.install_code({
+                arg = [];
+                wasm_module = userShardWasmModule;
+                mode = #reinstall;
+                canister_id = canisterPrincipal;
+            });
+            #ok(());
+        } catch (e) {
+            #err("Failed to reinstall code on shard: " # Error.message(e));
+        };
+    };
+
     // Function to update the WASM module
     public shared ({ caller }) func updateWasmModule(wasmModule : [Nat8]) : async Result.Result<(), Text> {
         if (isPermitted(caller)) {
@@ -233,7 +247,7 @@ actor class UserShardManager() {
         var errorCount = 0;
 
         for ((shardID, principal) in BTree.entries(shards)) {
-            let installResult = await installCodeOnShard(principal);
+            let installResult = await reinstallCodeOnShard(principal);
             switch (installResult) {
                 case (#ok(())) {
                     updatedCount += 1;

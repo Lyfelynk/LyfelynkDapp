@@ -15,6 +15,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { CircleX } from "lucide-react";
+import lighthouse from "@lighthouse-web3/sdk";
+
 import LoadingScreen from "../LoadingScreen";
 import ActorContext from "../ActorContext";
 import * as vetkd from "ic-vetkd-utils";
@@ -73,13 +75,13 @@ const FileUpload = () => {
     const fileSizeMB = file.size / (1024 * 1024);
     if (!supportedFormats.includes(fileType)) {
       setErrorMessage(
-        "Unsupported file format. Please select a file with one of the supported formats: PDF, CSV, XML, JPG, JPEG, PNG.",
+        "Unsupported file format. Please select a file with one of the supported formats: PDF, CSV, XML, JPG, JPEG, PNG."
       );
       return false;
     }
     if (fileSizeMB > 1.9) {
       setErrorMessage(
-        "File size is larger than 2 MB. Please select a smaller file.",
+        "File size is larger than 2 MB. Please select a smaller file."
       );
       return false;
     }
@@ -113,9 +115,44 @@ const FileUpload = () => {
     }
   };
 
-  const handleUpload = async () => {
-    if (file) {
-      setLoading(true);
+  const uploadToLighthouse = async (file) => {
+    const progressCallback = (progressData) => {
+      let percentageDone =
+        100 - (progressData?.total / progressData?.uploaded)?.toFixed(2);
+      console.log(`Upload progress: ${percentageDone}%`);
+    };
+
+    try {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      const fileList = dataTransfer.files;
+      console.log(fileList);
+      const output = await lighthouse.upload(
+        fileList,
+        process.env.LIGHTHOUSEAPI,
+        null,
+        progressCallback
+      );
+      console.log("File Status:", output);
+      console.log(
+        "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+      );
+      return output.data.Hash;
+    } catch (error) {
+      console.error("Error uploading to Lighthouse:", error);
+      throw error;
+    }
+  };
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Validate file before proceeding
+      if (!file || !(file.file instanceof File)) {
+        throw new Error("No valid file uploaded. Please upload a valid file.");
+      }
 
       // Step 1: Upload/link an empty file to get a unique ID
       const emptyDataAsset = {
@@ -123,7 +160,6 @@ const FileUpload = () => {
         title: "Empty File",
         description: "Placeholder for encryption",
         data: "[]",
-
         metadata: {
           category: "",
           tags: [],
@@ -136,18 +172,16 @@ const FileUpload = () => {
 
       Object.keys(result).forEach((key) => {
         if (key === "err") {
-          alert(result[key]);
-          setLoading(false);
-          return;
+          throw new Error(result[key]);
         }
         if (key === "ok") {
           uniqueID = result[key];
         }
       });
-
+      console.log(uniqueID);
+      console.log("This is unique ID: : " + uniqueID);
       if (!uniqueID) {
-        setLoading(false);
-        return;
+        throw new Error("Failed to get unique ID");
       }
 
       // Step 2: Fetch the encrypted key using encrypted_symmetric_key_for_dataAsset
@@ -156,83 +190,99 @@ const FileUpload = () => {
       const encryptedKeyResult =
         await actors.dataAsset.getEncryptedSymmetricKeyForAsset(
           uniqueID,
-          Object.values(tsk.public_key()),
+          Object.values(tsk.public_key())
         );
 
       let encryptedKey = "";
 
       Object.keys(encryptedKeyResult).forEach((key) => {
         if (key === "err") {
-          alert(encryptedKeyResult[key]);
-          setLoading(false);
-          return;
+          throw new Error(encryptedKeyResult[key]);
         }
         if (key === "ok") {
           encryptedKey = encryptedKeyResult[key];
         }
       });
-
+      console.log("encrypted key " + encryptedKey);
       if (!encryptedKey) {
-        setLoading(false);
-        return;
+        throw new Error("Failed to get encrypted key");
       }
 
       const pkBytesHex =
         await actors.dataAsset.getSymmetricKeyVerificationKey(uniqueID);
-      console.log(pkBytesHex);
-      console.log(encryptedKey);
+
+      let symmetricVerificiationKey = "";
+
+      Object.keys(pkBytesHex).forEach((key) => {
+        if (key === "err") {
+          throw new Error(pkBytesHex[key]);
+        }
+        if (key === "ok") {
+          symmetricVerificiationKey = pkBytesHex[key];
+        }
+      });
+      console.log("symmetric verification key " + symmetricVerificiationKey);
+      if (!symmetricVerificiationKey) {
+        throw new Error("Failed to get encrypted key");
+      }
+
       const aesGCMKey = tsk.decrypt_and_hash(
         hex_decode(encryptedKey),
-        hex_decode(pkBytesHex),
+        hex_decode(symmetricVerificiationKey),
         new TextEncoder().encode(uniqueID),
         32,
-        new TextEncoder().encode("aes-256-gcm"),
+        new TextEncoder().encode("aes-256-gcm")
       );
       console.log(aesGCMKey);
+
       // Step 3: Encrypt the user's file using the AES-GCM key
-      const fileReader = new FileReader();
-      fileReader.onload = async () => {
-        const arrayBuffer = fileReader.result;
-        const uint8Array = new Uint8Array(arrayBuffer);
-        const encryptedData = await aes_gcm_encrypt(uint8Array, aesGCMKey);
+      const arrayBuffer = await file.file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const encryptedData = await aes_gcm_encrypt(uint8Array, aesGCMKey);
 
-        const metadata = {
-          category: category,
-          tags: [keywords],
-          format: file.file.type,
-        };
+      // Step 4: Upload encrypted data to Lighthouse
+      const encryptedBlob = new Blob([encryptedData]);
+      const encryptedFile = new File([encryptedBlob], "encrypted.bin", {
+        type: "application/octet-stream",
+      });
+      const lighthouseHash = await uploadToLighthouse(encryptedFile);
 
-        const dataAsset = {
-          assetID: uniqueID,
-          title: file.file.name,
-          description: description,
-          data: Object.values(encryptedData),
-          metadata: metadata,
-        };
-
-        // Step 4: Update the data asset with the encrypted file
-        const updateResult = await actors.dataAsset.updateDataAsset(
-          uniqueID,
-          dataAsset,
-        );
-
-        Object.keys(updateResult).forEach((key) => {
-          if (key === "err") {
-            alert(updateResult[key]);
-            setLoading(false);
-          }
-          if (key === "ok") {
-            // alert("File uploaded successfully");
-            toast({
-              title: "Success",
-              description: updateResult[key],
-              variant: "success",
-            });
-            setLoading(false);
-          }
-        });
+      const metadata = {
+        category: category,
+        tags: [keywords],
+        format: file.type,
       };
-      fileReader.readAsArrayBuffer(file.file);
+
+      const dataAsset = {
+        assetID: uniqueID,
+        title: file.name,
+        description: description,
+        data: lighthouseHash,
+        metadata: metadata,
+      };
+
+      // Step 5: Update the data asset with the Lighthouse hash
+      const updateResult = await actors.dataAsset.updateDataAsset(
+        uniqueID,
+        dataAsset
+      );
+
+      Object.keys(updateResult).forEach((key) => {
+        if (key === "err") {
+          throw new Error(updateResult[key]);
+        }
+        if (key === "ok") {
+          toast({
+            title: "Success",
+            description: updateResult[key],
+            variant: "success",
+          });
+        }
+      });
+    } catch (error) {
+      handleError(error); // Use utility function for error handling
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -243,12 +293,12 @@ const FileUpload = () => {
       rawKey,
       "AES-GCM",
       false,
-      ["encrypt"],
+      ["encrypt"]
     );
     const ciphertext_buffer = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      data,
+      data
     );
     const ciphertext = new Uint8Array(ciphertext_buffer);
     const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
@@ -260,7 +310,7 @@ const FileUpload = () => {
   //   bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
     );
 
   const handleRemoveFile = () => {
@@ -292,7 +342,7 @@ const FileUpload = () => {
             "Content-Type": "multipart/form-data",
           },
           responseType: "blob",
-        },
+        }
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -323,6 +373,16 @@ const FileUpload = () => {
 
     // Save the PDF file
     doc.save(fileName);
+  };
+
+  // Utility function for error handling
+  const handleError = (error) => {
+    console.error("Error:", error);
+    toast({
+      title: "Error",
+      description: error.message,
+      variant: "destructive",
+    });
   };
 
   if (loading) {
@@ -423,7 +483,10 @@ const FileUpload = () => {
 
       {file && (
         <>
-          <Button onClick={handleUpload} className="my-2 mr-2">
+          <Button
+            onClick={handleUpload}
+            className="my-2 mr-2"
+          >
             Upload
           </Button>
           <CloudFunctionCallButton
@@ -433,7 +496,10 @@ const FileUpload = () => {
       )}
 
       {csvData && (
-        <Button onClick={convertCsvToPdf} className="my-2 mr-2">
+        <Button
+          onClick={convertCsvToPdf}
+          className="my-2 mr-2"
+        >
           Download Analyzed File
         </Button>
       )}
@@ -458,7 +524,10 @@ const FileUpload = () => {
 };
 
 const CloudFunctionCallButton = ({ handleCallCloudFunction }) => (
-  <Button variant="outline" onClick={handleCallCloudFunction}>
+  <Button
+    variant="outline"
+    onClick={handleCallCloudFunction}
+  >
     Run Analytics
   </Button>
 );

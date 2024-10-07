@@ -110,7 +110,7 @@ module Types {
         }) -> async ({ encrypted_key : Blob });
     };
 
-    public let admin : Text = ("eblrh-umgcj-fl75h-m36cu-lwppj-db6ll-x6emt-apn5e-gri6o-24ou3-pqe");
+    public let admin : Text = ("wzu4y-fglii-3zve6-rllp6-ns5v6-howr5-7xmkg-ju6gz-yjkie-ebmc3-uqe");
     public let vetkdSystemCanisterID : Text = ("dfdal-2uaaa-aaaaa-qaama-cai");
     public let wellnessAvatarNFTCanisterID : Text = ("cuj6u-c4aaa-aaaaa-qaajq-cai");
     public let identityManagerCanisterID : Text = ("avqkn-guaaa-aaaaa-qaaea-cai");
@@ -127,4 +127,24 @@ module Types {
     public let xpSystemCanisterID : Text = ("cbopz-duaaa-aaaaa-qaaka-cai");
     public let gamificationSystemCanisterID : Text = ("by6od-j4aaa-aaaaa-qaadq-cai");
     public let visitManagerCanisterID : Text = ("ctiya-peaaa-aaaaa-qaaja-cai");
+
+    public let permissionedCanisters : [Text] = [
+        admin,
+        vetkdSystemCanisterID,
+        wellnessAvatarNFTCanisterID,
+        identityManagerCanisterID,
+        userServiceCanisterID,
+        professionalServiceCanisterID,
+        facilityServiceCanisterID,
+        dataAssetCanisterID,
+        sharedActivityCanisterID,
+        userShardManagerCanisterID,
+        professionalShardManagerCanisterID,
+        facilityShardManagerCanisterID,
+        dataAssetShardManagerCanisterID,
+        sharedActivityShardManagerCanisterID,
+        xpSystemCanisterID,
+        gamificationSystemCanisterID,
+        visitManagerCanisterID,
+    ];
 };

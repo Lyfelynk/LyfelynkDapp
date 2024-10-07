@@ -105,31 +105,7 @@
       "type": "motoko"
     },
     "lyfelynkMVP_frontend": {
-      "dependencies": [
-        "internet_identity",
-        "icrc1_ledger_canister",
-        "vetkd_system_api",
-        "Identity_Manager",
-        "User",
-        "UserShardManager",
-        "UserShard",
-        "Professional",
-        "ProfessionalShardManager",
-        "ProfessionalShard",
-        "Facility",
-        "FacilityShardManager",
-        "FacilityShard",
-        "DataAsset",
-        "DataAssetShardManager",
-        "DataAssetShard",
-        "Shared_Activity",
-        "SharedActivityShardManager",
-        "SharedActivityShard",
-        "XPRewardSystem",
-        "WellnessAvatarNFT",
-        "GamificationSystem",
-        "VisitManager"
-      ],
+      "dependencies": [],
       "source": ["src/lyfelynkMVP_frontend/dist"],
       "type": "assets",
       "workspace": "lyfelynkMVP_frontend"

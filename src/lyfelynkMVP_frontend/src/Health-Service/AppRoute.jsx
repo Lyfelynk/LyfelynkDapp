@@ -8,6 +8,7 @@ import ProfileContent from "./Pages/Profile";
 import UploadContent from "./Pages/UploadPage";
 import YourRecords from "./Pages/Records/YourRecords";
 import SharedWithYou from "./Pages/Records/SharedWithYou";
+import GamificationTab from "./Pages/GamificationTab";
 
 import NotFoundPage from "./NotFoundPage";
 import AppBanner from "../AppBanner";
@@ -43,6 +44,7 @@ export default function AppRoute1() {
             <Route path="/Upload" element={<UploadContent />} />
             <Route path="/Marketplace" element={<MarketplaceContent />} />
             <Route path="/Profile" element={<ProfileContent />} />
+            <Route path="/Gamification" element={<GamificationTab />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </div>

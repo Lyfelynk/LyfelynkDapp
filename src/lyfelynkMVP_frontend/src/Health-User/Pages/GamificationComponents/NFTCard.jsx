@@ -19,7 +19,14 @@ import { Badge } from "@/components/ui/badge";
 import { Send, AlertCircle } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
-const NFTCard = ({ nft, onVisit, isPending, showManage = false, onManage, onTransfer }) => {
+const NFTCard = ({
+  nft,
+  onVisit,
+  isPending,
+  showManage = false,
+  onManage,
+  onTransfer,
+}) => {
   const [isTransferOpen, setIsTransferOpen] = useState(false);
   const [principalAddress, setPrincipalAddress] = useState("");
   const [isTransferring, setIsTransferring] = useState(false);
@@ -68,12 +75,23 @@ const NFTCard = ({ nft, onVisit, isPending, showManage = false, onManage, onTran
         <p className="text-sm text-gray-400 mb-4">{nft.description}</p>
 
         <div className="grid grid-cols-2 gap-4">
-          {Object.entries(nft.attributes).map(([key, value]) => (
-            <div key={key} className="flex flex-col">
-              <span className="text-xs text-gray-500 uppercase">{key}</span>
-              <span className="text-lg font-semibold">{value}</span>
-            </div>
-          ))}
+          {Object.entries(nft).map(([key, value]) => {
+            if (
+              typeof value !== "object" &&
+              key !== "id" &&
+              key !== "name" &&
+              key !== "description" &&
+              key !== "image"
+            ) {
+              return (
+                <div key={key} className="flex flex-col">
+                  <span className="text-xs text-gray-500 uppercase">{key}</span>
+                  <span className="text-lg font-semibold">{value}</span>
+                </div>
+              );
+            }
+            return null;
+          })}
         </div>
       </CardContent>
 
@@ -103,8 +121,8 @@ const NFTCard = ({ nft, onVisit, isPending, showManage = false, onManage, onTran
                     onChange={(e) => setPrincipalAddress(e.target.value)}
                     className="bg-gray-700 text-white"
                   />
-                  <Button 
-                    onClick={handleTransfer} 
+                  <Button
+                    onClick={handleTransfer}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                     disabled={isTransferring}
                   >

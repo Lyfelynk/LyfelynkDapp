@@ -11,17 +11,18 @@ import IdentityManager "../IdentityManager/IdentityManager";
 import Types "../Types";
 import Hex "../utility/Hex";
 import ProfessionalShardManager "ProfessionalShardManager";
+
 actor ProfessionalService {
+
     type HealthIDProfessional = Types.HealthIDProfessional;
     type ProfessionalShardManager = ProfessionalShardManager.ProfessionalShardManager;
 
     let ShardManager : ProfessionalShardManager = actor (Types.professionalShardManagerCanisterID); // Professional Shard Manager Canister ID
-    let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID); // Replace with actual IdentityManager canister ID
+    let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID); // IdentityManager canister ID
     let vetkd_system_api : Types.VETKD_SYSTEM_API = actor (Types.vetkdSystemCanisterID);
 
     private stable var pendingRequests : Map.Map<Principal, HealthIDProfessional> = Map.new<Principal, HealthIDProfessional>(); // Map of Pending Requests of Professionals Registered
-    private stable var adminPrincipal = ""; // Admin Principal
-    private var isAdminRegistered : Bool = false; // Admin Registration Status
+    private stable var adminPrincipal = Types.admin; // Admin Principal
 
     public shared ({ caller }) func createProfessionalRequest(demoInfo : Blob, occupationInfo : Blob, certificationInfo : Blob) : async Result.Result<Text, Text> {
         let tempProfessional : HealthIDProfessional = {
@@ -274,18 +275,8 @@ actor ProfessionalService {
         Principal.toText(caller);
     };
 
-    // Function to check if a principal is an admin
-    public shared ({ caller }) func registerAdmin() : async Bool {
-        if (Principal.isAnonymous(caller) or isAdminRegistered) {
-            return false;
-        };
-        adminPrincipal := Principal.toText(caller);
-        isAdminRegistered := true;
-        return true;
-    };
     // Helper function to check if a principal is an admin
     private func isAdmin(principal : Principal) : Bool {
-        // Check if the provided principal matches the admin principal
         Principal.toText(principal) == adminPrincipal;
 
     };

@@ -420,9 +420,9 @@ shared (_init_msg) actor class WellnessAvatarNFT(
     public shared (msg) func icrc37_approve_collection(approvals : [ApproveCollectionArg]) : async [?ApproveCollectionResult] {
         icrc37().approve_collection<system>(msg.caller, approvals);
     };
-
-    public shared (msg) func icrc7_transfer<system>(args : [TransferArgs]) : async [?TransferResult] {
-        icrc7().transfer(msg.caller, args);
+    //Modified
+    public func icrc7_transfer<system>(caller : Principal, args : [TransferArgs]) : async [?TransferResult] {
+        icrc7().transfer(caller, args);
     };
 
     public shared (msg) func icrc37_transfer_from<system>(args : [TransferFromArg]) : async [?TransferFromResult] {

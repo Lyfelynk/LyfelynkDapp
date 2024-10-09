@@ -110,7 +110,7 @@ module Types {
         }) -> async ({ encrypted_key : Blob });
     };
 
-    public let admin : Text = ("2n52h-xa3zc-ijie2-xgdcm-jxi6p-oapl2-ahgsh-sbbde-q2nh2-rvrgh-4qe");
+    public let admin : Text = ("jzvjc-m65ee-vd7ur-o4t4m-ywsll-xk4rm-5c4xu-ngmhj-flt3x-e2eho-iqe");
     public let vetkdSystemCanisterID : Text = ("dfdal-2uaaa-aaaaa-qaama-cai");
     public let wellnessAvatarNFTCanisterID : Text = ("cuj6u-c4aaa-aaaaa-qaajq-cai");
     public let identityManagerCanisterID : Text = ("avqkn-guaaa-aaaaa-qaaea-cai");

@@ -75,12 +75,23 @@ const NFTCard = ({
         <p className="text-sm text-gray-400 mb-4">{nft.description}</p>
 
         <div className="grid grid-cols-2 gap-4">
-          {Object.entries(nft.attributes).map(([key, value]) => (
-            <div key={key} className="flex flex-col">
-              <span className="text-xs text-gray-500 uppercase">{key}</span>
-              <span className="text-lg font-semibold">{value}</span>
-            </div>
-          ))}
+          {Object.entries(nft).map(([key, value]) => {
+            if (
+              typeof value !== "object" &&
+              key !== "id" &&
+              key !== "name" &&
+              key !== "description" &&
+              key !== "image"
+            ) {
+              return (
+                <div key={key} className="flex flex-col">
+                  <span className="text-xs text-gray-500 uppercase">{key}</span>
+                  <span className="text-lg font-semibold">{value}</span>
+                </div>
+              );
+            }
+            return null;
+          })}
         </div>
       </CardContent>
 

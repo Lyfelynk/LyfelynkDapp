@@ -57,6 +57,11 @@ const Sidebar = ({ isOpen, onClose }) => {
       icon: <ShoppingCart />,
       text: "Marketplace",
     },
+    {
+      to: "/Health-Service/Gamification",
+      icon: <Gamepad />,
+      text: "Gamification",
+    },
     { to: "/Health-Service/Profile", icon: <User />, text: "Profile" },
   ];
 

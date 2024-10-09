@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Menu } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
-
+import { Button } from "@/components/ui/button";
 import { useLocation } from "react-router-dom";
 
 const Navbar = ({ toggleSidebar }) => {

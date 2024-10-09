@@ -15,7 +15,7 @@ actor class DataAssetShard() {
     private stable var dataAccessTP = BTree.init<Text, [Principal]>(null);
     private stable var dataAccessPT = BTree.init<Principal, [Text]>(null);
 
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor ("cgpjn-omaaa-aaaaa-qaakq-cai");
+    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor (Types.vetkdSystemCanisterID);
 
     // List of permitted principals (e.g., DataAssetShardManager)
     private stable var permittedPrincipals : [Principal] = []; // Add permitted principals here

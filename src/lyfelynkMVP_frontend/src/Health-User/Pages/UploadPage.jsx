@@ -69,11 +69,11 @@ export default function UploadContent() {
         fileList,
         process.env.LIGHTHOUSEAPI,
         null,
-        progressCallback,
+        progressCallback
       );
       console.log("File Status:", output);
       console.log(
-        "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash,
+        "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
       );
       return output.data.Hash;
     } catch (error) {
@@ -123,7 +123,7 @@ export default function UploadContent() {
       const encryptedKeyResult =
         await actors.dataAsset.getEncryptedSymmetricKeyForAsset(
           uniqueID,
-          Object.values(tsk.public_key()),
+          Object.values(tsk.public_key())
         );
 
       let encryptedKey = "";
@@ -136,7 +136,7 @@ export default function UploadContent() {
           encryptedKey = encryptedKeyResult[key];
         }
       });
-      console.log(encryptedKey);
+      console.log("encrypted key " + encryptedKey);
       if (!encryptedKey) {
         throw new Error("Failed to get encrypted key");
       }
@@ -154,7 +154,7 @@ export default function UploadContent() {
           symmetricVerificiationKey = pkBytesHex[key];
         }
       });
-      console.log(symmetricVerificiationKey);
+      console.log("symmetric verification key " + symmetricVerificiationKey);
       if (!symmetricVerificiationKey) {
         throw new Error("Failed to get encrypted key");
       }
@@ -164,7 +164,7 @@ export default function UploadContent() {
         hex_decode(symmetricVerificiationKey),
         new TextEncoder().encode(uniqueID),
         32,
-        new TextEncoder().encode("aes-256-gcm"),
+        new TextEncoder().encode("aes-256-gcm")
       );
       console.log(aesGCMKey);
 
@@ -211,7 +211,7 @@ export default function UploadContent() {
       // Step 5: Update the data asset with the Lighthouse hash
       const updateResult = await actors.dataAsset.updateDataAsset(
         uniqueID,
-        dataAsset,
+        dataAsset
       );
 
       Object.keys(updateResult).forEach((key) => {
@@ -245,12 +245,12 @@ export default function UploadContent() {
       rawKey,
       "AES-GCM",
       false,
-      ["encrypt"],
+      ["encrypt"]
     );
     const ciphertext_buffer = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      data,
+      data
     );
     const ciphertext = new Uint8Array(ciphertext_buffer);
     const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
@@ -262,7 +262,7 @@ export default function UploadContent() {
   //   bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
     );
 
   if (loading) {
@@ -278,10 +278,16 @@ export default function UploadContent() {
         <div className="mt-6 w-full max-w-4xl">
           <Tabs defaultValue="Document">
             <TabsList className="w-full">
-              <TabsTrigger className="w-1/2" value="Document">
+              <TabsTrigger
+                className="w-1/2"
+                value="Document"
+              >
                 Document
               </TabsTrigger>
-              <TabsTrigger className="w-1/2" value="Form">
+              <TabsTrigger
+                className="w-1/2"
+                value="Form"
+              >
                 Form
               </TabsTrigger>
             </TabsList>
@@ -294,14 +300,20 @@ export default function UploadContent() {
                 Fill the form out carefully and make sure the information is
                 true to your knowledge.
               </p>
-              <form className="space-y-6" onSubmit={handleSubmit}>
+              <form
+                className="space-y-6"
+                onSubmit={handleSubmit}
+              >
                 <div>
                   <h2 className="text-xl font-semibold">
                     Health Checkup Details
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div className="flex flex-col space-y-1.5">
-                      <label className="font-medium" htmlFor="date-of-checkup">
+                      <label
+                        className="font-medium"
+                        htmlFor="date-of-checkup"
+                      >
                         Date of Checkup
                       </label>
                       <DatePicker
@@ -311,7 +323,10 @@ export default function UploadContent() {
                       />
                     </div>
                     <div className="flex flex-col space-y-1.5">
-                      <label className="font-medium" htmlFor="type-of-checkup">
+                      <label
+                        className="font-medium"
+                        htmlFor="type-of-checkup"
+                      >
                         Type of Checkup
                       </label>
                       <Select
@@ -390,7 +405,10 @@ export default function UploadContent() {
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div className="flex flex-col space-y-1.5">
-                      <label className="font-medium" htmlFor="medication-name">
+                      <label
+                        className="font-medium"
+                        htmlFor="medication-name"
+                      >
                         Medication Name(s)
                       </label>
                       <Input
@@ -401,7 +419,10 @@ export default function UploadContent() {
                       />
                     </div>
                     <div className="flex flex-col space-y-1.5">
-                      <label className="font-medium" htmlFor="dosage">
+                      <label
+                        className="font-medium"
+                        htmlFor="dosage"
+                      >
                         Dosage
                       </label>
                       <Input
@@ -412,7 +433,10 @@ export default function UploadContent() {
                       />
                     </div>
                     <div className="flex flex-col space-y-1.5">
-                      <label className="font-medium" htmlFor="frequency">
+                      <label
+                        className="font-medium"
+                        htmlFor="frequency"
+                      >
                         Frequency
                       </label>
                       <Input

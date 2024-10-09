@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActorContext from "../ActorContext";
-
+import { toast } from "@/components/ui/use-toast";
 function MintNFTForm() {
   const { actors } = useContext(ActorContext);
   const [userPrincipal, setUserPrincipal] = useState("");
@@ -28,16 +28,25 @@ function MintNFTForm() {
         userPrincipal,
         [],
         avatarType,
-        "https://gateway.lighthouse.storage/ipfs/bafkreihhnhf2wasvj7r3gywekm3lpgbiulpov6xwhcv2var2am4c3fn6wm",
+        "https://gateway.lighthouse.storage/ipfs/bafkreihhnhf2wasvj7r3gywekm3lpgbiulpov6xwhcv2var2am4c3fn6wm"
       );
-      if (result[0].Ok) {
-        setMessage(`NFT minted successfully for ${userPrincipal}`);
+      if (result.ok) {
+        toast({
+          title: "NFT minted successfully",
+          description: `NFT minted successfully for ${userPrincipal}`,
+        });
       } else {
-        setMessage(`Error minting NFT: ${JSON.stringify(result[0].Err)}`);
+        toast({
+          title: "Error minting NFT",
+          description: JSON.stringify(result[0].Err),
+        });
       }
     } catch (error) {
       console.error("Error minting NFT:", error);
-      setMessage("Error minting NFT. Please try again.");
+      toast({
+        title: "Error minting NFT",
+        description: "Error minting NFT. Please try again.",
+      });
     }
   };
 

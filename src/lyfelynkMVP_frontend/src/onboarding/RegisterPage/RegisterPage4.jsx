@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,9 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import ActorContext from "../../ActorContext";
+import * as vetkd from "ic-vetkd-utils";
+import { toast } from "@/components/ui/use-toast";
 
 export default function RegisterPage4Content() {
   const [step, setStep] = useState(1);
@@ -23,12 +26,15 @@ export default function RegisterPage4Content() {
   const [txnId, setTxnId] = useState("");
   const [username, setUsername] = useState("");
   const [mobile, setMobile] = useState("");
-  const [bloodType, setbloodType] = useState("");
+  const [bloodType, setBloodType] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [healthIdData, setHealthIdData] = useState(null);
   const [pincode, setPincode] = useState("");
   const [loading, setLoading] = useState(false);
+  const { actors } = useContext(ActorContext);
+  const navigate = useNavigate();
+
   const generateRandomUsername = () => {
     const characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -38,8 +44,7 @@ export default function RegisterPage4Content() {
         Math.floor(Math.random() * characters.length)
       );
     }
-    const generatedUsername = `user${randomStr}`;
-    return generatedUsername;
+    return `user${randomStr}`;
   };
 
   useEffect(() => {
@@ -52,18 +57,132 @@ export default function RegisterPage4Content() {
     { id: "2", name: "Create Health ID" },
   ];
 
-  const navigate = useNavigate();
-git 
   const registerUser = async () => {
-    const { name, gender } = healthIdData;
-    const dob = `${healthIdData.yearOfBirth}-${healthIdData.monthOfBirth}-${healthIdData.dayOfBirth}`;
-    const state = healthIdData.stateName;
-    const country = "India";
-    const heartRate = 0;
-    const demoInfo = { name, dob, gender, country, state, pincode };
-    const basicHealthPara = { bloodType, height, heartRate, weight };
-    console.log(demoInfo, basicHealthPara);
+    setLoading(true);
+    try {
+      const { name, gender } = healthIdData;
+      const dob = `${healthIdData.yearOfBirth}-${healthIdData.monthOfBirth}-${healthIdData.dayOfBirth}`;
+      const state = healthIdData.stateName;
+      const country = "India";
+      const heartRate = 0; // Default value or modify as needed
+      const demoInfo = { name, dob, gender, country, state, pincode };
+      const basicHealthPara = { bloodType, height, heartRate, weight };
+
+      // Convert to JSON strings
+      const demoInfoJson = JSON.stringify(demoInfo);
+      const basicHealthParaJson = JSON.stringify(basicHealthPara);
+
+      // Convert JSON strings to Uint8Array
+      const demoInfoArray = new TextEncoder().encode(demoInfoJson);
+      const basicHealthParaArray = new TextEncoder().encode(
+        basicHealthParaJson
+      );
+
+      // Step 2: Fetch the encrypted key using encrypted_symmetric_key_for_dataAsset
+      const seed = window.crypto.getRandomValues(new Uint8Array(32));
+      const tsk = new vetkd.TransportSecretKey(seed);
+      const encryptedKeyResult =
+        await actors.user.encrypted_symmetric_key_for_user(
+          Object.values(tsk.public_key())
+        );
+
+      let encryptedKey = "";
+
+      Object.keys(encryptedKeyResult).forEach((key) => {
+        if (key === "err") {
+          toast({
+            title: "Error",
+            description: encryptedKeyResult[key],
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+        if (key === "ok") {
+          encryptedKey = encryptedKeyResult[key];
+        }
+      });
+
+      if (!encryptedKey) {
+        setLoading(false);
+        return;
+      }
+
+      const pkBytesHex = await actors.user.symmetric_key_verification_key();
+      const principal = await actors.user.whoami();
+      console.log(pkBytesHex);
+      console.log(encryptedKey);
+      const aesGCMKey = tsk.decrypt_and_hash(
+        hex_decode(encryptedKey),
+        hex_decode(pkBytesHex),
+        new TextEncoder().encode(principal),
+        32,
+        new TextEncoder().encode("aes-256-gcm")
+      );
+      console.log(aesGCMKey);
+
+      const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
+      const encryptedDataBasicHealth = await aes_gcm_encrypt(
+        basicHealthParaArray,
+        aesGCMKey
+      );
+      const result = await actors.user.createUser(
+        Object.values(encryptedDataDemo),
+        Object.values(encryptedDataBasicHealth),
+        [],
+        []
+      );
+      console.log(result);
+      Object.keys(result).forEach((key) => {
+        if (key == "err") {
+          toast({
+            title: "Error",
+            description: result[key],
+            variant: "destructive",
+          });
+          setLoading(false);
+        }
+        if (key == "ok") {
+          toast({
+            title: "Success",
+            description: "User ID No. :" + result[key],
+            variant: "success",
+          });
+          setLoading(false);
+          navigate("verify");
+        }
+      });
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+
+      setLoading(false);
+    }
   };
+  const aes_gcm_encrypt = async (data, rawKey) => {
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const aes_key = await window.crypto.subtle.importKey(
+      "raw",
+      rawKey,
+      "AES-GCM",
+      false,
+      ["encrypt"]
+    );
+    const ciphertext_buffer = await window.crypto.subtle.encrypt(
+      { name: "AES-GCM", iv: iv },
+      aes_key,
+      data
+    );
+    const ciphertext = new Uint8Array(ciphertext_buffer);
+    const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
+    iv_and_ciphertext.set(iv, 0);
+    iv_and_ciphertext.set(ciphertext, iv.length);
+    return iv_and_ciphertext;
+  };
+
+  const hex_decode = (hexString) =>
+    Uint8Array.from(
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+    );
 
   const generateOtp = async () => {
     setLoading(true);
@@ -75,15 +194,13 @@ git
     try {
       const response = await axios.post(
         "https://squid-app-ehrho.ondigitalocean.app/generate-otp",
-        {
-          aadhaar,
-        }
+        { aadhaar }
       );
       setTxnId(response.data.txnId);
       setMessage("Aadhaar OTP sent. Please check your phone.");
       setStep(2);
     } catch (error) {
-      setMessage("Failed to generate Aadhaar OTP", error.response.message);
+      setMessage("Failed to generate Aadhaar OTP: " + error.response.message);
     } finally {
       setLoading(false);
     }
@@ -107,6 +224,8 @@ git
       } else {
         setMessage("No pincode found for the specified district.");
       }
+
+      // Call registerUser after creating health ID
     } catch (error) {
       if (error.response && error.response.data) {
         const response = error.response.data;
@@ -115,9 +234,9 @@ git
         if (response.details && response.details.length > 0) {
           serverMessage = response.details[0].message;
         }
-        setMessage(`Failed to Create Health ID:  ${serverMessage}`);
+        setMessage(`Failed to Create Health ID: ${serverMessage}`);
       } else {
-        setMessage("Failed to  Create Health ID: An unexpected error occurred");
+        setMessage("Failed to Create Health ID: An unexpected error occurred");
       }
     } finally {
       setLoading(false);
@@ -148,7 +267,7 @@ git
 
           <div className="flex-1 items-center max-w-xl bg-background rounded-lg p-8">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl  md:text-2xl font-bold">
+              <h2 className="text-xl md:text-2xl font-bold">
                 Create ID with ABHA
               </h2>
               <Link to="/Register">
@@ -162,12 +281,14 @@ git
                 className="space-y-4 md:flex md:space-x-8 md:space-y-0"
               >
                 {steps.map((stepItem, index) => (
-                  <li key={stepItem.name} className="md:flex-1">
+                  <li
+                    key={stepItem.name}
+                    className="md:flex-1"
+                  >
                     <div className="relative flex items-center">
                       {step > index + 1 ? (
                         <div className="group flex w-full flex-col border-l-4 border-blue-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
                           <span className="text-sm font-bold text-blue-600 transition-colors">
-                            {" "}
                             Step {stepItem.id}
                           </span>
                           <span className="text-sm font-medium text-blue-600 transition-colors min-w-fit">
@@ -180,7 +301,6 @@ git
                           aria-current="step"
                         >
                           <span className="text-sm font-bold text-blue-600 transition-colors">
-                            {" "}
                             Step {stepItem.id}
                           </span>
                           <span className="text-sm font-medium text-blue-600 min-w-fit ">
@@ -213,122 +333,127 @@ git
                     value={aadhaar}
                     onChange={(e) => setAadhaar(e.target.value)}
                   />
-                  <Button onClick={generateOtp} className="w-full">
+                  <Button
+                    onClick={generateOtp}
+                    className="w-full"
+                  >
                     Generate Aadhaar OTP
                   </Button>
                 </div>
               )}
 
-              {step === 2 && (
-                <div className="flex flex-col space-y-2">
-                  <div>
-                    <label
-                      className="block text-sm font-medium leading-5 text-foreground"
-                      htmlFor="mobile"
-                    >
-                      Mobile
-                    </label>
-                    <div className="mt-1">
-                      <Input
-                        id="mobile"
-                        type="text"
-                        placeholder="Mobile"
-                        value={mobile}
-                        onChange={(e) => setMobile(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label
-                      className="block text-sm font-medium leading-5 text-foreground"
-                      htmlFor="otp"
-                    >
-                      Otp
-                    </label>
-                    <div className="mt-1">
-                      <Input
-                        id="otp"
-                        type="text"
-                        placeholder="OTP"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label
-                      className="block text-sm font-medium leading-5 text-foreground"
-                      htmlFor="blood_type"
-                    >
-                      Blood Type
-                    </label>
-                    <div className="mt-1">
-                      <Select
-                        value={bloodType}
-                        onValueChange={(value) => setbloodType(value)} // Update state on selection
+              {step === 2 &&
+                !healthIdData && ( // Check if healthIdData is not available
+                  <div className="flex flex-col space-y-2">
+                    <div>
+                      <label
+                        className="block text-sm font-medium leading-5 text-foreground"
+                        htmlFor="mobile"
                       >
-                        <SelectTrigger id="blood_type">
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent position="popper">
-                          <SelectItem value="a+">A+</SelectItem>
-                          <SelectItem value="a-">A-</SelectItem>
-                          <SelectItem value="b+">B+</SelectItem>
-                          <SelectItem value="b-">B-</SelectItem>
-                          <SelectItem value="ab+">AB+</SelectItem>
-                          <SelectItem value="ab-">AB-</SelectItem>
-                          <SelectItem value="o+">O+</SelectItem>
-                          <SelectItem value="o-">O-</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        Mobile
+                      </label>
+                      <div className="mt-1">
+                        <Input
+                          id="mobile"
+                          type="text"
+                          placeholder="Mobile"
+                          value={mobile}
+                          onChange={(e) => setMobile(e.target.value)}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label
-                      className="block text-sm font-medium leading-5 text-foreground"
-                      htmlFor="height"
+                    <div>
+                      <label
+                        className="block text-sm font-medium leading-5 text-foreground"
+                        htmlFor="otp"
+                      >
+                        Otp
+                      </label>
+                      <div className="mt-1">
+                        <Input
+                          id="otp"
+                          type="text"
+                          placeholder="OTP"
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        className="block text-sm font-medium leading-5 text-foreground"
+                        htmlFor="blood_type"
+                      >
+                        Blood Type
+                      </label>
+                      <div className="mt-1">
+                        <Select
+                          value={bloodType}
+                          onValueChange={(value) => setBloodType(value)} // Update state on selection
+                        >
+                          <SelectTrigger id="blood_type">
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent position="popper">
+                            <SelectItem value="a+">A+</SelectItem>
+                            <SelectItem value="a-">A-</SelectItem>
+                            <SelectItem value="b+">B+</SelectItem>
+                            <SelectItem value="b-">B-</SelectItem>
+                            <SelectItem value="ab+">AB+</SelectItem>
+                            <SelectItem value="ab-">AB-</SelectItem>
+                            <SelectItem value="o+">O+</SelectItem>
+                            <SelectItem value="o-">O-</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        className="block text-sm font-medium leading-5 text-foreground"
+                        htmlFor="height"
+                      >
+                        Height
+                      </label>
+                      <div className="mt-1">
+                        <Input
+                          id="height"
+                          type="number"
+                          inputMode="decimal"
+                          placeholder="Height in cm"
+                          value={height}
+                          onChange={(e) => setHeight(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        className="block text-sm font-medium leading-5 text-foreground"
+                        htmlFor="weight"
+                      >
+                        Weight
+                      </label>
+                      <div className="mt-1">
+                        <Input
+                          id="weight"
+                          type="number"
+                          inputMode="decimal"
+                          placeholder="Weight in Kg"
+                          value={weight}
+                          onChange={(e) => setWeight(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      onClick={createHealthId}
+                      className="w-full"
                     >
-                      Height
-                    </label>
-                    <div className="mt-1">
-                      <Input
-                        id="height"
-                        type="number"
-                        inputMode="decimal"
-                        placeholder="Height in cm"
-                        value={height}
-                        onChange={(e) => setHeight(e.target.value)}
-                      />
-                    </div>
+                      Create ABHA ID
+                    </Button>
                   </div>
-                  <div>
-                    <label
-                      className="block text-sm font-medium leading-5 text-foreground"
-                      htmlFor="weight"
-                    >
-                      Weight
-                    </label>
-                    <div className="mt-1">
-                      <Input
-                        id="weight"
-                        type="number"
-                        inputMode="decimal"
-                        placeholder="Weight in Kg"
-                        value={weight}
-                        onChange={(e) => setWeight(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <Button onClick={createHealthId} className="w-full">
-                    Create Health ID
-                  </Button>
-                </div>
-              )}
-              <p className="text-white">{message}</p>
+                )}
 
               {healthIdData && (
                 <>
-                  {" "}
                   <h3 className="text-lg font-bold">Health ID Details:</h3>
                   <div className="text-white flex gap-x-4">
                     <div className="w-full ">
@@ -348,11 +473,11 @@ git
                             {healthIdData.yearOfBirth}
                           </span>
                         </div>
-                        <span className="font-bold">Gender:</span>{" "}
+                        <span className="font-bold">Gender:</span>
                         <span>{healthIdData.gender}</span>
                       </div>
                       <div>
-                        <span className="font-bold">City:</span>{" "}
+                        <span className="font-bold">City:</span>
                         <span>{healthIdData.districtName}</span>
                       </div>
                     </div>
@@ -375,6 +500,12 @@ git
                       </div>
                     </div>
                   </div>
+                  <Button
+                    onClick={registerUser}
+                    className="w-full"
+                  >
+                    Create User Health ID
+                  </Button>
                 </>
               )}
             </div>

@@ -95,8 +95,10 @@ const Gamification = () => {
           // Fetch additional details
           const avatarAttributes =
             await actors.gamificationSystem.getAvatarAttributes(tokenId);
+          console.log("avatarAttributes", avatarAttributes);
           const visitCount =
             await actors.visitManager.getAvatarVisitCount(tokenId);
+          console.log("visitCount", visitCount);
 
           console.log({
             id: Number(tokenId),
@@ -110,7 +112,7 @@ const Gamification = () => {
             focus: attributes.focus,
             vitality: attributes.vitality,
             resilience: attributes.resilience,
-            hp: INITIAL_HP, //avatarAttributes.ok ? avatarAttributes.ok[1] : INITIAL_HP, // Use the HP from getAvatarAttributes
+            hp: avatarAttributes.ok ? avatarAttributes.ok[1] : INITIAL_HP, // Use the HP from getAvatarAttributes
 
             visitCount: 0, //Number(visitCount),
           });
@@ -126,7 +128,9 @@ const Gamification = () => {
             focus: attributes.focus,
             vitality: attributes.vitality,
             resilience: attributes.resilience,
-            hp: avatarAttributes.ok ? avatarAttributes.ok[1] : INITIAL_HP, // Use the HP from getAvatarAttributes
+            hp: avatarAttributes.ok
+              ? Number(avatarAttributes.ok[1])
+              : INITIAL_HP, // Use the HP from getAvatarAttributes
             visitCount: Number(visitCount),
           };
         })
@@ -212,6 +216,7 @@ const Gamification = () => {
       const result = await actors.gamificationSystem.levelUpAvatar(
         selectedAvatar.id
       );
+      console.log("result", result);
       if (result.ok) {
         const updatedAttributes =
           await actors.gamificationSystem.getAvatarAttributes(

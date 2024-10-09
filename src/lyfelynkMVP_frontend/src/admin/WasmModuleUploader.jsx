@@ -12,15 +12,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { useNavigate } from "react-router-dom";
 import ActorContext from "../ActorContext";
 
 function WasmModuleUploader() {
-  const { actors, login } = useContext(ActorContext);
+  const { actors, login, logout } = useContext(ActorContext);
   const [wasmFile, setWasmFile] = useState(null);
   const [selectedModule, setSelectedModule] = useState("User");
   const [message, setMessage] = useState("");
-
+  const navigate = useNavigate();
   const readFile = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -55,7 +55,7 @@ function WasmModuleUploader() {
         case "Professional":
           result =
             await actors.professional.updateProfessionalShardWasmModule(
-              byteArray,
+              byteArray
             );
           break;
         case "Facility":
@@ -79,7 +79,7 @@ function WasmModuleUploader() {
         setMessage(`WASM module for ${selectedModule} updated successfully.`);
       } else {
         setMessage(
-          `Error updating ${selectedModule} WASM module: ${result.err}`,
+          `Error updating ${selectedModule} WASM module: ${result.err}`
         );
       }
     } catch (error) {
@@ -91,13 +91,24 @@ function WasmModuleUploader() {
     <Card className="mt-8">
       <CardHeader>
         <Button onClick={login}>Login</Button>
+        <Button
+          onClick={() => {
+            logout();
+            navigate("/");
+          }}
+        >
+          Logout
+        </Button>
         <CardTitle className="flex items-center text-lg font-semibold">
           <RefreshCw className="mr-2 h-6 w-6" />
           Update WASM Module
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <form onSubmit={handleUpdateWasmModule} className="space-y-6">
+        <form
+          onSubmit={handleUpdateWasmModule}
+          className="space-y-6"
+        >
           <div className="flex flex-col space-y-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -157,7 +168,10 @@ function WasmModuleUploader() {
                 onChange={handleWasmFileChange}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+            >
               Upload
             </Button>
           </div>

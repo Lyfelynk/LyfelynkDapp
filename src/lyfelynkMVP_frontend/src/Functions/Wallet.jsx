@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useCanister } from "@connect2ic/react";
+import React, { useState, useContext } from "react";
+
 import { Principal } from "@dfinity/principal";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,10 +12,9 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
-
+import ActorContext from "../ActorContext";
 export default function Wallet() {
-  const [icrc1_ledger_canister] = useCanister("icrc1_ledger_canister");
-  const [lyfelynkMVP_backend] = useCanister("lyfelynkMVP_backend");
+  const { actors } = useContext(ActorContext);
   const [approveAmount, setApproveAmount] = useState("");
   const [allowanceValue, setAllowanceValue] = useState(0);
   const [balance, setBalance] = useState(0);
@@ -50,7 +49,7 @@ export default function Wallet() {
 
   const getAllowance = async () => {
     try {
-      const principal = await lyfelynkMVP_backend.whoami();
+      const principal = await actors.gamificationSystem.whoami();
       const allowanceArgument = {
         account: {
           owner: Principal.fromText(principal),
@@ -76,7 +75,7 @@ export default function Wallet() {
 
   const getBalance = async () => {
     try {
-      const principal = await lyfelynkMVP_backend.whoami();
+      const principal = await actors.gamificationSystem.whoami();
       const result = await icrc1_ledger_canister.icrc1_balance_of({
         owner: Principal.fromText(principal),
         subaccount: [],
@@ -89,7 +88,8 @@ export default function Wallet() {
 
   const sendTokenRequest = async () => {
     try {
-      const result = await lyfelynkMVP_backend.requestForTokens(requestAmount);
+      const result =
+        await actors.gamificationSystem.requestForTokens(requestAmount);
       if ("err" in result) {
         console.error(result.err);
       } else if ("ok" in result) {
@@ -151,7 +151,11 @@ export default function Wallet() {
               value={approveAmount}
               onChange={(e) => setApproveAmount(e.target.value)}
             />
-            <Button size="sm" type="button" onClick={approveSpendToken}>
+            <Button
+              size="sm"
+              type="button"
+              onClick={approveSpendToken}
+            >
               Submit
             </Button>
           </div>
@@ -165,7 +169,10 @@ export default function Wallet() {
               value={requestAmount}
               onChange={(e) => setRequestAmount(e.target.value)}
             />
-            <Button type="button" onClick={sendTokenRequest}>
+            <Button
+              type="button"
+              onClick={sendTokenRequest}
+            >
               Send request
             </Button>
           </div>

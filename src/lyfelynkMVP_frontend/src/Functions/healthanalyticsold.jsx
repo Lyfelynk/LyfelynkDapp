@@ -3,7 +3,7 @@ import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import { Dna, Footprints, GlassWater, Heart, User, Weight } from "lucide-react";
 import ActorContext from "../ActorContext";
 import LoadingScreen from "../LoadingScreen";
-
+import { toast } from "@/components/ui/use-toast";
 import * as vetkd from "ic-vetkd-utils";
 
 function HealthAnalyticsOld() {
@@ -22,205 +22,114 @@ function HealthAnalyticsOld() {
       rawKey,
       "AES-GCM",
       false,
-      ["decrypt"],
+      ["decrypt"]
     );
     const decrypted_buffer = await window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      ciphertext,
+      ciphertext
     );
     return new Uint8Array(decrypted_buffer);
   };
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
     );
 
   const fetchUserData = async () => {
     setLoading(true);
-    const userCategory = await lyfelynkMVP_backend.isRegistered();
 
-    if (userCategory == "User") {
-      try {
-        const result = await actors.user.readUser();
-        if (result.ok) {
-          const { IDNum, UUID, MetaData } = result.ok;
-          const {
-            DemographicInformation,
-            BasicHealthParameters,
-            BiometricData,
-            FamilyInformation,
-          } = MetaData;
-          // Step 1: Retrieve the encrypted key using encrypted_symmetric_key_for_dataAsset
+    try {
+      const result = await actors.user.readUser();
+      if (result.ok) {
+        const { IDNum, UUID, MetaData } = result.ok;
+        const {
+          DemographicInformation,
+          BasicHealthParameters,
+          BiometricData,
+          FamilyInformation,
+        } = MetaData;
+        // Step 1: Retrieve the encrypted key using encrypted_symmetric_key_for_dataAsset
 
-          const seed = window.crypto.getRandomValues(new Uint8Array(32));
-          const tsk = new vetkd.TransportSecretKey(seed);
-          const encryptedKeyResult =
-            await actors.user.encrypted_symmetric_key_for_user(
-              Object.values(tsk.public_key()),
-            );
+        const seed = window.crypto.getRandomValues(new Uint8Array(32));
+        const tsk = new vetkd.TransportSecretKey(seed);
+        const encryptedKeyResult =
+          await actors.user.encrypted_symmetric_key_for_user(
+            Object.values(tsk.public_key())
+          );
 
-          let encryptedKey = "";
+        let encryptedKey = "";
 
-          Object.keys(encryptedKeyResult).forEach((key) => {
-            if (key === "err") {
-              alert(encryptedKeyResult[key]);
-              setLoading(false);
-              return;
-            }
-            if (key === "ok") {
-              encryptedKey = encryptedKeyResult[key];
-            }
-          });
-
-          if (!encryptedKey) {
+        Object.keys(encryptedKeyResult).forEach((key) => {
+          if (key === "err") {
+            alert(encryptedKeyResult[key]);
             setLoading(false);
             return;
           }
-
-          const pkBytesHex = await actors.user.symmetric_key_verification_key();
-          const principal = await actors.user.whoami();
-          console.log(pkBytesHex);
-          console.log(encryptedKey);
-          const aesGCMKey = tsk.decrypt_and_hash(
-            hex_decode(encryptedKey),
-            hex_decode(pkBytesHex),
-            new TextEncoder().encode(principal),
-            32,
-            new TextEncoder().encode("aes-256-gcm"),
-          );
-          console.log(aesGCMKey);
-          console.log(typeof DemographicInformation);
-          console.log(typeof BasicHealthParameters);
-          console.log(DemographicInformation);
-          console.log(BasicHealthParameters);
-          const decryptedDataDemo = await aes_gcm_decrypt(
-            new Uint8Array(DemographicInformation),
-            aesGCMKey,
-          );
-          const decryptedDataBasicHealth = await aes_gcm_decrypt(
-            new Uint8Array(BasicHealthParameters),
-            aesGCMKey,
-          );
-
-          const parsedDemographicInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataDemo),
-          );
-          const parsedBasicHealthParams = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataBasicHealth),
-          );
-          const parsedBiometricData =
-            BiometricData.length > 0
-              ? JSON.parse(String.fromCharCode.apply(null, BiometricData))
-              : null;
-          const parsedFamilyInfo =
-            FamilyInformation.length > 0
-              ? JSON.parse(String.fromCharCode.apply(null, FamilyInformation))
-              : null;
-          setAge(calculateAge(parsedDemographicInfo.dob));
-          setHeight(parsedBasicHealthParams.height);
-          setWeight(parsedBasicHealthParams.weight);
-          setGender(parsedDemographicInfo.gender);
-          setLoading(false);
-        } else {
-          setLoading(false);
-          alert(result.err);
-        }
-      } catch (error) {
-        setLoading(false);
-        console.error("Error fetching user data:", error);
-      }
-    } else if (userCategory == "Professional") {
-      try {
-        const result = await lyfelynkMVP_backend.readProfessional();
-        if (result.ok) {
-          const { IDNum, UUID, MetaData } = result.ok;
-          const {
-            DemographicInformation,
-            OccupationInformation,
-            CertificationInformation,
-          } = MetaData;
-
-          // Step 1: Retrieve the encrypted key using encrypted_symmetric_key_for_dataAsset
-
-          const seed = window.crypto.getRandomValues(new Uint8Array(32));
-          const tsk = new vetkd.TransportSecretKey(seed);
-          const encryptedKeyResult =
-            await lyfelynkMVP_backend.encrypted_symmetric_key_for_user(
-              Object.values(tsk.public_key()),
-            );
-
-          let encryptedKey = "";
-
-          Object.keys(encryptedKeyResult).forEach((key) => {
-            if (key === "err") {
-              alert(encryptedKeyResult[key]);
-              setLoading(false);
-              return;
-            }
-            if (key === "ok") {
-              encryptedKey = encryptedKeyResult[key];
-            }
-          });
-
-          if (!encryptedKey) {
-            setLoading(false);
-            return;
+          if (key === "ok") {
+            encryptedKey = encryptedKeyResult[key];
           }
+        });
 
-          const pkBytesHex =
-            await lyfelynkMVP_backend.symmetric_key_verification_key();
-          const principal = await lyfelynkMVP_backend.whoami();
-          console.log(pkBytesHex);
-          console.log(encryptedKey);
-          const aesGCMKey = tsk.decrypt_and_hash(
-            hex_decode(encryptedKey),
-            hex_decode(pkBytesHex),
-            new TextEncoder().encode(principal),
-            32,
-            new TextEncoder().encode("aes-256-gcm"),
-          );
-          console.log(aesGCMKey);
-
-          const decryptedDataDemographic = await aes_gcm_decrypt(
-            DemographicInformation,
-            aesGCMKey,
-          );
-          const decryptedDataOccupation = await aes_gcm_decrypt(
-            OccupationInformation,
-            aesGCMKey,
-          );
-          const decryptedDataCertification = await aes_gcm_decrypt(
-            CertificationInformation,
-            aesGCMKey,
-          );
-
-          const parsedDemographicInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataDemographic),
-          );
-          const parsedOccupationInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataOccupation),
-          );
-          const parsedCertificationInfo = JSON.parse(
-            String.fromCharCode.apply(null, decryptedDataCertification),
-          );
-
-          setAge(calculateAge(parsedDemographicInfo.dob));
-          setHeight(parsedDemographicInfo.height);
-          setWeight(parsedDemographicInfo.weight);
-          setGender(parsedDemographicInfo.gender);
+        if (!encryptedKey) {
           setLoading(false);
-        } else {
-          alert("Error fetching professional data:", result.err);
-          setLoading(false);
+          return;
         }
-      } catch (error) {
-        console.error("Error fetching professional data:", error);
+
+        const pkBytesHex = await actors.user.symmetric_key_verification_key();
+        const principal = await actors.user.whoami();
+        console.log(pkBytesHex);
+        console.log(encryptedKey);
+        const aesGCMKey = tsk.decrypt_and_hash(
+          hex_decode(encryptedKey),
+          hex_decode(pkBytesHex),
+          new TextEncoder().encode(principal),
+          32,
+          new TextEncoder().encode("aes-256-gcm")
+        );
+        console.log(aesGCMKey);
+        console.log(typeof DemographicInformation);
+        console.log(typeof BasicHealthParameters);
+        console.log(DemographicInformation);
+        console.log(BasicHealthParameters);
+        const decryptedDataDemo = await aes_gcm_decrypt(
+          new Uint8Array(DemographicInformation),
+          aesGCMKey
+        );
+        const decryptedDataBasicHealth = await aes_gcm_decrypt(
+          new Uint8Array(BasicHealthParameters),
+          aesGCMKey
+        );
+
+        const parsedDemographicInfo = JSON.parse(
+          String.fromCharCode.apply(null, decryptedDataDemo)
+        );
+        const parsedBasicHealthParams = JSON.parse(
+          String.fromCharCode.apply(null, decryptedDataBasicHealth)
+        );
+        const parsedBiometricData =
+          BiometricData.length > 0
+            ? JSON.parse(String.fromCharCode.apply(null, BiometricData))
+            : null;
+        const parsedFamilyInfo =
+          FamilyInformation.length > 0
+            ? JSON.parse(String.fromCharCode.apply(null, FamilyInformation))
+            : null;
+        setAge(calculateAge(parsedDemographicInfo.dob));
+        setHeight(parsedBasicHealthParams.height);
+        setWeight(parsedBasicHealthParams.weight);
+        setGender(parsedDemographicInfo.gender);
+        setLoading(false);
+      } else {
+        toast({
+          title: "Error fetching user data",
+          description: result.err,
+        });
         setLoading(false);
       }
-    } else {
+    } catch (error) {
+      console.error("Error fetching user data:", error);
       setLoading(false);
-      console.log("pass");
     }
   };
 
@@ -276,7 +185,7 @@ function HealthAnalyticsOld() {
 
   useEffect(() => {
     fetchUserData();
-  }, [lyfelynkMVP_backend]);
+  }, [actors]);
 
   if (loading) {
     return <LoadingScreen />;

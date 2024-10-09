@@ -89,11 +89,11 @@ const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP, userTokens }) => {
 
       <div className="flex space-x-2">
         <Button
-          onClick={() => onRestoreHP(1)}
-          disabled={userTokens < 1 || avatar.hp >= 100}
+          onClick={() => onRestoreHP(10)}
+          disabled={userTokens < 10 || avatar.hp >= 100}
           className="bg-green-600 hover:bg-green-700 text-white"
         >
-          Restore 1 HP (1 Token)
+          Restore 10 HP (10 Tokens)
         </Button>
         <Button
           onClick={onLevelUp}

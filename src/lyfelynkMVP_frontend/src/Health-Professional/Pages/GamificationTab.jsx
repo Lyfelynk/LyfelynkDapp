@@ -109,7 +109,8 @@ const GamificationTab = () => {
         professionalInfo.availableSlots
       );
       console.log(result);
-      if (result.ok) {
+      // Check if the result is valid and contains the expected structure
+      if (result && result.ok !== undefined) {
         toast({
           title: "Success",
           description: "Professional information updated successfully",
@@ -217,6 +218,7 @@ const GamificationTab = () => {
                   showTimeSelect
                   dateFormat="Pp"
                   placeholderText="Start Date"
+                  className="bg-white text-black dark:bg-gray-800 dark:text-white" // Added classes for dark mode
                 />
                 <DatePicker
                   selected={endDate}
@@ -224,6 +226,7 @@ const GamificationTab = () => {
                   showTimeSelect
                   dateFormat="Pp"
                   placeholderText="End Date"
+                  className="bg-white text-black dark:bg-gray-800 dark:text-white" // Added classes for dark mode
                 />
                 <Button
                   type="button"
@@ -251,12 +254,19 @@ const GamificationTab = () => {
               key={visit.visitId}
               className="mb-4"
             >
-              <p>Visit ID: {visit.visitId}</p>
-              <p>User ID: {visit.userId}</p>
+              <p>Visit ID: {Number(visit.visitId)}</p>
+              <p>User ID: {Number(visit.userId)}</p>
               <p>
                 Timestamp:{" "}
                 {new Date(Number(visit.timestamp) / 1000000).toLocaleString()}
               </p>
+              <p>Duration: {visit.duration} minutes</p>
+              <p>Avatar ID: {Number(visit.avatarId)}</p>
+              <p>
+                Professional ID:{" "}
+                {visit.professionalId ? visit.professionalId : "N/A"}
+              </p>
+              <p>Facility ID: {visit.facilityId ? visit.facilityId : "N/A"}</p>
               <Button
                 onClick={() => handleVisit(visit.visitId, "complete")}
                 className="mr-2"

@@ -90,7 +90,7 @@ actor class GamificationSystem() {
     };
 
     // Minting function with default values
-    public shared ({ caller }) func mintWellnessAvatar(mintNFTPrincipal : Text, memo : ?Blob, avatarType : Text, imageURL : Text) : async [SetNFTResult] {
+    public shared ({ caller }) func mintWellnessAvatar(mintNFTPrincipal : Text, memo : ?Blob, avatarType : Text, imageURL : Text) : async Result.Result<[SetNFTResult], ICRC7.TransferError> {
         let currentTokenId = await wellnessAvatarNFT.icrc7_total_supply();
         let tokenId = currentTokenId + 1;
 
@@ -106,7 +106,14 @@ actor class GamificationSystem() {
         }];
         avatarAttributes.put(tokenId, defaultAttributes(avatarType));
         avatarHP.put(tokenId, MAX_HP);
-        await wellnessAvatarNFT.icrcX_mint(Principal.fromText(mintNFTPrincipal), request);
+        let result = await wellnessAvatarNFT.icrcX_mint(caller, request);
+        let transferResult = await wellnessAvatarNFT.icrc7_transfer(caller, [{ from_subaccount = null; to = { owner = Principal.fromText(mintNFTPrincipal); subaccount = null }; token_id = tokenId; memo = memo; created_at_time = null }]);
+        switch (transferResult[0]) {
+            case (? #Ok(_)) { #ok(result) };
+            case (? #Err(err)) { return #err(err) };
+            case (null) { return (#ok(result)) };
+        };
+
     };
 
     // Helper function to create default metadata
@@ -195,7 +202,7 @@ actor class GamificationSystem() {
                 };
 
                 avatarAttributes.put(tokenId, updatedAttributes);
-                let response = await wellnessAvatarNFT.icrcX_update(caller, tokenId, updatedAttributes);
+                let response = await wellnessAvatarNFT.icrcX_update(Principal.fromText(Types.admin), tokenId, updatedAttributes);
                 switch (response) {
                     case (#ok(val)) { #ok(val) };
                     case (#err(err)) { #err(err) };
@@ -410,7 +417,7 @@ actor class GamificationSystem() {
             case null MAX_HP;
         };
         let hpFactor = Float.fromInt(currentHP) / Float.fromInt(MAX_HP);
-        Int.abs(Float.toInt((Float.fromInt(BASE_TOKENS_PER_VISIT * qualityMultiplier) * hpFactor)));
+        Int.abs(Float.toInt((Float.fromInt(BASE_TOKENS_PER_VISIT * qualityMultiplier) * hpFactor))) * 13;
     };
 
     system func preupgrade() {

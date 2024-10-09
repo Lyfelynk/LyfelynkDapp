@@ -10,7 +10,7 @@ import AnalyticsContent from "./Pages/Analytics";
 import Gamification from "./Pages/Gamification";
 import YourRecords from "./Pages/Records/YourRecords";
 import SharedWithYou from "./Pages/Records/SharedWithYou";
-
+import Dev from "../Dev";
 import NotFoundPage from "./NotFoundPage";
 import AppBanner from "../AppBanner";
 
@@ -27,7 +27,10 @@ export default function AppRoute1() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
+      />
       <div className="flex-1 flex flex-col overflow-auto">
         <Navbar toggleSidebar={toggleSidebar} />
         <AppBanner />
@@ -36,18 +39,46 @@ export default function AppRoute1() {
             <div className="circle w-[17rem] h-[17rem] bg-[#5743ee42] rounded-full" />
           </div>
           <Routes>
-            <Route path="/Home" element={<DashboardContent />} />
-            <Route path="/Records/Your-Records" element={<YourRecords />} />
+            <Route
+              path="/Home"
+              element={<DashboardContent />}
+            />
+            <Route
+              path="/Records/Your-Records"
+              element={<YourRecords />}
+            />
             <Route
               path="/Records/Shared-With-You"
               element={<SharedWithYou />}
             />
-            <Route path="/Analytics" element={<AnalyticsContent />} />
-            <Route path="/Upload" element={<UploadContent />} />
-            <Route path="/Marketplace" element={<MarketplaceContent />} />
-            <Route path="/Gamification" element={<Gamification />} />
-            <Route path="/Profile" element={<ProfileContent />} />
-            <Route path="*" element={<NotFoundPage />} />
+            <Route
+              path="/Analytics"
+              element={<AnalyticsContent />}
+            />
+            <Route
+              path="/Upload"
+              element={<UploadContent />}
+            />
+            <Route
+              path="/Marketplace"
+              element={<MarketplaceContent />}
+            />
+            <Route
+              path="/Gamification"
+              element={<Gamification />}
+            />
+            <Route
+              path="/Profile"
+              element={<ProfileContent />}
+            />
+            <Route
+              path="/minigames"
+              element={<Dev />}
+            />
+            <Route
+              path="*"
+              element={<NotFoundPage />}
+            />
           </Routes>
         </div>
       </div>

@@ -128,7 +128,6 @@ const Gamification = () => {
           return avatar;
         });
       });
-
     } catch (error) {
       console.error("Error performing activity:", error);
     }
@@ -137,12 +136,12 @@ const Gamification = () => {
   const levelUp = async () => {
     try {
       const result = await actors.gamificationSystem.levelUpAvatar(
-        selectedAvatar.id
+        selectedAvatar.id,
       );
       if (result.ok) {
         const updatedAttributes =
           await actors.gamificationSystem.getAvatarAttributes(
-            selectedAvatar.id
+            selectedAvatar.id,
           );
         setUserAvatars((prevAvatars) =>
           prevAvatars.map((avatar) =>
@@ -154,8 +153,8 @@ const Gamification = () => {
                   tokens: avatar.tokens - avatar.level * 100,
                   hp: INITIAL_HP + avatar.level * 10,
                 }
-              : avatar
-          )
+              : avatar,
+          ),
         );
         setSelectedAvatar((prevAvatar) => ({
           ...prevAvatar,
@@ -174,11 +173,11 @@ const Gamification = () => {
     try {
       await actors.gamificationSystem.restoreHP(
         selectedAvatar.id.toString(),
-        amount
+        amount,
       );
       await actors.gamificationSystem.spendTokens(
         selectedAvatar.id.toString(),
-        amount
+        amount,
       );
 
       setUserAvatars((prevAvatars) =>
@@ -188,18 +187,18 @@ const Gamification = () => {
                 ...avatar,
                 hp: Math.min(
                   avatar.hp + amount,
-                  INITIAL_HP + (avatar.level - 1) * 10
+                  INITIAL_HP + (avatar.level - 1) * 10,
                 ),
                 tokens: avatar.tokens - amount,
               }
-            : avatar
-        )
+            : avatar,
+        ),
       );
       setSelectedAvatar((prevAvatar) => ({
         ...prevAvatar,
         hp: Math.min(
           prevAvatar.hp + amount,
-          INITIAL_HP + (prevAvatar.level - 1) * 10
+          INITIAL_HP + (prevAvatar.level - 1) * 10,
         ),
         tokens: prevAvatar.tokens - amount,
       }));
@@ -213,7 +212,7 @@ const Gamification = () => {
       try {
         await actors.gamificationSystem.spendTokens(
           selectedAvatar.id.toString(),
-          16
+          16,
         );
         setUserAvatars((prevAvatars) =>
           prevAvatars.map((avatar) =>
@@ -223,8 +222,8 @@ const Gamification = () => {
                   tokens: avatar.tokens - 16,
                   gems: avatar.gems + 1,
                 }
-              : avatar
-          )
+              : avatar,
+          ),
         );
         setSelectedAvatar((prevAvatar) => ({
           ...prevAvatar,
@@ -241,12 +240,12 @@ const Gamification = () => {
     if (selectedAvatar.gems > 0) {
       try {
         const result = await actors.gamificationSystem.levelUpAvatar(
-          selectedAvatar.id
+          selectedAvatar.id,
         );
         if (result.ok) {
           const updatedAttributes =
             await actors.gamificationSystem.getAvatarAttributes(
-              selectedAvatar.id
+              selectedAvatar.id,
             );
           setUserAvatars((prevAvatars) =>
             prevAvatars.map((avatar) =>
@@ -256,8 +255,8 @@ const Gamification = () => {
                     ...updatedAttributes,
                     gems: avatar.gems - 1,
                   }
-                : avatar
-            )
+                : avatar,
+            ),
           );
           setSelectedAvatar((prevAvatar) => ({
             ...prevAvatar,
@@ -276,7 +275,7 @@ const Gamification = () => {
     try {
       const result = await actors.gamificationSystem.mintWellnessAvatar(
         null,
-        "Professional"
+        "Professional",
       );
       if (result[0].Ok) {
         await fetchUserAvatars();
@@ -293,11 +292,10 @@ const Gamification = () => {
     try {
       const result = await actors.gamificationSystem.mintWellnessAvatar(
         null,
-        "Facility"
+        "Facility",
       );
       if (result[0].Ok) {
         await fetchUserAvatars();
-
       }
     } catch (error) {
       console.error("Error visiting facility:", error);
@@ -316,7 +314,7 @@ const Gamification = () => {
       // Implement the logic to transfer the avatar using your actor
       // For example:
       // await actors.gamificationSystem.transferAvatar(avatarId, principalAddress);
-      
+
       // After successful transfer, update the user avatars
       await fetchUserAvatars();
       toast({
@@ -375,27 +373,15 @@ const Gamification = () => {
       )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Tabs
-            defaultValue="avatars"
-            className="mb-6"
-          >
+          <Tabs defaultValue="avatars" className="mb-6">
             <TabsList className="bg-gray-800 text-white rounded-lg">
-              <TabsTrigger
-                value="avatars"
-                className="text-white"
-              >
+              <TabsTrigger value="avatars" className="text-white">
                 Avatars
               </TabsTrigger>
-              <TabsTrigger
-                value="professionals"
-                className="text-white"
-              >
+              <TabsTrigger value="professionals" className="text-white">
                 Professionals
               </TabsTrigger>
-              <TabsTrigger
-                value="facilities"
-                className="text-white"
-              >
+              <TabsTrigger value="facilities" className="text-white">
                 Facilities
               </TabsTrigger>
             </TabsList>

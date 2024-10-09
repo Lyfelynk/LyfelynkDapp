@@ -73,27 +73,27 @@ function App() {
       });
       const professionalActor = createProfessionalActor(
         process.env.CANISTER_ID_PROFESSIONAL,
-        { agent }
+        { agent },
       );
       const facilityActor = createFacilityActor(
         process.env.CANISTER_ID_FACILITY,
-        { agent }
+        { agent },
       );
       const dataAssetActor = createDataAssetActor(
         process.env.CANISTER_ID_DATAASSET,
-        { agent }
+        { agent },
       );
       const identityManagerActor = createIdentityManagerActor(
         process.env.CANISTER_ID_IDENTITY_MANAGER,
-        { agent }
+        { agent },
       );
       const sharedActivityActor = createSharedActivityActor(
         process.env.CANISTER_ID_SHARED_ACTIVITY,
-        { agent }
+        { agent },
       );
       const gamificationSystemActor = createGamificationSystemActor(
         process.env.CANISTER_ID_GAMIFICATIONSYSTEM,
-        { agent }
+        { agent },
       );
       setActors({
         user: userActor,
@@ -129,31 +129,16 @@ function App() {
         <Router>
           <Routes>
             {/* <Route path="/admin" element={<AdminDashboard />} /> */}
-            <Route
-              path="/admin"
-              element={<Home />}
-            />
-            {/* <Route path="/dev" element={<Dev />} /> */}
+            <Route path="/admin" element={<Home />} />
+            <Route path="/dev" element={<Dev />} />
 
-            <Route
-              path="/"
-              element={<Navigate to="/Connect" />}
-            />
+            <Route path="/" element={<Navigate to="/Connect" />} />
 
-            <Route
-              path="/Connect"
-              element={<ConnectPage />}
-            />
+            <Route path="/Connect" element={<ConnectPage />} />
 
-            <Route
-              path="/Register"
-              element={<FirstPageContent />}
-            />
+            <Route path="/Register" element={<FirstPageContent />} />
             <Route path="/Register">
-              <Route
-                path="Health-User"
-                element={<RegisterPage1Content />}
-              />
+              <Route path="Health-User" element={<RegisterPage1Content />} />
               <Route
                 path="Health-User/verify"
                 element={<RegisteredContent1 />}
@@ -166,31 +151,16 @@ function App() {
                 path="Health-Professional/verify"
                 element={<RegisteredContent2 />}
               />
-              <Route
-                path="Health-Service"
-                element={<RegisterPage3Content />}
-              />
+              <Route path="Health-Service" element={<RegisterPage3Content />} />
               <Route
                 path="Health-Service/verify"
                 element={<RegisteredContent3 />}
               />
             </Route>
-            <Route
-              path="/Health-User/*"
-              element={<AppRoute1 />}
-            />
-            <Route
-              path="/Health-Professional/*"
-              element={<AppRoute2 />}
-            />
-            <Route
-              path="/Health-Service/*"
-              element={<AppRoute3 />}
-            />
-            <Route
-              path="*"
-              element={<NotFound />}
-            />
+            <Route path="/Health-User/*" element={<AppRoute1 />} />
+            <Route path="/Health-Professional/*" element={<AppRoute2 />} />
+            <Route path="/Health-Service/*" element={<AppRoute3 />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
       </ThemeProvider>

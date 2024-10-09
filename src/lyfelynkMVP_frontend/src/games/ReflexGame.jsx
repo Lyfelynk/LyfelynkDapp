@@ -44,7 +44,7 @@ export default function ReflexGame() {
   }, [handleKeyDown]);
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100">
+    <div className="flex flex-col items-center justify-center">
       <h1 className="text-3xl font-bold mb-8">Quick Reflex Game</h1>
       <div
         className={`w-64 h-64 rounded-full flex items-center justify-center text-white text-2xl font-bold cursor-pointer mb-8 ${

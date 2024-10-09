@@ -16,18 +16,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Zap, Grid3X3 } from "lucide-react";
+import { Zap, Grid3X3, Palette } from "lucide-react";
 import ReflexGame from "./ReflexGame";
 import MatchCards from "./MatchCards";
+import ColorConfusion from "./ColorConfusion";
 
 export default function GameHome() {
   const [openReflexGame, setOpenReflexGame] = useState(false);
   const [openMatchCards, setOpenMatchCards] = useState(false);
+  const [openColorConfusion, setOpenColorConfusion] = useState(false);
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-center mb-8">Mini Games</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Dialog open={openReflexGame} onOpenChange={setOpenReflexGame}>
           <DialogTrigger asChild>
             <Card className="cursor-pointer hover:shadow-lg transition-shadow">
@@ -75,6 +77,34 @@ export default function GameHome() {
               <DialogDescription>Match all the pairs to win!</DialogDescription>
             </DialogHeader>
             <MatchCards />
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={openColorConfusion} onOpenChange={setOpenColorConfusion}>
+          <DialogTrigger asChild>
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle>Color Confusion Game</CardTitle>
+                <CardDescription>
+                  Test your color recognition skills!
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Palette className="w-12 h-12 mx-auto text-purple-500" />
+              </CardContent>
+              <CardFooter>
+                <Button className="w-full">Play Now</Button>
+              </CardFooter>
+            </Card>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Color Confusion Game</DialogTitle>
+              <DialogDescription>
+                Choose the correct color based on the word displayed!
+              </DialogDescription>
+            </DialogHeader>
+            <ColorConfusion />
           </DialogContent>
         </Dialog>
       </div>

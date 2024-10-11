@@ -214,13 +214,13 @@ const Gamification = () => {
   const levelUp = async () => {
     try {
       const result = await actors.gamificationSystem.levelUpAvatar(
-        selectedAvatar.id,
+        selectedAvatar.id
       );
       console.log("result", result);
       if (result.ok) {
         const updatedAttributes =
           await actors.gamificationSystem.getAvatarAttributes(
-            selectedAvatar.id,
+            selectedAvatar.id
           );
         setUserAvatars((prevAvatars) =>
           prevAvatars.map((avatar) =>
@@ -232,8 +232,8 @@ const Gamification = () => {
                   tokens: avatar.tokens - avatar.level * 100,
                   hp: INITIAL_HP + avatar.level * 10,
                 }
-              : avatar,
-          ),
+              : avatar
+          )
         );
         setSelectedAvatar((prevAvatar) => ({
           ...prevAvatar,
@@ -261,18 +261,18 @@ const Gamification = () => {
                 ...avatar,
                 hp: Math.min(
                   avatar.hp + amount,
-                  INITIAL_HP + (avatar.level - 1) * 10,
+                  INITIAL_HP + (avatar.level - 1) * 10
                 ),
                 tokens: avatar.tokens - amount,
               }
-            : avatar,
-        ),
+            : avatar
+        )
       );
       setSelectedAvatar((prevAvatar) => ({
         ...prevAvatar,
         hp: Math.min(
           prevAvatar.hp + amount,
-          INITIAL_HP + (prevAvatar.level - 1) * 10,
+          INITIAL_HP + (prevAvatar.level - 1) * 10
         ),
         tokens: prevAvatar.tokens - amount,
       }));
@@ -288,7 +288,7 @@ const Gamification = () => {
 
   const transferAvatar = async (avatarId, principalAddress) => {
     try {
-      const result = await actors.gamificationSystem.transferAvatar(
+      const result = await actors.gamificationSystem.transferNFT(
         avatarId,
         principalAddress
       );
@@ -374,15 +374,27 @@ const Gamification = () => {
       )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Tabs defaultValue="avatars" className="mb-6">
+          <Tabs
+            defaultValue="avatars"
+            className="mb-6"
+          >
             <TabsList className="bg-gray-800 text-white rounded-lg">
-              <TabsTrigger value="avatars" className="text-white">
+              <TabsTrigger
+                value="avatars"
+                className="text-white"
+              >
                 Avatars
               </TabsTrigger>
-              <TabsTrigger value="professionals" className="text-white">
+              <TabsTrigger
+                value="professionals"
+                className="text-white"
+              >
                 Professionals
               </TabsTrigger>
-              <TabsTrigger value="facilities" className="text-white">
+              <TabsTrigger
+                value="facilities"
+                className="text-white"
+              >
                 Facilities
               </TabsTrigger>
             </TabsList>

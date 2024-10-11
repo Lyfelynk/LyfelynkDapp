@@ -1,66 +1,94 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useContext } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChart, Cpu, Folder, Image, Search } from "lucide-react";
+import {
+  BarChart,
+  Cpu,
+  Folder,
+  File,
+  Image as LucideImageIcon,
+  Search,
+} from "lucide-react"; // Rename Lucide Image import
+import ActorContext from "../../ActorContext"; // Import ActorContext
+import LoadingScreen from "../../LoadingScreen"; // Import LoadingScreen
 
 export default function Component() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const records = [
-    {
-      id: 2,
-      type: "image",
-      title: "Brain MRI Scan",
-      description: "High-resolution medical image data",
-      date: "2024-09-04",
-      format: "DICOM",
-      image: "/brain.jpeg",
-    },
-    {
-      id: 4,
-      type: "model",
-      title: "Tumor Detection Model",
-      description: "AI-powered medical diagnosis tool",
-      date: "2023-11-12",
-      format: "TensorFlow",
-      image: "/tumor.jpg",
-    },
-    {
-      id: 6,
-      type: "image",
-      title: "Chest X-Ray Scans",
-      description: "High-quality medical imaging data",
-      date: "2024-08-27",
-      format: "DICOM",
-      image: "/chest.jpeg",
-    },
-    {
-      id: 8,
-      type: "model",
-      title: "Diabetes Prediction Model",
-      description: "AI-powered medical diagnosis tool",
-      date: "2023-12-01",
-      format: "TensorFlow",
-      image: "/diabetes.jpeg",
-    },
-  ];
+  const [records, setRecords] = useState([]);
+  const { actors } = useContext(ActorContext); // Use ActorContext
+  const [loading, setLoading] = useState(true);
+
+  // Function to get icon based on category
+  const getIconByCategory = (category) => {
+    switch (category) {
+      case "Bills":
+        return <File size={48} />; // Example icon for bills category
+      case "GeneticData":
+        return <Cpu size={48} />; // Example icon for genetic category
+      case "MedicalImageData":
+        return <LucideImageIcon size={48} />; // Use renamed LucideImageIcon as a component
+      case "MedicalStatData":
+        return <BarChart size={48} />; // Example icon for statistics category
+      case "Reports":
+        return <Folder size={48} />; // Example icon for reports category
+      case "TrainingModels":
+        return <Cpu size={48} />; // Example icon for training models category
+      default:
+        return <Folder size={48} />; // Default icon if category doesn't match
+    }
+  };
+
+  useEffect(() => {
+    const fetchUserDataAssets = async () => {
+      try {
+        const result = await actors.dataAsset.getUserDataAssets();
+        if (result.ok) {
+          const dataAssets = result.ok.map(([timestamp, asset]) => ({
+            id: asset.assetID,
+            category: asset.metadata.category, // Assuming type is part of metadata
+            title: asset.title,
+            description: asset.description,
+            date: new Date(timestamp / 1000000).toISOString().split("T")[0], // Convert to date string
+            format: asset.metadata.format,
+            icon: getIconByCategory(asset.metadata.category), // Update to use a function to get image by category
+          }));
+          setRecords(dataAssets);
+          console.log(dataAssets);
+          setLoading(false);
+        } else {
+          console.error("Error fetching user data assets:", result.err);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error fetching user data assets:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchUserDataAssets();
+  }, [actors]);
 
   const filteredRecords = useMemo(() => {
     let filtered = records;
 
     if (activeTab !== "all") {
-      filtered = filtered.filter((record) => record.type === activeTab);
+      filtered = filtered.filter((record) => record.category === activeTab);
     }
 
     if (searchTerm) {
       filtered = filtered.filter(
         (record) =>
           record.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          record.description.toLowerCase().includes(searchTerm.toLowerCase()),
+          record.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     return filtered;
   }, [activeTab, searchTerm, records]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -93,7 +121,7 @@ export default function Component() {
                 ? "bg-blue-500 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
             }`}
-            onClick={() => setActiveTab("genetic")}
+            onClick={() => setActiveTab("GeneticData")}
           >
             <Cpu size={16} />
             Genetic Data
@@ -104,9 +132,9 @@ export default function Component() {
                 ? "bg-blue-500 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
             }`}
-            onClick={() => setActiveTab("image")}
+            onClick={() => setActiveTab("MedicalImageData")}
           >
-            <Image size={16} />
+            <LucideImageIcon size={16} />
             Medical Image Data
           </button>
           <button
@@ -115,10 +143,20 @@ export default function Component() {
                 ? "bg-blue-500 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
             }`}
-            onClick={() => setActiveTab("statistics")}
+            onClick={() => setActiveTab("MedicalStatData")}
           >
             <BarChart size={16} />
             Medical Statistics Data
+          </button>
+          <button
+            className={`py-2 px-4 flex items-center gap-2 rounded-lg transition ${
+              activeTab === "Reports"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
+            }`}
+            onClick={() => setActiveTab("Reports")}
+          >
+            Reports
           </button>
           <button
             className={`py-2 px-4 flex items-center gap-2 rounded-lg transition ${
@@ -139,12 +177,7 @@ export default function Component() {
             key={record.id}
             className="shadow-lg rounded-lg overflow-hidden"
           >
-            <img
-              src={record.image}
-              alt={record.title}
-              className="object-cover w-full h-48"
-              style={{ aspectRatio: "400/300" }}
-            />
+            {getIconByCategory(record.category)}
             <CardContent className="p-4">
               <h3 className="text-lg font-semibold mb-2">{record.title}</h3>
               <p className="text-sm text-gray-600 mb-4">{record.description}</p>

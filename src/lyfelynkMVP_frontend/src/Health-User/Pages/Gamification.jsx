@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Copy } from "lucide-react";
+import { AlertCircle, Copy, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import AvatarStatus from "./GamificationComponents/AvatarStatus";
 import NFTCard from "./GamificationComponents/NFTCard";
-
 import { INITIAL_HP } from "./GamificationComponents/constants";
 import ActorContext from "../../ActorContext";
 import {
@@ -14,22 +13,28 @@ import {
   SelectValue,
   SelectItem,
   SelectContent,
-} from "@/components/ui/select"; // Import Select component
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const Gamification = () => {
   const { actors } = useContext(ActorContext);
   const [userAvatars, setUserAvatars] = useState([]);
   const [professionals, setProfessionals] = useState([]);
   const [facilities, setFacilities] = useState([]);
-  const [pendingVisit, setPendingVisit] = useState(null);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
-  const [principalId, setPrincipalId] = useState(null);
   const [selectedProfessional, setSelectedProfessional] = useState(null);
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [visitDuration, setVisitDuration] = useState(30);
-  const [availableSlots, setAvailableSlots] = useState([]); // New state for available slots
-  const [selectedAvatarForVisit, setSelectedAvatarForVisit] = useState(null); // New state for selected avatar for visit
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [selectedAvatarForVisit, setSelectedAvatarForVisit] = useState(null);
   const [userTokens, setUserTokens] = useState(null);
+  const [isAvatarStatusOpen, setIsAvatarStatusOpen] = useState(false);
 
   useEffect(() => {
     fetchUserAvatars();
@@ -312,27 +317,6 @@ const Gamification = () => {
     }
   };
 
-  const getPrincipalId = async () => {
-    try {
-      const principal = await actors.gamificationSystem.whoami();
-      setPrincipalId(principal);
-      await navigator.clipboard.writeText(principal);
-      toast({
-        title: "Principal ID Copied",
-        description: "Your Principal ID has been copied to the clipboard.",
-        duration: 3000,
-      });
-    } catch (error) {
-      console.error("Error getting Principal ID:", error);
-      toast({
-        title: "Error",
-        description: "Failed to get Principal ID. Please try again.",
-        variant: "destructive",
-        duration: 3000,
-      });
-    }
-  };
-
   const handleProfessionalSelect = async (prof) => {
     setSelectedProfessional(prof);
     await fetchAvailableSlots(prof.id); // Fetch slots when a professional is selected
@@ -351,28 +335,47 @@ const Gamification = () => {
     }
   };
 
+  const TokenDisplay = () => (
+    <div className="flex items-center space-x-2 mb-4">
+      <div className="bg-gradient-to-r from-blue-400 to-blue-200 text-black font-bold py-2 px-4 rounded-full flex items-center">
+        <Coins className="mr-2" />
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800">
+          {userTokens}
+          <span className="text-lg font-semibold"> Tokens</span>
+        </span>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="p-4 container mx-auto bg-gray-900 text-white min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">
+    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-4xl font-bold text-foreground mb-6">
         Wellness Avatar Platform
       </h1>
-      {userTokens !== null && (
-        <h2 className="text-2xl font-semibold mb-4 text-yellow-400">
-          Your Tokens: {userTokens}
-        </h2>
-      )}
-      <Button
-        onClick={getPrincipalId}
-        className="mb-4 bg-blue-600 hover:bg-blue-700 text-white flex items-center"
-      >
-        <Copy className="mr-2 h-4 w-4" /> Who am I?
-      </Button>
-      {principalId && (
-        <p className="mb-4 text-sm text-gray-400">
-          Your Principal ID: {principalId}
-        </p>
-      )}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      {userTokens !== null && <TokenDisplay />}
+
+      <div className="my-6">
+        <h1 className="text-2xl font-bold text-primary">Select an Avatar for Visit</h1>
+        <Select
+          onValueChange={setSelectedAvatarForVisit}
+          value={selectedAvatarForVisit}
+        >
+          <SelectTrigger className="w-56">
+            <SelectValue placeholder="Select Avatar for Visit" className='text-white' />
+          </SelectTrigger>
+          <SelectContent>
+            {userAvatars.map((avatar) => (
+              <SelectItem key={avatar.id} value={Number(avatar.id)}>
+                {avatar.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+      </Select>
+      </div>
+
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-2">
           <Tabs defaultValue="avatars" className="mb-6">
             <TabsList className="bg-gray-800 text-white rounded-lg">
@@ -402,7 +405,10 @@ const Gamification = () => {
                       key={avatar.id}
                       nft={avatar}
                       showManage={true}
-                      onManage={manageAvatar}
+                      onManage={() => {
+                        setSelectedAvatar(avatar);
+                        setIsAvatarStatusOpen(true);
+                      }}
                       onTransfer={transferAvatar}
                     />
                   ))}
@@ -411,77 +417,83 @@ const Gamification = () => {
             </TabsContent>
             <TabsContent value="professionals">
               <h2 className="text-xl font-semibold mb-4 text-blue-400">
-                Available Professionals
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {professionals.map((prof) => (
-                  <div
-                    key={prof.id}
-                    className="border p-4 rounded"
-                  >
-                    <h3 className="text-lg font-semibold">{prof.name}</h3>
-                    <p>Specialization: {prof.specialization}</p>
-                    <Button onClick={() => handleProfessionalSelect(prof)}>
-                      View Available Slots
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              {selectedProfessional && (
-                <div>
-                  <h3 className="text-lg font-semibold mt-4">
-                    Available Slots for {selectedProfessional.name}
-                  </h3>
-                  {availableSlots.length > 0 ? (
-                    availableSlots.map((slot, index) => (
-                      <div
-                        key={index}
-                        className="border p-4 rounded"
-                      >
-                        <p>
-                          Available Slot: {slot[0].toLocaleString()} -{" "}
-                          {slot[1].toLocaleString()}
-                        </p>
-                        <Button
-                          onClick={() => initiateVisit(selectedProfessional.id)}
-                        >
-                          Book Visit
-                        </Button>
-                      </div>
-                    ))
-                  ) : (
-                    <p>No available slots for booking.</p>
-                  )}
+                  Available Professionals
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {professionals.map((prof) => (
+                    <div
+                      key={prof.id}
+                      className="border p-4 rounded"
+                    >
+                      <h3 className="text-lg font-semibold">{prof.name}</h3>
+                      <p>Specialization: {prof.specialization}</p>
+                      <Button onClick={() => handleProfessionalSelect(prof)}>
+                        View Available Slots
+                      </Button>
+                    </div>
+                  ))}
                 </div>
-              )}
+                {selectedProfessional && (
+                  <div>
+                    <h3 className="text-lg font-semibold mt-4">
+                      Available Slots for {selectedProfessional.name}
+                    </h3>
+                    {availableSlots.length > 0 ? (
+                      availableSlots.map((slot, index) => (
+                        <div
+                          key={index}
+                          className="border p-4 rounded"
+                        >
+                          <p>
+                            Available Slot: {slot[0].toLocaleString()} -{" "}
+                            {slot[1].toLocaleString()}
+                          </p>
+                          <Button
+                            onClick={() => initiateVisit(selectedProfessional.id)}
+                          >
+                            Book Visit
+                          </Button>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No available slots for booking.</p>
+                    )}
+                  </div>
+                )}
             </TabsContent>
             <TabsContent value="facilities">
               <h2 className="text-xl font-semibold mb-4 text-blue-400">
-                Available Facilities
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {facilities.map((facility) => (
-                  <div
-                    key={facility.id}
-                    className="border p-4 rounded"
-                  >
-                    <h3 className="text-lg font-semibold">{facility.name}</h3>
-                    <p>Type: {facility.facilityType}</p>
-                    <Button
-                      onClick={() => {
-                        setSelectedFacility(facility.id);
-                        initiateVisit(facility.id);
-                      }}
+                  Available Facilities
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {facilities.map((facility) => (
+                    <div
+                      key={facility.id}
+                      className="border p-4 rounded"
                     >
-                      Book Visit
-                    </Button>
-                  </div>
-                ))}
-              </div>
+                      <h3 className="text-lg font-semibold">{facility.name}</h3>
+                      <p>Type: {facility.facilityType}</p>
+                      <Button
+                        onClick={() => {
+                          setSelectedFacility(facility.id);
+                          initiateVisit(facility.id);
+                        }}
+                      >
+                        Book Visit
+                      </Button>
+                    </div>
+                  ))}
+                </div>
             </TabsContent>
           </Tabs>
         </div>
-        <div>
+      </div>
+
+      <Dialog open={isAvatarStatusOpen} onOpenChange={setIsAvatarStatusOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Avatar Status</DialogTitle>
+          </DialogHeader>
           {selectedAvatar && (
             <>
               <AvatarStatus
@@ -490,7 +502,6 @@ const Gamification = () => {
                 onRestoreHP={restoreHP}
                 userTokens={userTokens}
               />
-
               {selectedAvatar.hp <= 20 && (
                 <div className="mt-4 p-4 bg-yellow-900 text-yellow-200 rounded-md flex items-center">
                   <AlertCircle className="mr-2" />
@@ -502,26 +513,8 @@ const Gamification = () => {
               )}
             </>
           )}
-        </div>
-      </div>
-      <Select
-        onValueChange={setSelectedAvatarForVisit}
-        value={selectedAvatarForVisit}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select Avatar" />
-        </SelectTrigger>
-        <SelectContent>
-          {userAvatars.map((avatar) => (
-            <SelectItem
-              key={avatar.id}
-              value={Number(avatar.id)}
-            >
-              {avatar.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

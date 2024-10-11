@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Send, AlertCircle } from "lucide-react";
+import { Send, AlertCircle, Eye } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
 const NFTCard = ({
@@ -64,34 +64,46 @@ const NFTCard = ({
 
   return (
     <Card className="bg-gray-800 text-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
-      <CardHeader className="border-b border-gray-700">
-        <h2 className="text-2xl font-bold">{nft.name}</h2>
-        <Badge className={`${qualityStyles.bg} ${qualityStyles.text} w-fit`}>
-          {nft.quality}
-        </Badge>
+      <CardHeader className="border-b border-gray-700 flex flex-row items-center space-x-4">
+        <img
+          src={nft.image}
+          alt={nft.name}
+          className="w-20 h-20 rounded-lg object-cover"
+        />
+        <div className="flex-1">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">{nft.name}</h2>
+          </div>
+          <Badge className={`${qualityStyles.bg} ${qualityStyles.text} w-fit`}>
+            {nft.quality}
+          </Badge>
+          <p className="text-sm text-gray-400">{nft.type}</p>
+
+        </div>
       </CardHeader>
 
       <CardContent className="p-4">
-        <p className="text-sm text-gray-400 mb-4">{nft.description}</p>
-
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {Object.entries(nft).map(([key, value]) => {
             if (
               typeof value !== "object" &&
-              key !== "id" &&
-              key !== "name" &&
-              key !== "description" &&
-              key !== "image"
+              !["id", "name", "description", "image", "type", "quality"].includes(key)
             ) {
               return (
                 <div key={key} className="flex flex-col">
                   <span className="text-xs text-gray-500 uppercase">{key}</span>
                   <span className="text-lg font-semibold">{value}</span>
                 </div>
+              
               );
             }
+
             return null;
           })}
+        </div>
+        <div className="mt-4 flex items-center">
+          <Eye className="w-4 h-4 mr-2 text-gray-400" />
+          <span className="text-sm text-gray-400">Visits: {nft.visitCount || 0}</span>
         </div>
       </CardContent>
 
@@ -144,7 +156,7 @@ const NFTCard = ({
           </>
         ) : (
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white w-full"
             onClick={() => onVisit(nft)}
             disabled={isPending}
           >

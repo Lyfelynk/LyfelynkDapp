@@ -34,12 +34,12 @@ const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP, userTokens }) => {
   const maxHP = 100 + (avatar.level - 1) * 10;
 
   return (
-    <div className="bg-gray-800 border border-gray-700 text-white p-4 rounded-lg mb-6">
-      <div className="flex items-center text-blue-400 text-xl font-bold mb-4">
+    <div className="bg-gray-800 border border-gray-700 text-white p-4 rounded-lg mb-6 max-h-[80vh] overflow-y-auto">
+      <div className="flex items-center text-blue-400 text-xl font-bold mb-4 sticky top-0 bg-gray-800 py-2 z-10">
         <User className="mr-2" /> Avatar Status
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
           <img
             src={avatar.image}
@@ -47,7 +47,7 @@ const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP, userTokens }) => {
             className="w-full h-auto rounded-lg"
           />
         </div>
-        <div>
+        <div className="flex flex-col justify-center">
           <p className="text-lg font-semibold">{avatar.type}</p>
           <p className="text-sm text-gray-400 mb-2">
             Quality: {avatar.quality}
@@ -87,18 +87,18 @@ const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP, userTokens }) => {
         ))}
       </div>
 
-      <div className="flex space-x-2">
+      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 sticky bottom-0 bg-gray-800 py-2 z-10">
         <Button
           onClick={() => onRestoreHP(10)}
           disabled={userTokens < 10 || avatar.hp >= 100}
-          className="bg-green-600 hover:bg-green-700 text-white"
+          className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
         >
           Restore 10 HP (10 Tokens)
         </Button>
         <Button
           onClick={onLevelUp}
           disabled={userTokens < avatar.level * 100}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
         >
           Level Up ({avatar.level * 100} Tokens)
         </Button>

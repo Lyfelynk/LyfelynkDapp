@@ -58,7 +58,7 @@ const GamificationTab = () => {
         setServiceInfo(result.ok);
         // Fetch available slots for the professional
         const slotsResult = await actors.visitManager.getAvailableSlots(
-          result.ok.id
+          result.ok.id,
         ); // Assuming result.ok.id is the professional ID
         if (slotsResult.ok) {
           setServiceInfo((prev) => ({
@@ -104,7 +104,7 @@ const GamificationTab = () => {
         serviceInfo.name,
         serviceInfo.description,
         serviceInfo.location,
-        serviceInfo.availableSlots
+        serviceInfo.availableSlots,
       );
       if (result.ok) {
         toast({
@@ -131,7 +131,7 @@ const GamificationTab = () => {
       if (action === "complete") {
         result = await actors.gamificationSystem.completeVisit(
           visitId,
-          avatarId // Pass avatar ID
+          avatarId, // Pass avatar ID
         );
       } else if (action === "reject") {
         result = await actors.gamificationSystem.rejectVisit(visitId);
@@ -205,7 +205,7 @@ const GamificationTab = () => {
                 value={serviceInfo.availableSlots
                   .map(
                     ([start, end]) =>
-                      `${formatTime(start)} - ${formatTime(end)}`
+                      `${formatTime(start)} - ${formatTime(end)}`,
                   )
                   .join(", ")}
                 onChange={handleInputChange}
@@ -229,10 +229,7 @@ const GamificationTab = () => {
         </CardHeader>
         <CardContent>
           {avatars.map(([tokenId, metadata]) => (
-            <div
-              key={tokenId}
-              className="mb-4"
-            >
+            <div key={tokenId} className="mb-4">
               <h3 className="text-lg font-semibold">Avatar #{tokenId}</h3>
               <p>Type: {metadata[0][3].value.Class[5].value.Text}</p>
               <p>Quality: {metadata[0][3].value.Class[4].value.Text}</p>
@@ -248,10 +245,7 @@ const GamificationTab = () => {
         </CardHeader>
         <CardContent>
           {pendingVisits.map((visit) => (
-            <div
-              key={visit.visitId}
-              className="mb-4"
-            >
+            <div key={visit.visitId} className="mb-4">
               <p>Visit ID: {visit.visitId}</p>
               <p>User ID: {visit.userId}</p>
               <p>

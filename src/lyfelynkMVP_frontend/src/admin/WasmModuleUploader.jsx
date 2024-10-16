@@ -55,7 +55,7 @@ function WasmModuleUploader() {
         case "Professional":
           result =
             await actors.professional.updateProfessionalShardWasmModule(
-              byteArray
+              byteArray,
             );
           break;
         case "Facility":
@@ -79,7 +79,7 @@ function WasmModuleUploader() {
         setMessage(`WASM module for ${selectedModule} updated successfully.`);
       } else {
         setMessage(
-          `Error updating ${selectedModule} WASM module: ${result.err}`
+          `Error updating ${selectedModule} WASM module: ${result.err}`,
         );
       }
     } catch (error) {
@@ -105,10 +105,7 @@ function WasmModuleUploader() {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <form
-          onSubmit={handleUpdateWasmModule}
-          className="space-y-6"
-        >
+        <form onSubmit={handleUpdateWasmModule} className="space-y-6">
           <div className="flex flex-col space-y-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -168,10 +165,7 @@ function WasmModuleUploader() {
                 onChange={handleWasmFileChange}
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-            >
+            <Button type="submit" className="w-full">
               Upload
             </Button>
           </div>

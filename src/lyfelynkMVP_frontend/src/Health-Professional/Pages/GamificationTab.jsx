@@ -9,7 +9,19 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Calendar, User, Briefcase, Building, Trash2, Plus, X, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import {
+  Clock,
+  Calendar,
+  User,
+  Briefcase,
+  Building,
+  Trash2,
+  Plus,
+  X,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
 
 const GamificationTab = () => {
   const { actors } = useContext(ActorContext);
@@ -36,7 +48,11 @@ const GamificationTab = () => {
       setAvatars(result);
     } catch (error) {
       console.error("Error fetching avatars:", error);
-      toast({ title: "Error", description: "Failed to fetch avatars", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to fetch avatars",
+        variant: "destructive",
+      });
     }
   };
 
@@ -46,7 +62,11 @@ const GamificationTab = () => {
       setPendingVisits(result.ok || []);
     } catch (error) {
       console.error("Error fetching pending visits:", error);
-      toast({ title: "Error", description: "Failed to fetch pending visits", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to fetch pending visits",
+        variant: "destructive",
+      });
     }
   };
 
@@ -60,7 +80,11 @@ const GamificationTab = () => {
       }
     } catch (error) {
       console.error("Error fetching professional info:", error);
-      toast({ title: "Error", description: "Failed to fetch professional information", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to fetch professional information",
+        variant: "destructive",
+      });
     }
   };
 
@@ -82,7 +106,11 @@ const GamificationTab = () => {
       setStartDate(null);
       setEndDate(null);
     } else {
-      toast({ title: "Error", description: "Please select both start and end dates.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Please select both start and end dates.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -99,16 +127,23 @@ const GamificationTab = () => {
       const result = await actors.visitManager.updateProfessionalInfo(
         professionalInfo.name,
         professionalInfo.specialization,
-        professionalInfo.availableSlots
+        professionalInfo.availableSlots,
       );
       if (result && result.ok !== undefined) {
-        toast({ title: "Success", description: "Professional information updated successfully" });
+        toast({
+          title: "Success",
+          description: "Professional information updated successfully",
+        });
       } else {
         throw new Error(result.err);
       }
     } catch (error) {
       console.error("Error updating professional info:", error);
-      toast({ title: "Error", description: "Failed to update professional information", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to update professional information",
+        variant: "destructive",
+      });
     }
   };
 
@@ -128,20 +163,30 @@ const GamificationTab = () => {
         if (avatarId === null) {
           throw new Error("No avatar available to complete the visit");
         }
-        result = await actors.gamificationSystem.completeVisit(visitId, avatarId);
+        result = await actors.gamificationSystem.completeVisit(
+          visitId,
+          avatarId,
+        );
       } else if (action === "reject") {
         result = await actors.gamificationSystem.rejectVisit(visitId);
       }
 
       if (result.ok) {
-        toast({ title: "Success", description: `Visit ${action === "complete" ? "completed" : "rejected"} successfully` });
+        toast({
+          title: "Success",
+          description: `Visit ${action === "complete" ? "completed" : "rejected"} successfully`,
+        });
         fetchPendingVisits();
       } else {
         throw new Error(result.err);
       }
     } catch (error) {
       console.error(`Error ${action}ing visit:`, error);
-      toast({ title: "Error", description: `Failed to ${action} visit`, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: `Failed to ${action} visit`,
+        variant: "destructive",
+      });
     }
   };
 
@@ -158,7 +203,10 @@ const GamificationTab = () => {
               <CardTitle>Update Professional Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="space-y-4" onSubmit={handleUpdateProfessionalInfo}>
+              <form
+                className="space-y-4"
+                onSubmit={handleUpdateProfessionalInfo}
+              >
                 <div>
                   <Label htmlFor="name">Name</Label>
                   <Input
@@ -184,7 +232,10 @@ const GamificationTab = () => {
                   <div className="mt-2 space-y-2">
                     {professionalInfo.availableSlots.length > 0 ? (
                       professionalInfo.availableSlots.map((slot, index) => (
-                        <div key={index} className="flex items-center justify-between">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between"
+                        >
                           <Badge variant="secondary" className="text-sm">
                             {`${formatTime(slot[0])} - ${formatTime(slot[1])}`}
                           </Badge>
@@ -221,7 +272,11 @@ const GamificationTab = () => {
                       placeholderText="End Date"
                       className="w-full sm:w-auto px-3 py-2 border rounded-md"
                     />
-                    <Button type="button" onClick={handleAddSlot} className="w-full sm:w-auto">
+                    <Button
+                      type="button"
+                      onClick={handleAddSlot}
+                      className="w-full sm:w-auto"
+                    >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Slot
                     </Button>
@@ -252,27 +307,43 @@ const GamificationTab = () => {
                         </div>
                         <div className="flex items-center">
                           <Clock className="mr-2 h-4 w-4" />
-                          <span>Duration: {Number(visit.duration)} minutes</span>
+                          <span>
+                            Duration: {Number(visit.duration)} minutes
+                          </span>
                         </div>
                         <div className="flex items-center">
                           <Calendar className="mr-2 h-4 w-4" />
-                          <span>Date: {new Date(Number(visit.timestamp) / 1000000).toLocaleDateString()}</span>
+                          <span>
+                            Date:{" "}
+                            {new Date(
+                              Number(visit.timestamp) / 1000000,
+                            ).toLocaleDateString()}
+                          </span>
                         </div>
                         <div className="flex items-center">
                           <Briefcase className="mr-2 h-4 w-4" />
-                          <span>Professional ID: {visit.professionalId || "N/A"}</span>
+                          <span>
+                            Professional ID: {visit.professionalId || "N/A"}
+                          </span>
                         </div>
                         <div className="flex items-center">
                           <Building className="mr-2 h-4 w-4" />
-                          <span>Facility ID: {(Number(visit.facilityId)) || "N/A"}</span>
+                          <span>
+                            Facility ID: {Number(visit.facilityId) || "N/A"}
+                          </span>
                         </div>
                       </div>
                       <div className="flex justify-end space-x-2">
-                        <Button onClick={() => handleVisit(visit.visitId, "complete")}>
+                        <Button
+                          onClick={() => handleVisit(visit.visitId, "complete")}
+                        >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Complete
                         </Button>
-                        <Button onClick={() => handleVisit(visit.visitId, "reject")} variant="destructive">
+                        <Button
+                          onClick={() => handleVisit(visit.visitId, "reject")}
+                          variant="destructive"
+                        >
                           <XCircle className="h-4 w-4 mr-2" />
                           Reject
                         </Button>

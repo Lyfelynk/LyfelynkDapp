@@ -41,7 +41,7 @@ export default function RegisterPage4Content() {
     let randomStr = "";
     for (let i = 0; i < 10; i++) {
       randomStr += characters.charAt(
-        Math.floor(Math.random() * characters.length)
+        Math.floor(Math.random() * characters.length),
       );
     }
     return `user${randomStr}`;
@@ -75,7 +75,7 @@ export default function RegisterPage4Content() {
       // Convert JSON strings to Uint8Array
       const demoInfoArray = new TextEncoder().encode(demoInfoJson);
       const basicHealthParaArray = new TextEncoder().encode(
-        basicHealthParaJson
+        basicHealthParaJson,
       );
 
       // Step 2: Fetch the encrypted key using encrypted_symmetric_key_for_dataAsset
@@ -83,7 +83,7 @@ export default function RegisterPage4Content() {
       const tsk = new vetkd.TransportSecretKey(seed);
       const encryptedKeyResult =
         await actors.user.encrypted_symmetric_key_for_user(
-          Object.values(tsk.public_key())
+          Object.values(tsk.public_key()),
         );
 
       let encryptedKey = "";
@@ -117,20 +117,20 @@ export default function RegisterPage4Content() {
         hex_decode(pkBytesHex),
         new TextEncoder().encode(principal),
         32,
-        new TextEncoder().encode("aes-256-gcm")
+        new TextEncoder().encode("aes-256-gcm"),
       );
       console.log(aesGCMKey);
 
       const encryptedDataDemo = await aes_gcm_encrypt(demoInfoArray, aesGCMKey);
       const encryptedDataBasicHealth = await aes_gcm_encrypt(
         basicHealthParaArray,
-        aesGCMKey
+        aesGCMKey,
       );
       const result = await actors.user.createUser(
         Object.values(encryptedDataDemo),
         Object.values(encryptedDataBasicHealth),
         [],
-        []
+        [],
       );
       console.log(result);
       Object.keys(result).forEach((key) => {
@@ -165,12 +165,12 @@ export default function RegisterPage4Content() {
       rawKey,
       "AES-GCM",
       false,
-      ["encrypt"]
+      ["encrypt"],
     );
     const ciphertext_buffer = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      data
+      data,
     );
     const ciphertext = new Uint8Array(ciphertext_buffer);
     const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
@@ -181,7 +181,7 @@ export default function RegisterPage4Content() {
 
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
     );
 
   const generateOtp = async () => {
@@ -194,7 +194,7 @@ export default function RegisterPage4Content() {
     try {
       const response = await axios.post(
         "https://squid-app-ehrho.ondigitalocean.app/generate-otp",
-        { aadhaar }
+        { aadhaar },
       );
       setTxnId(response.data.txnId);
       setMessage("Aadhaar OTP sent. Please check your phone.");
@@ -211,13 +211,13 @@ export default function RegisterPage4Content() {
     try {
       const response = await axios.post(
         "https://squid-app-ehrho.ondigitalocean.app/create-health-id",
-        { otp, txnId, username, mobile }
+        { otp, txnId, username, mobile },
       );
       setHealthIdData(response.data.healthIdData);
       setMessage("Health ID created successfully!");
       const district = response.data.healthIdData.districtName;
       const pincodeResponse = await axios.get(
-        `https://api.postalpincode.in/postoffice/${district}`
+        `https://api.postalpincode.in/postoffice/${district}`,
       );
       if (pincodeResponse.data[0].PostOffice.length > 0) {
         setPincode(pincodeResponse.data[0].PostOffice[0].Pincode);
@@ -281,10 +281,7 @@ export default function RegisterPage4Content() {
                 className="space-y-4 md:flex md:space-x-8 md:space-y-0"
               >
                 {steps.map((stepItem, index) => (
-                  <li
-                    key={stepItem.name}
-                    className="md:flex-1"
-                  >
+                  <li key={stepItem.name} className="md:flex-1">
                     <div className="relative flex items-center">
                       {step > index + 1 ? (
                         <div className="group flex w-full flex-col border-l-4 border-blue-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
@@ -333,10 +330,7 @@ export default function RegisterPage4Content() {
                     value={aadhaar}
                     onChange={(e) => setAadhaar(e.target.value)}
                   />
-                  <Button
-                    onClick={generateOtp}
-                    className="w-full"
-                  >
+                  <Button onClick={generateOtp} className="w-full">
                     Generate Aadhaar OTP
                   </Button>
                 </div>
@@ -443,10 +437,7 @@ export default function RegisterPage4Content() {
                         />
                       </div>
                     </div>
-                    <Button
-                      onClick={createHealthId}
-                      className="w-full"
-                    >
+                    <Button onClick={createHealthId} className="w-full">
                       Create ABHA ID
                     </Button>
                   </div>
@@ -500,10 +491,7 @@ export default function RegisterPage4Content() {
                       </div>
                     </div>
                   </div>
-                  <Button
-                    onClick={registerUser}
-                    className="w-full"
-                  >
+                  <Button onClick={registerUser} className="w-full">
                     Create User Health ID
                   </Button>
                 </>

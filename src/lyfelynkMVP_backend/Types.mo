@@ -72,12 +72,14 @@ module Types {
     };
 
     public type Listing = {
+        id : Text;
         title : Text;
         description : Text;
         price : Nat;
         category : Text;
         seller : Text;
         assetID : Text;
+        timestamp : Text;
     };
 
     public type purchasedInfo = {
@@ -110,7 +112,7 @@ module Types {
         }) -> async ({ encrypted_key : Blob });
     };
 
-    public let admin : Text = ("jzvjc-m65ee-vd7ur-o4t4m-ywsll-xk4rm-5c4xu-ngmhj-flt3x-e2eho-iqe");
+    public let admin : Text = ("2n52h-xa3zc-ijie2-xgdcm-jxi6p-oapl2-ahgsh-sbbde-q2nh2-rvrgh-4qe");
     public let vetkdSystemCanisterID : Text = ("dfdal-2uaaa-aaaaa-qaama-cai");
     public let wellnessAvatarNFTCanisterID : Text = ("cuj6u-c4aaa-aaaaa-qaajq-cai");
     public let identityManagerCanisterID : Text = ("avqkn-guaaa-aaaaa-qaaea-cai");
@@ -127,7 +129,7 @@ module Types {
     public let xpSystemCanisterID : Text = ("cbopz-duaaa-aaaaa-qaaka-cai");
     public let gamificationSystemCanisterID : Text = ("by6od-j4aaa-aaaaa-qaadq-cai");
     public let visitManagerCanisterID : Text = ("ctiya-peaaa-aaaaa-qaaja-cai");
-
+    public let marketplaceShardManagerCanisterID : Text = ("c2lt4-zmaaa-aaaaa-qaaiq-cai");
     public let permissionedCanisters : [Text] = [
         admin,
         vetkdSystemCanisterID,

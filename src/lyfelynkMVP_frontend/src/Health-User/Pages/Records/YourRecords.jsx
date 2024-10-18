@@ -14,7 +14,7 @@ export default function YourRecords() {
 
           <div className="mt-4 w-full">
             <ShareSellTable shareMode />
-            {/* <YourRecordsFiles /> */}
+            <YourRecordsFiles />
           </div>
         </div>
       </div>

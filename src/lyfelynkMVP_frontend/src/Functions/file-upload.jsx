@@ -250,12 +250,12 @@ const FileUpload = () => {
       const metadata = {
         category: category,
         tags: [keywords],
-        format: file.type,
+        format: file.file.type,
       };
 
       const dataAsset = {
         assetID: uniqueID,
-        title: file.name,
+        title: file.file.name,
         description: description,
         data: lighthouseHash,
         metadata: metadata,
@@ -457,12 +457,22 @@ const FileUpload = () => {
                 </TableCell>
                 <TableCell>
                   <div className="border rounded-sm">
-                    <Textarea
-                      type="text"
-                      className="py-3"
+                    <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                    />
+                      className="py-3"
+                    >
+                      <option value="">Select Category</option>
+                      <option value="GeneticData">Genetic Data</option>
+                      <option value="MedicalImageData">
+                        Medical Image Data
+                      </option>
+                      <option value="Reports">Reports</option>
+                      <option value="Bills">Bills</option>
+                      <option value="MedicalStatData">
+                        Medical Statics Data
+                      </option>
+                    </select>
                   </div>
                 </TableCell>
 

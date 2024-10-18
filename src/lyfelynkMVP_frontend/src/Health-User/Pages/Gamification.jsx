@@ -231,13 +231,13 @@ const Gamification = () => {
   const levelUp = async () => {
     try {
       const result = await actors.gamificationSystem.levelUpAvatar(
-        selectedAvatar.id,
+        selectedAvatar.id
       );
       console.log("result", result);
       if (result.ok) {
         const updatedAttributes =
           await actors.gamificationSystem.getAvatarAttributes(
-            selectedAvatar.id,
+            selectedAvatar.id
           );
         setUserAvatars((prevAvatars) =>
           prevAvatars.map((avatar) =>
@@ -249,8 +249,8 @@ const Gamification = () => {
                   tokens: avatar.tokens - avatar.level * 100,
                   hp: INITIAL_HP + avatar.level * 10,
                 }
-              : avatar,
-          ),
+              : avatar
+          )
         );
         setSelectedAvatar((prevAvatar) => ({
           ...prevAvatar,
@@ -278,18 +278,18 @@ const Gamification = () => {
                 ...avatar,
                 hp: Math.min(
                   avatar.hp + amount,
-                  INITIAL_HP + (avatar.level - 1) * 10,
+                  INITIAL_HP + (avatar.level - 1) * 10
                 ),
                 tokens: avatar.tokens - amount,
               }
-            : avatar,
-        ),
+            : avatar
+        )
       );
       setSelectedAvatar((prevAvatar) => ({
         ...prevAvatar,
         hp: Math.min(
           prevAvatar.hp + amount,
-          INITIAL_HP + (prevAvatar.level - 1) * 10,
+          INITIAL_HP + (prevAvatar.level - 1) * 10
         ),
         tokens: prevAvatar.tokens - amount,
       }));
@@ -305,7 +305,7 @@ const Gamification = () => {
 
   const transferAvatar = async (avatarId, principalAddress) => {
     try {
-      const result = await actors.gamificationSystem.transferAvatar(
+      const result = await actors.gamificationSystem.transferNFT(
         avatarId,
         principalAddress,
       );

@@ -180,6 +180,7 @@ actor class GamificationSystem() {
 
     // Level up function
     public shared ({ caller }) func levelUpAvatar(tokenId : Nat) : async Result.Result<[ICRC7.UpdateNFTResult], Text> {
+
         switch (avatarAttributes.get(tokenId)) {
             case (?attributes) {
                 let existingAttributes = attributes;
@@ -200,6 +201,16 @@ actor class GamificationSystem() {
                     avatarType = existingAttributes.avatarType;
                     level = existingAttributes.level + 1;
                 };
+                let tokensRequired = switch (existingAttributes.quality) {
+                    case ("Common") 100;
+                    case ("Uncommon") 200;
+                    case ("Rare") 300;
+                    case ("Epic") 400;
+                    case ("Legendary") 500;
+                    case ("Mythic") 600;
+                    case (_) 100;
+                };
+                ignore await spendTokens(caller, tokensRequired);
 
                 avatarAttributes.put(tokenId, updatedAttributes);
                 let response = await wellnessAvatarNFT.icrcX_update(Principal.fromText(Types.admin), tokenId, updatedAttributes);

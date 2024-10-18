@@ -27,6 +27,7 @@ export const QUALITY_TIERS = {
   Rare: { bg: "bg-blue-400", text: "text-blue-100" },
   Epic: { bg: "bg-purple-400", text: "text-purple-100" },
   Legendary: { bg: "bg-yellow-400", text: "text-yellow-100" },
+  Mythic: { bg: "bg-red-400", text: "text-red-100" },
 };
 
 export const AVATAR_TYPES = [

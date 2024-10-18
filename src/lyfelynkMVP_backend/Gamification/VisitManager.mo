@@ -9,6 +9,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 import TrieMap "mo:base/TrieMap";
+import BTree "mo:stableheapbtreemap/BTree";
 
 import IdentityManager "../IdentityManager/IdentityManager";
 import Types "../Types";
@@ -47,17 +48,13 @@ actor class VisitManager() {
         availableSlots : [(Time.Time, Time.Time)]; // (start, end) times
     };
 
-    private stable var visitsEntries : [(Nat, Visit)] = [];
-    private var visits : TrieMap.TrieMap<Nat, Visit> = TrieMap.fromEntries(visitsEntries.vals(), Nat.equal, Hash.hash);
+    private stable var visits : BTree.BTree<Nat, Visit> = BTree.init<Nat, Visit>(null);
 
-    private stable var userVisitsEntries : [(Text, [Nat])] = [];
-    private var userVisits : TrieMap.TrieMap<Text, [Nat]> = TrieMap.fromEntries(userVisitsEntries.vals(), Text.equal, Text.hash);
+    private stable var userVisits : BTree.BTree<Text, [Nat]> = BTree.init<Text, [Nat]>(null);
 
-    private stable var professionalVisitsEntries : [(Text, [Nat])] = [];
-    private var professionalVisits : TrieMap.TrieMap<Text, [Nat]> = TrieMap.fromEntries(professionalVisitsEntries.vals(), Text.equal, Text.hash);
+    private stable var professionalVisits : BTree.BTree<Text, [Nat]> = BTree.init<Text, [Nat]>(null);
 
-    private stable var facilityVisitsEntries : [(Text, [Nat])] = [];
-    private var facilityVisits : TrieMap.TrieMap<Text, [Nat]> = TrieMap.fromEntries(facilityVisitsEntries.vals(), Text.equal, Text.hash);
+    private stable var facilityVisits : BTree.BTree<Text, [Nat]> = BTree.init<Text, [Nat]>(null);
 
     private stable var professionalsEntries : [(Text, ProfessionalInfo)] = [];
     private var professionals : TrieMap.TrieMap<Text, ProfessionalInfo> = TrieMap.fromEntries(professionalsEntries.vals(), Text.equal, Text.hash);
@@ -71,26 +68,6 @@ actor class VisitManager() {
     private stable var nextVisitId : Nat = 1;
 
     private let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID);
-
-    system func preupgrade() {
-        visitsEntries := Iter.toArray(visits.entries());
-        userVisitsEntries := Iter.toArray(userVisits.entries());
-        professionalVisitsEntries := Iter.toArray(professionalVisits.entries());
-        facilityVisitsEntries := Iter.toArray(facilityVisits.entries());
-        professionalsEntries := Iter.toArray(professionals.entries());
-        facilitiesEntries := Iter.toArray(facilities.entries());
-        avatarVisitCountEntries := Iter.toArray(avatarVisitCount.entries());
-    };
-
-    system func postupgrade() {
-        visits := TrieMap.fromEntries(visitsEntries.vals(), Nat.equal, Hash.hash);
-        userVisits := TrieMap.fromEntries(userVisitsEntries.vals(), Text.equal, Text.hash);
-        professionalVisits := TrieMap.fromEntries(professionalVisitsEntries.vals(), Text.equal, Text.hash);
-        facilityVisits := TrieMap.fromEntries(facilityVisitsEntries.vals(), Text.equal, Text.hash);
-        professionals := TrieMap.fromEntries(professionalsEntries.vals(), Text.equal, Text.hash);
-        facilities := TrieMap.fromEntries(facilitiesEntries.vals(), Text.equal, Text.hash);
-        avatarVisitCount := TrieMap.fromEntries(avatarVisitCountEntries.vals(), Nat.equal, Hash.hash);
-    };
 
     // Function to add or update professional information
     public shared ({ caller }) func updateProfessionalInfo(name : Text, specialization : Text, availableSlots : [(Time.Time, Time.Time)]) : async Result.Result<(), Text> {
@@ -158,20 +135,9 @@ actor class VisitManager() {
         Iter.toArray(facilities.vals());
     };
 
-    private func addVisitToMap(map : TrieMap.TrieMap<Text, [Nat]>, key : Text, visitId : Nat) {
-        switch (map.get(key)) {
-            case (?existingVisits) {
-                map.put(key, Array.append(existingVisits, [visitId]));
-            };
-            case null {
-                map.put(key, [visitId]);
-            };
-        };
-    };
-
     private func hasOverlappingVisit(id : Text, timestamp : Time.Time, duration : Nat) : Bool {
         let endTime = timestamp + duration * 60_000_000_000; // Convert minutes to nanoseconds
-        for ((_, visit) in visits.entries()) {
+        for ((_, visit) in BTree.entries(visits)) {
             if (visit.professionalId == ?id or visit.facilityId == ?id) {
                 let visitEndTime = visit.timestamp + visit.duration * 60_000_000_000;
                 if (
@@ -193,7 +159,7 @@ actor class VisitManager() {
                 let isFacility = facilities.get(idToVisit);
 
                 switch (isProfessional, isFacility) {
-                    case (?profInfo, null) {
+                    case (?_profInfo, null) {
                         if (hasOverlappingVisit(idToVisit, timestamp, duration)) {
                             return #err("The selected time slot is not available");
                         };
@@ -212,13 +178,30 @@ actor class VisitManager() {
                             avatarId = avatarId;
                         };
 
-                        visits.put(visitId, newVisit);
-                        addVisitToMap(userVisits, userId, visitId);
-                        addVisitToMap(professionalVisits, idToVisit, visitId);
+                        ignore BTree.insert<Nat, Visit>(visits, Nat.compare, visitId, newVisit);
+                        switch (BTree.get(userVisits, Text.compare, userId)) {
+                            case (?existingVisits) {
+                                ignore BTree.insert(userVisits, Text.compare, userId, Array.append(existingVisits, [visitId]));
+                            };
+                            case null {
+                                ignore BTree.insert(userVisits, Text.compare, userId, [visitId]);
+                            };
+                        };
+
+                        switch (BTree.get(professionalVisits, Text.compare, idToVisit)) {
+                            case (?existingVisits) {
+                                ignore BTree.insert(professionalVisits, Text.compare, idToVisit, Array.append(existingVisits, [visitId]));
+                            };
+                            case null {
+                                ignore BTree.insert(professionalVisits, Text.compare, idToVisit, [visitId]);
+                            };
+                        };
+                        // addVisitToMap(userVisits, userId, visitId);
+                        // addVisitToMap(professionalVisits, idToVisit, visitId);
 
                         #ok(visitId);
                     };
-                    case (null, ?facInfo) {
+                    case (null, ?_facInfo) {
                         if (hasOverlappingVisit(idToVisit, timestamp, duration)) {
                             return #err("The selected time slot is not available");
                         };
@@ -237,9 +220,25 @@ actor class VisitManager() {
                             avatarId = avatarId;
                         };
 
-                        visits.put(visitId, newVisit);
-                        addVisitToMap(userVisits, userId, visitId);
-                        addVisitToMap(facilityVisits, idToVisit, visitId);
+                        ignore BTree.insert<Nat, Visit>(visits, Nat.compare, visitId, newVisit);
+                        switch (BTree.get(userVisits, Text.compare, userId)) {
+                            case (?existingVisits) {
+                                ignore BTree.insert(userVisits, Text.compare, userId, Array.append(existingVisits, [visitId]));
+                            };
+                            case null {
+                                ignore BTree.insert(userVisits, Text.compare, userId, [visitId]);
+                            };
+                        };
+
+                        switch (BTree.get(facilityVisits, Text.compare, idToVisit)) {
+                            case (?existingVisits) {
+                                ignore BTree.insert(facilityVisits, Text.compare, idToVisit, Array.append(existingVisits, [visitId]));
+                            };
+                            case null {
+                                ignore BTree.insert(facilityVisits, Text.compare, idToVisit, [visitId]);
+                            };
+                        };
+                        // addVisitToMap(facilityVisits, idToVisit, visitId);
 
                         #ok(visitId);
                     };
@@ -263,12 +262,12 @@ actor class VisitManager() {
             case (#ok((callerId, callerType))) {
                 if (callerType == "Professional" or callerType == "Facility") {
                     let visitsMap = if (callerType == "Professional") professionalVisits else facilityVisits;
-                    switch (visitsMap.get(callerId)) {
+                    switch (BTree.get(visitsMap, Text.compare, callerId)) {
                         case (?visitIds) {
                             let pendingVisits = Array.mapFilter<Nat, Visit>(
                                 visitIds,
                                 func(id) {
-                                    switch (visits.get(id)) {
+                                    switch (BTree.get(visits, Nat.compare, id)) {
                                         case (?visit) {
                                             if (visit.status == #Pending) {
                                                 ?visit;
@@ -295,7 +294,7 @@ actor class VisitManager() {
     };
 
     public func updateVisitStatus(caller : Principal, visitId : Nat, newStatus : VisitStatus) : async Result.Result<(), Text> {
-        switch (visits.get(visitId)) {
+        switch (BTree.get(visits, Nat.compare, visitId)) {
             case (?visit) {
                 let callerIdResult = await identityManager.getIdentity(caller);
                 switch (callerIdResult) {
@@ -315,7 +314,12 @@ actor class VisitManager() {
                                     timestamp = visit.timestamp;
                                     avatarId = visit.avatarId;
                                 };
-                                visits.put(visitId, updatedVisit);
+                                ignore BTree.insert(
+                                    visits,
+                                    Nat.compare,
+                                    visitId,
+                                    updatedVisit,
+                                );
 
                                 if (newStatus == #Completed) {
                                     let currentCount = switch (avatarVisitCount.get(visit.avatarId)) {
@@ -345,7 +349,7 @@ actor class VisitManager() {
     };
 
     public query func getVisitStatus(visitId : Nat) : async Result.Result<VisitStatus, Text> {
-        switch (visits.get(visitId)) {
+        switch (BTree.get(visits, Nat.compare, visitId)) {
             case (?visit) {
                 #ok(visit.status);
             };
@@ -410,12 +414,12 @@ actor class VisitManager() {
         let userIdResult = await getUserId(caller);
         switch (userIdResult) {
             case (#ok(userId)) {
-                switch (userVisits.get(userId)) {
+                switch (BTree.get(userVisits, Text.compare, userId)) {
                     case (?visitIds) {
                         let userVisitsList = Array.mapFilter<Nat, Visit>(
                             visitIds,
                             func(id) {
-                                switch (visits.get(id)) {
+                                switch (BTree.get(visits, Nat.compare, id)) {
                                     case (?visit) { ?visit };
                                     case null { null };
                                 };

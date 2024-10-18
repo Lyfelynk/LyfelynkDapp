@@ -64,7 +64,7 @@ export default function RegisterPage4Content() {
       const dob = `${healthIdData.yearOfBirth}-${healthIdData.monthOfBirth}-${healthIdData.dayOfBirth}`;
       const state = healthIdData.stateName;
       const country = "India";
-      const heartRate = 0; // Default value or modify as needed
+      const heartRate = 80; // Default value or modify as needed
       const demoInfo = { name, dob, gender, country, state, pincode };
       const basicHealthPara = { bloodType, height, heartRate, weight };
 
@@ -126,12 +126,12 @@ export default function RegisterPage4Content() {
         basicHealthParaArray,
         aesGCMKey
       );
-      const result = await actors.user.createUser(
-        Object.values(encryptedDataDemo),
-        Object.values(encryptedDataBasicHealth),
-        [],
-        []
-      );
+      const result = await actors.user.createUser({
+        DemographicInformation: Object.values(encryptedDataDemo),
+        BasicHealthParameters: Object.values(encryptedDataBasicHealth),
+        BiometricData: [],
+        FamilyInformation: [],
+      });
       console.log(result);
       Object.keys(result).forEach((key) => {
         if (key == "err") {

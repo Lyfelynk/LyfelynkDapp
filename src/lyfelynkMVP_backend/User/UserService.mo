@@ -6,22 +6,20 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 
-import IdentityManager "../IdentityManager/IdentityManager";
 import Types "../Types";
+import CanisterTypes "../Types/CanisterTypes";
+import ManagerCanisterTypes "../Types/ManagerCanisterTypes";
 import Hex "../utility/Hex";
-import UserShardManager "UserShardManager";
+
 actor class UserService() {
     type HealthIDUser = Types.HealthIDUser;
-    type UserShardManager = UserShardManager.UserShardManager;
 
-    private var adminPrincipal = Types.admin; //Admin Principal
-    private var isAdminRegistered = false; //Admin Registration Status
-    let ShardManager : UserShardManager = actor (Types.userShardManagerCanisterID); // User Shard Manager Canister ID
-    let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID); // Replace with actual IdentityManager canister ID
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor (Types.vetkdSystemCanisterID);
+    let ShardManager = ManagerCanisterTypes.userShardManager;
+    let identityManager = CanisterTypes.identityManager;
+    let vetkd_system_api = CanisterTypes.vetkd_system_api;
 
     // Function to create a new user
-    public shared ({ caller }) func createUser(demoInfo : Blob, basicHealthPara : Blob, bioMData : ?Blob, familyData : ?Blob) : async Result.Result<Text, Text> {
+    public shared ({ caller }) func createUser(userData : Types.HealthIDUserData) : async Result.Result<Text, Text> {
         let userIDResult = await ShardManager.generateUserID(); // Generate User ID via UserShardManager
         let uuidResult = await ShardManager.generateUUID(); // Generate UUID via UserShardManager
 
@@ -33,10 +31,10 @@ actor class UserService() {
                     UUID = uuid;
                     MetaData = {
                         // User Metadata
-                        DemographicInformation = demoInfo;
-                        BasicHealthParameters = basicHealthPara;
-                        BiometricData = bioMData;
-                        FamilyInformation = familyData;
+                        DemographicInformation = userData.DemographicInformation;
+                        BasicHealthParameters = userData.BasicHealthParameters;
+                        BiometricData = userData.BiometricData;
+                        FamilyInformation = userData.FamilyInformation;
                     };
                 };
                 let registerResult = await ShardManager.registerUser(caller, userID);
@@ -107,7 +105,7 @@ actor class UserService() {
     };
 
     // Function to update user data
-    public shared ({ caller }) func updateUser(demoInfo : Blob, basicHealthPara : Blob, bioMData : ?Blob, familyData : ?Blob) : async Result.Result<(), Text> {
+    public shared ({ caller }) func updateUser(updateData : Types.HealthIDUserData) : async Result.Result<(), Text> {
         let userIDResult = await ShardManager.getUserID(caller);
         switch (userIDResult) {
             case (#ok(id)) {
@@ -121,10 +119,10 @@ actor class UserService() {
                                     IDNum = value.IDNum;
                                     UUID = value.UUID;
                                     MetaData = {
-                                        DemographicInformation = demoInfo;
-                                        BasicHealthParameters = basicHealthPara;
-                                        BiometricData = bioMData;
-                                        FamilyInformation = familyData;
+                                        DemographicInformation = updateData.DemographicInformation;
+                                        BasicHealthParameters = updateData.BasicHealthParameters;
+                                        BiometricData = updateData.BiometricData;
+                                        FamilyInformation = updateData.FamilyInformation;
                                     };
                                 };
 
@@ -136,8 +134,8 @@ actor class UserService() {
                             };
                         };
                     };
-                    case (#err(e)) {
-                        #err(e);
+                    case (#err(err)) {
+                        #err(err);
                     };
                 };
             };
@@ -192,26 +190,6 @@ actor class UserService() {
         };
     };
 
-    public shared ({ caller }) func updateUserShardWasmModule(wasmModule : [Nat8]) : async Result.Result<(), Text> {
-
-        // if (isAdmin(caller)) {
-        // Call the updateWasmModule function of the UserShardManager
-        let result = await ShardManager.updateWasmModule(wasmModule);
-
-        switch (result) {
-            case (#ok(())) {
-                #ok(());
-            };
-            case (#err(e)) {
-                #err("Failed to update WASM module: " # e);
-            };
-        };
-        // } else {
-        //     #err("You don't have permission to perform this action");
-        // };
-
-    };
-
     // Function to get the caller's principal ID
     public shared query ({ caller }) func whoami() : async Text {
         Principal.toText(caller);
@@ -246,8 +224,8 @@ actor class UserService() {
             case (#ok(principal)) {
                 #ok(principal);
             };
-            case (#err(message)) {
-                #err((message));
+            case (#err(err)) {
+                #err((err));
             };
         };
 
@@ -257,23 +235,6 @@ actor class UserService() {
     public func getNumberOfUsers() : async Nat {
         await ShardManager.getTotalUserCount();
     };
-
-    public shared ({ caller }) func registerAdmin() : async Bool {
-        if (Principal.isAnonymous(caller) or isAdminRegistered) {
-            return false;
-        };
-        adminPrincipal := Principal.toText(caller);
-        isAdminRegistered := true;
-        return true;
-    };
-    // Helper function to check if a principal is an admin
-    private func isAdmin(principal : Principal) : Bool {
-        // Check if the provided principal matches the admin principal
-        Principal.toText(principal) == adminPrincipal;
-
-    };
-
-    //VetKey
 
     //VetKey Section
 
@@ -304,5 +265,7 @@ actor class UserService() {
 
         #ok(Hex.encode(Blob.toArray(encrypted_key)));
     };
+
+    //VetKey Section
 
 };

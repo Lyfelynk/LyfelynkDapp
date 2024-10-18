@@ -1,4 +1,5 @@
 import Array "mo:base/Array";
+import Buffer "mo:base/Buffer";
 import Nat "mo:base/Nat";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
@@ -6,32 +7,34 @@ import Text "mo:base/Text";
 import BTree "mo:stableheapbtreemap/BTree";
 
 import Types "../Types";
+import CanisterIDs "../Types/CanisterIDs";
 
 actor class UserShard() {
     // BTree to store user data
     private var userMap : BTree.BTree<Text, Types.HealthIDUser> = BTree.init<Text, Types.HealthIDUser>(null);
+    // private var adminPrincipal = Types.admin;
+
+    private var permittedPrincipal : [Principal] = [Principal.fromText(CanisterIDs.userShardManagerCanisterID), Principal.fromText(CanisterIDs.userServiceCanisterID)];
 
     // Function to insert a user
     public shared ({ caller }) func insertUser(userID : Text, user : Types.HealthIDUser) : async Result.Result<(), Text> {
-        // if (isPermitted(caller)) {
-
-        // } else {
-        //     return #err("You are not permitted");
-        // };
+        if (not isPermitted(caller)) {
+            return #err("You are not permitted");
+        };
         if (BTree.has(userMap, Text.compare, userID)) {
-            #err("User with ID " # userID # " already exists");
+            return #err("User with ID " # userID # " already exists");
         } else {
             let insertResult = BTree.insert(userMap, Text.compare, userID, user);
             switch (insertResult) {
                 case null {
                     if (BTree.has(userMap, Text.compare, userID)) {
-                        #ok(());
+                        return #ok(());
                     } else {
-                        #err("Failed to insert user with user ID " # userID);
+                        return #err("Failed to insert user with user ID " # userID);
                     };
                 };
                 case (?_) {
-                    #err("Unexpected result: User already existed");
+                    return #err("Unexpected result: User already existed");
                 };
             };
         };
@@ -39,58 +42,42 @@ actor class UserShard() {
 
     // Function to get a user by ID
     public shared ({ caller }) func getUser(userID : Text) : async Result.Result<Types.HealthIDUser, Text> {
-        // if (isPermitted(caller)) {} else {
-        //     return #err("You are not permitted");
-        // };
+        if (not isPermitted(caller)) {
+            return #err("You are not permitted");
+        };
         switch (BTree.get(userMap, Text.compare, userID)) {
-            case (?value) { #ok(value) };
-            case null { #err("User not found") };
+            case (?value) { return #ok(value) };
+            case null { return #err("User not found") };
         };
     };
 
     // Function to update a user
     public shared ({ caller }) func updateUser(userID : Text, user : Types.HealthIDUser) : async Result.Result<(), Text> {
-        // if (isPermitted(caller)) {} else {
-        //     return #err("You are not permitted");
-        // };
+        if (not isPermitted(caller)) {
+            return #err("You are not permitted");
+        };
         switch (BTree.get(userMap, Text.compare, userID)) {
             case (?_) {
                 switch (BTree.insert(userMap, Text.compare, userID, user)) {
-                    case (?_) { #ok(()) };
-                    case null { #err("Failed to update user") };
+                    case (?_) { return #ok(()) };
+                    case null { return #err("Failed to update user") };
                 };
             };
             case null {
-                #err("User not found");
+                return #err("User not found");
             };
         };
     };
 
     // Function to delete a user
     public shared ({ caller }) func deleteUser(userID : Text) : async Result.Result<(), Text> {
-        // if (isPermitted(caller)) {
-
-        // } else {
-        //     return #err("You are not permitted");
-        // };
+        if (not isPermitted(caller)) {
+            return #err("You are not permitted");
+        };
         switch (BTree.delete(userMap, Text.compare, userID)) {
-            case (?_) { #ok(()) };
-            case null { #err("User not found") };
+            case (?_) { return #ok(()) };
+            case null { return #err("User not found") };
         };
-    };
-
-    private func isPermitted(principal : Principal) : Bool {
-        // For example, you could have a list of admin principals:
-        let permittedPrincipals : [Principal] = [
-            Principal.fromText("a4tbr-q4aaa-aaaaa-qaafq-cai"),
-        ];
-
-        for (permittedPrincipal in permittedPrincipals.vals()) {
-            if (principal == permittedPrincipal) {
-                return true;
-            };
-        };
-        false;
     };
 
     // Function to get the total number of users
@@ -101,6 +88,55 @@ actor class UserShard() {
     // Function to get all user IDs
     public query func getAllUserIDs() : async [Text] {
         Array.map(BTree.toArray(userMap), func((id, _) : (Text, Types.HealthIDUser)) : Text { id });
+    };
+
+    private func isPermitted(principal : Principal) : Bool {
+        for (permittedPrincipal in permittedPrincipal.vals()) {
+            if (principal == permittedPrincipal) {
+                return true;
+            };
+        };
+        return false;
+    };
+
+    // private func isAdmin(caller : Principal) : Bool {
+    //     if (Principal.fromText(adminPrincipal) == caller) {
+    //         true;
+    //     } else {
+    //         false;
+    //     };
+    // };
+
+    public shared ({ caller }) func addPermittedPrincipal(principalToAdd : Text) : async Result.Result<Text, Text> {
+
+        if (not isPermitted(caller)) {
+            return #err("You are not Admin, only admin can perform this action");
+        };
+
+        let permittedPrincipalBuffer = Buffer.fromArray<Principal>(permittedPrincipal);
+        permittedPrincipalBuffer.add(Principal.fromText(principalToAdd));
+        permittedPrincipal := Buffer.toArray(permittedPrincipalBuffer);
+        return #ok("Added Principal as Permitted Permitted Principal Successfully");
+    };
+
+    public shared ({ caller }) func removePermittedPrincipal(principalToRemove : Text) : async Result.Result<Text, Text> {
+        if (not isPermitted(caller)) {
+            return #err("You are not Admin, only admin can perform this action");
+        };
+
+        let permittedPrincipalBuffer = Buffer.fromArray<Principal>(permittedPrincipal);
+        let indexToRemove = Buffer.indexOf<Principal>(Principal.fromText(principalToRemove), permittedPrincipalBuffer, Principal.equal);
+        switch (indexToRemove) {
+            case (?value) {
+                ignore permittedPrincipalBuffer.remove(value);
+                permittedPrincipal := Buffer.toArray(permittedPrincipalBuffer);
+                return #ok("Removed Principal from Permitted Principal Successfully");
+            };
+            case (null) {
+                return #err("Princial ID is not present to remove");
+            };
+        };
+
     };
 
 };

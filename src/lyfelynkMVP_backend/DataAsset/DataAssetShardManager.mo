@@ -8,8 +8,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import BTree "mo:stableheapbtreemap/BTree";
 
-import IdentityManager "../IdentityManager/IdentityManager";
-import Types "../Types";
+import CanisterTypes "../Types/CanisterTypes";
 import Interface "../utility/ic-management-interface";
 import DataAssetShard "DataAssetShard";
 
@@ -18,7 +17,7 @@ actor class DataAssetShardManager() {
     private stable var shardCount : Nat = 0;
     private let ASSETS_PER_SHARD : Nat = 200_000;
     private stable let shards : BTree.BTree<Text, Principal> = BTree.init<Text, Principal>(null);
-    private let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID); // Replace with actual IdentityManager canister ID
+    private let identityManager = CanisterTypes.identityManager;
     private stable var userShardMap : BTree.BTree<Text, [Text]> = BTree.init<Text, [Text]>(null);
     private stable var dataAssetShardWasmModule : [Nat8] = [];
 
@@ -104,18 +103,17 @@ actor class DataAssetShardManager() {
         };
     };
 
-    private func reinstallCodeOnShard(canisterPrincipal : Principal) : async Result.Result<(), Text> {
+    private func upgradeCodeOnShard(canisterPrincipal : Principal) : async Result.Result<(), Text> {
         let arg = [];
 
         try {
             await ic.install_code({
                 arg = arg;
                 wasm_module = dataAssetShardWasmModule;
-                mode = #reinstall;
+                mode = #upgrade;
                 canister_id = canisterPrincipal;
             });
 
-            await ic.start_canister({ canister_id = canisterPrincipal });
             #ok(());
         } catch (e) {
             #err("Failed to install or start code on shard: " # Error.message(e));
@@ -123,9 +121,9 @@ actor class DataAssetShardManager() {
     };
 
     public shared ({ caller }) func updateWasmModule(wasmModule : [Nat8]) : async Result.Result<(), Text> {
-        // if (not isAdmin(caller)) {
-        //     return #err("You are not permitted to update the WASM module");
-        // };
+        if (not isAdmin(caller)) {
+            return #err("You are not permitted to update the WASM module");
+        };
         if (Array.size(wasmModule) < 8) {
             return #err("Invalid WASM module: too small");
         };
@@ -135,9 +133,9 @@ actor class DataAssetShardManager() {
     };
 
     public shared ({ caller }) func updateExistingShards() : async Result.Result<(), Text> {
-        // if (not isAdmin(caller)) {
-        //     return #err("You are not permitted to update shards");
-        // };
+        if (not isAdmin(caller)) {
+            return #err("You are not permitted to update shards");
+        };
         if (Array.size(dataAssetShardWasmModule) == 0) {
             return #err("Wasm module not set. Please update the Wasm module first.");
         };
@@ -146,7 +144,7 @@ actor class DataAssetShardManager() {
         var errorCount = 0;
 
         for ((shardID, principal) in BTree.entries(shards)) {
-            let installResult = await reinstallCodeOnShard(principal);
+            let installResult = await upgradeCodeOnShard(principal);
             switch (installResult) {
                 case (#ok(())) {
                     updatedCount += 1;

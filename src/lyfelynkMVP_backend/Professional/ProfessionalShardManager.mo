@@ -10,6 +10,7 @@ import BTree "mo:stableheapbtreemap/BTree";
 import Source "mo:uuid/async/SourceV4";
 import UUID "mo:uuid/UUID";
 
+import CanisterIDs "../Types/CanisterIDs";
 import Interface "../utility/ic-management-interface";
 import ProfessionalShard "ProfessionalShard";
 
@@ -26,11 +27,11 @@ actor class ProfessionalShardManager() {
     private let IC = "aaaaa-aa";
     private let ic : Interface.Self = actor (IC);
 
-    private stable var admins : [Principal] = [/* list of admin principals */];
+    private stable var admins : [Text] = [CanisterIDs.admin, CanisterIDs.dataAssetCanisterID];
 
-    private func isAdmin(caller : Principal) : Bool {
-        Array.find<Principal>(admins, func(p) { p == caller }) != null;
-    };
+    // private func isAdmin(caller : Principal) : Bool {
+    //     Array.find<Principal>(admins, func(p) { p == caller }) != null;
+    // };
 
     public func generateProfessionalID() : async Result.Result<Text, Text> {
         #ok(Nat.toText(STARTING_PROFESSIONAL_ID + totalProfessionalCount));

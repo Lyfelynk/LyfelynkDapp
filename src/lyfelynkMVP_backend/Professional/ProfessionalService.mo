@@ -7,19 +7,18 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Map "mo:map/Map";
 
-import IdentityManager "../IdentityManager/IdentityManager";
 import Types "../Types";
+import CanisterTypes "../Types/CanisterTypes";
+import ManagerCanisterTypes "../Types/ManagerCanisterTypes";
 import Hex "../utility/Hex";
-import ProfessionalShardManager "ProfessionalShardManager";
 
 actor ProfessionalService {
 
     type HealthIDProfessional = Types.HealthIDProfessional;
-    type ProfessionalShardManager = ProfessionalShardManager.ProfessionalShardManager;
 
-    let ShardManager : ProfessionalShardManager = actor (Types.professionalShardManagerCanisterID); // Professional Shard Manager Canister ID
-    let identityManager : IdentityManager.IdentityManager = actor (Types.identityManagerCanisterID); // IdentityManager canister ID
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor (Types.vetkdSystemCanisterID);
+    let ShardManager = ManagerCanisterTypes.professionalShardManager;
+    let identityManager = CanisterTypes.identityManager;
+    let vetkd_system_api = CanisterTypes.vetkd_system_api;
 
     private stable var pendingRequests : Map.Map<Principal, HealthIDProfessional> = Map.new<Principal, HealthIDProfessional>(); // Map of Pending Requests of Professionals Registered
     private stable var adminPrincipal = Types.admin; // Admin Principal

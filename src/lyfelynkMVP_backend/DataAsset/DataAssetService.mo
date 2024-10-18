@@ -6,26 +6,20 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 
-import IdentityManager "../IdentityManager/IdentityManager";
-import SharedActivityService "../SharedActivitySystem/SharedActivityService";
 import Types "../Types";
-import XPRewardSystem "../XPSystem/XPRewardSystem";
-import DataAssetShardManager "DataAssetShardManager";
+import CanisterTypes "../Types/CanisterTypes";
+import ManagerCanisterTypes "../Types/ManagerCanisterTypes";
 
 actor DataAssetService {
     type DataAsset = Types.DataAsset;
     type DataAssetInfo = Types.DataAssetInfo;
     type SharedType = Types.SharedType;
     type sharedActivityInfo = Types.sharedActivityInfo;
-    type DataAssetShardManager = DataAssetShardManager.DataAssetShardManager;
-    type SharedActivityService = SharedActivityService.SharedActivityService;
-    type IdentityManager = IdentityManager.IdentityManager;
-    type XPRewardSystem = XPRewardSystem.XPRewardSystem;
 
-    let ShardManager : DataAssetShardManager = actor (Types.dataAssetShardManagerCanisterID);
-    let sharedActivityService : SharedActivityService = actor (Types.sharedActivityCanisterID);
-    let identityManager : IdentityManager = actor (Types.identityManagerCanisterID); //
-    let xpRewardSystem : XPRewardSystem = actor (Types.xpSystemCanisterID); // Replace with actual canister ID
+    let ShardManager = ManagerCanisterTypes.dataAssetShardManager;
+    let sharedActivityService = CanisterTypes.sharedActivityService;
+    let identityManager = CanisterTypes.identityManager; //
+    let xpRewardSystem = CanisterTypes.xpSystem; // Replace with actual canister ID
 
     public shared ({ caller }) func uploadDataAsset(asset : DataAsset) : async Result.Result<Text, Text> {
         let userIDResult = await getUserID(caller);

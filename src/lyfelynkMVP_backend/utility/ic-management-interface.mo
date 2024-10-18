@@ -17,6 +17,13 @@ module {
 
     public type wasm_module = [Nat8];
 
+    public type SchnorrAlgorithm = { #bip340secp256k1; #ed25519 };
+
+    public type KeyId = {
+        algorithm : SchnorrAlgorithm;
+        name : Text;
+    };
+
     public type Self = actor {
         canister_status : shared { canister_id : canister_id } -> async {
             status : { #stopped; #stopping; #running };
@@ -53,5 +60,16 @@ module {
             settings : canister_settings;
         } -> async ();
 
+        schnorr_public_key : ({
+            canister_id : ?Principal;
+            derivation_path : [Blob];
+            key_id : KeyId;
+        }) -> async ({ public_key : Blob });
+
+        sign_with_schnorr : ({
+            message : Blob;
+            derivation_path : [Blob];
+            key_id : KeyId;
+        }) -> async ({ signature : Blob });
     };
 };

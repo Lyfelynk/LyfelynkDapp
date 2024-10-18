@@ -1,13 +1,13 @@
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
 import Buffer "mo:base/Buffer";
-import List "mo:base/List";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
 import BTree "mo:stableheapbtreemap/BTree";
 
 import Types "../Types";
+import CanisterTypes "../Types/CanisterTypes";
 import Hex "../utility/Hex";
 
 actor class DataAssetShard() {
@@ -15,7 +15,7 @@ actor class DataAssetShard() {
     private stable var dataAccessTP = BTree.init<Text, [Principal]>(null);
     private stable var dataAccessPT = BTree.init<Principal, [Text]>(null);
 
-    let vetkd_system_api : Types.VETKD_SYSTEM_API = actor (Types.vetkdSystemCanisterID);
+    let vetkd_system_api = CanisterTypes.vetkd_system_api;
 
     // List of permitted principals (e.g., DataAssetShardManager)
     private stable var permittedPrincipals : [Principal] = []; // Add permitted principals here

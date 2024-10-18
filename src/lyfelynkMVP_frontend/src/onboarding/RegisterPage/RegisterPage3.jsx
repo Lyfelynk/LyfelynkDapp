@@ -17,7 +17,10 @@ const formSchema = z.object({
   country: z.string().optional(),
   state: z.string().optional(),
   city: z.string().optional(),
-  pincode: z.string().min(1, "Pincode is required"),
+  pincode: z
+    .string()
+    .min(1, { message: "Pincode is required" })
+    .regex(/^\d+$/, { message: "Pincode must contain only numbers" }),
   serviceName: z.string().min(1, "Service Name is required"),
   serviceDesc: z.string().optional(),
 });

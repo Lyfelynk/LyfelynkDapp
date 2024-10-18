@@ -18,21 +18,12 @@ export default function MarketplaceContent() {
           <Wallet />
         </div>
 
-        <Tabs
-          defaultValue="Purchase"
-          className=""
-        >
+        <Tabs defaultValue="Purchase" className="">
           <TabsList className="w-full">
-            <TabsTrigger
-              value="Purchase"
-              className="w-2/3"
-            >
+            <TabsTrigger value="Purchase" className="w-2/3">
               Purchase
             </TabsTrigger>
-            <TabsTrigger
-              value="Past Orders"
-              className="w-1/3"
-            >
+            <TabsTrigger value="Past Orders" className="w-1/3">
               Past Orders
             </TabsTrigger>
           </TabsList>

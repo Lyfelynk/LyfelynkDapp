@@ -75,13 +75,13 @@ const FileUpload = () => {
     const fileSizeMB = file.size / (1024 * 1024);
     if (!supportedFormats.includes(fileType)) {
       setErrorMessage(
-        "Unsupported file format. Please select a file with one of the supported formats: PDF, CSV, XML, JPG, JPEG, PNG."
+        "Unsupported file format. Please select a file with one of the supported formats: PDF, CSV, XML, JPG, JPEG, PNG.",
       );
       return false;
     }
     if (fileSizeMB > 1.9) {
       setErrorMessage(
-        "File size is larger than 2 MB. Please select a smaller file."
+        "File size is larger than 2 MB. Please select a smaller file.",
       );
       return false;
     }
@@ -131,11 +131,11 @@ const FileUpload = () => {
         fileList,
         process.env.LIGHTHOUSEAPI,
         null,
-        progressCallback
+        progressCallback,
       );
       console.log("File Status:", output);
       console.log(
-        "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+        "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash,
       );
       return output.data.Hash;
     } catch (error) {
@@ -190,7 +190,7 @@ const FileUpload = () => {
       const encryptedKeyResult =
         await actors.dataAsset.getEncryptedSymmetricKeyForAsset(
           uniqueID,
-          Object.values(tsk.public_key())
+          Object.values(tsk.public_key()),
         );
 
       let encryptedKey = "";
@@ -231,7 +231,7 @@ const FileUpload = () => {
         hex_decode(symmetricVerificiationKey),
         new TextEncoder().encode(uniqueID),
         32,
-        new TextEncoder().encode("aes-256-gcm")
+        new TextEncoder().encode("aes-256-gcm"),
       );
       console.log(aesGCMKey);
 
@@ -264,7 +264,7 @@ const FileUpload = () => {
       // Step 5: Update the data asset with the Lighthouse hash
       const updateResult = await actors.dataAsset.updateDataAsset(
         uniqueID,
-        dataAsset
+        dataAsset,
       );
 
       Object.keys(updateResult).forEach((key) => {
@@ -293,12 +293,12 @@ const FileUpload = () => {
       rawKey,
       "AES-GCM",
       false,
-      ["encrypt"]
+      ["encrypt"],
     );
     const ciphertext_buffer = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      data
+      data,
     );
     const ciphertext = new Uint8Array(ciphertext_buffer);
     const iv_and_ciphertext = new Uint8Array(iv.length + ciphertext.length);
@@ -310,7 +310,7 @@ const FileUpload = () => {
   //   bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
     );
 
   const handleRemoveFile = () => {
@@ -342,7 +342,7 @@ const FileUpload = () => {
             "Content-Type": "multipart/form-data",
           },
           responseType: "blob",
-        }
+        },
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -493,10 +493,7 @@ const FileUpload = () => {
 
       {file && (
         <>
-          <Button
-            onClick={handleUpload}
-            className="my-2 mr-2"
-          >
+          <Button onClick={handleUpload} className="my-2 mr-2">
             Upload
           </Button>
           <CloudFunctionCallButton
@@ -506,10 +503,7 @@ const FileUpload = () => {
       )}
 
       {csvData && (
-        <Button
-          onClick={convertCsvToPdf}
-          className="my-2 mr-2"
-        >
+        <Button onClick={convertCsvToPdf} className="my-2 mr-2">
           Download Analyzed File
         </Button>
       )}
@@ -534,10 +528,7 @@ const FileUpload = () => {
 };
 
 const CloudFunctionCallButton = ({ handleCallCloudFunction }) => (
-  <Button
-    variant="outline"
-    onClick={handleCallCloudFunction}
-  >
+  <Button variant="outline" onClick={handleCallCloudFunction}>
     Run Analytics
   </Button>
 );

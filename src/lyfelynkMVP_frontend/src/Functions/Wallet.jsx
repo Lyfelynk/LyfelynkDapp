@@ -151,11 +151,7 @@ export default function Wallet() {
               value={approveAmount}
               onChange={(e) => setApproveAmount(e.target.value)}
             />
-            <Button
-              size="sm"
-              type="button"
-              onClick={approveSpendToken}
-            >
+            <Button size="sm" type="button" onClick={approveSpendToken}>
               Submit
             </Button>
           </div>
@@ -169,10 +165,7 @@ export default function Wallet() {
               value={requestAmount}
               onChange={(e) => setRequestAmount(e.target.value)}
             />
-            <Button
-              type="button"
-              onClick={sendTokenRequest}
-            >
+            <Button type="button" onClick={sendTokenRequest}>
               Send request
             </Button>
           </div>

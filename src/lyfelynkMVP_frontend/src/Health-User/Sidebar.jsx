@@ -87,24 +87,15 @@ const Sidebar = ({ isOpen, onClose }) => {
             } hidden lg:block`}
           >
             {isExpanded ? (
-              <ChevronLeft
-                size="32"
-                className="border p-1 rounded-lg"
-              />
+              <ChevronLeft size="32" className="border p-1 rounded-lg" />
             ) : (
-              <ChevronRight
-                size="32"
-                className="border p-1 rounded-lg"
-              />
+              <ChevronRight size="32" className="border p-1 rounded-lg" />
             )}
           </button>
         </div>
         <ul className="space-y-2 font-medium w-full">
           {links.map((link, index) => (
-            <li
-              key={index}
-              className="relative group w-full"
-            >
+            <li key={index} className="relative group w-full">
               {link.subMenu ? (
                 <div>
                   {isExpanded ? (

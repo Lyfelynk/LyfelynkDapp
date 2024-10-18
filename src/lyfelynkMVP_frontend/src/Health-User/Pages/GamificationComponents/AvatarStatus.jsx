@@ -61,18 +61,12 @@ const AvatarStatus = ({ avatar, onLevelUp, onRestoreHP, userTokens }) => {
           <span>HP</span>
           <span className="text-sm text-blue-400">{avatar.hp}</span>
         </div>
-        <Progress
-          value={100}
-          className="w-full"
-        />
+        <Progress value={100} className="w-full" />
       </div>
 
       <div className="space-y-4 mb-4">
         {stats.map((stat) => (
-          <div
-            key={stat.name}
-            className="space-y-2"
-          >
+          <div key={stat.name} className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>{stat.name}</span>
               <span className="text-blue-400">

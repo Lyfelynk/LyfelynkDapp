@@ -22,18 +22,18 @@ function HealthAnalyticsOld() {
       rawKey,
       "AES-GCM",
       false,
-      ["decrypt"]
+      ["decrypt"],
     );
     const decrypted_buffer = await window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv: iv },
       aes_key,
-      ciphertext
+      ciphertext,
     );
     return new Uint8Array(decrypted_buffer);
   };
   const hex_decode = (hexString) =>
     Uint8Array.from(
-      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+      hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
     );
 
   const fetchUserData = async () => {
@@ -55,7 +55,7 @@ function HealthAnalyticsOld() {
         const tsk = new vetkd.TransportSecretKey(seed);
         const encryptedKeyResult =
           await actors.user.encrypted_symmetric_key_for_user(
-            Object.values(tsk.public_key())
+            Object.values(tsk.public_key()),
           );
 
         let encryptedKey = "";
@@ -85,7 +85,7 @@ function HealthAnalyticsOld() {
           hex_decode(pkBytesHex),
           new TextEncoder().encode(principal),
           32,
-          new TextEncoder().encode("aes-256-gcm")
+          new TextEncoder().encode("aes-256-gcm"),
         );
         console.log(aesGCMKey);
         console.log(typeof DemographicInformation);
@@ -94,18 +94,18 @@ function HealthAnalyticsOld() {
         console.log(BasicHealthParameters);
         const decryptedDataDemo = await aes_gcm_decrypt(
           new Uint8Array(DemographicInformation),
-          aesGCMKey
+          aesGCMKey,
         );
         const decryptedDataBasicHealth = await aes_gcm_decrypt(
           new Uint8Array(BasicHealthParameters),
-          aesGCMKey
+          aesGCMKey,
         );
 
         const parsedDemographicInfo = JSON.parse(
-          String.fromCharCode.apply(null, decryptedDataDemo)
+          String.fromCharCode.apply(null, decryptedDataDemo),
         );
         const parsedBasicHealthParams = JSON.parse(
-          String.fromCharCode.apply(null, decryptedDataBasicHealth)
+          String.fromCharCode.apply(null, decryptedDataBasicHealth),
         );
         const parsedBiometricData =
           BiometricData.length > 0

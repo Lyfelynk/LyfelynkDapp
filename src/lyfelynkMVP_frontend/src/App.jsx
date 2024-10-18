@@ -34,6 +34,7 @@ import { HttpAgent } from "@dfinity/agent";
 import Home from "./admin/Home";
 import ConnectPage from "./onboarding/ConnectPage";
 import Dev from "./Dev";
+import AdminDashboard from "./admin/AdminDashboard";
 
 function App() {
   const [actors, setActors] = useState({
@@ -96,11 +97,11 @@ function App() {
       );
       const gamificationSystemActor = createGamificationSystemActor(
         process.env.CANISTER_ID_GAMIFICATIONSYSTEM,
-        { agent }
+        { agent },
       );
       const visitManagerActor = createVisitManagerActor(
         process.env.CANISTER_ID_VISITMANAGER,
-        { agent }
+        { agent },
       );
       setActors({
         user: userActor,
@@ -153,14 +154,8 @@ function App() {
         <Router>
           <Routes>
             {/* <Route path="/admin" element={<AdminDashboard />} /> */}
-            <Route
-              path="/admin"
-              element={<Home />}
-            />
-            <Route
-              path="/dev"
-              element={<Dev />}
-            />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/dev" element={<Dev />} />
 
             <Route path="/" element={<Navigate to="/Connect" />} />
 
@@ -168,18 +163,9 @@ function App() {
 
             <Route path="/Register" element={<FirstPageContent />} />
             <Route path="/Register">
-              <Route
-                path="Abha-Id"
-                element={<RegisterPage4Content />}
-              />
-              <Route
-                path="Abha-Id/verify"
-                element={<RegisteredContent1 />}
-              />
-              <Route
-                path="Health-User"
-                element={<RegisterPage1Content />}
-              />
+              <Route path="Abha-Id" element={<RegisterPage4Content />} />
+              <Route path="Abha-Id/verify" element={<RegisteredContent1 />} />
+              <Route path="Health-User" element={<RegisterPage1Content />} />
               <Route
                 path="Health-User/verify"
                 element={<RegisteredContent1 />}

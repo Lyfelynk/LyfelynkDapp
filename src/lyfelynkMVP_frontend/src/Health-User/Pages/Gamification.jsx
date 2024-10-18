@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Copy, Coins } from "lucide-react";
+import {
+  AlertCircle,
+  Copy,
+  Coins,
+  Calendar,
+  Clock,
+  UserCheck,
+  User,
+  Briefcase,
+  Building,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import AvatarStatus from "./GamificationComponents/AvatarStatus";
@@ -21,6 +31,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Gamification = () => {
   const { actors } = useContext(ActorContext);
@@ -138,7 +150,7 @@ const Gamification = () => {
               : INITIAL_HP, // Use the HP from getAvatarAttributes
             visitCount: Number(visitCount),
           };
-        })
+        }),
       );
 
       // Filter out any null values that might have been created due to invalid data
@@ -194,7 +206,7 @@ const Gamification = () => {
       const result = await actors.gamificationSystem.initiateVisit(
         idToVisit,
         visitDuration,
-        selectedAvatarForVisit // Pass selected avatar ID
+        selectedAvatarForVisit, // Pass selected avatar ID
       );
       if (result.ok) {
         toast({
@@ -257,7 +269,7 @@ const Gamification = () => {
     try {
       await actors.gamificationSystem.restoreHP(
         Number(selectedAvatar.id),
-        Number(amount)
+        Number(amount),
       );
       setUserAvatars((prevAvatars) =>
         prevAvatars.map((avatar) =>
@@ -295,7 +307,7 @@ const Gamification = () => {
     try {
       const result = await actors.gamificationSystem.transferNFT(
         avatarId,
-        principalAddress
+        principalAddress,
       );
       console.log("result", result);
       // After successful transfer, update the user avatars
@@ -352,57 +364,36 @@ const Gamification = () => {
       <h1 className="text-4xl font-bold text-foreground mb-6">
         Wellness Avatar Platform
       </h1>
-      
-      {userTokens !== null && <TokenDisplay />}
 
-      <div className="my-6">
-        <h1 className="text-2xl font-bold text-primary">Select an Avatar for Visit</h1>
-        <Select
-          onValueChange={setSelectedAvatarForVisit}
-          value={selectedAvatarForVisit}
-        >
-          <SelectTrigger className="w-56">
-            <SelectValue placeholder="Select Avatar for Visit" className='text-white' />
-          </SelectTrigger>
-          <SelectContent>
-            {userAvatars.map((avatar) => (
-              <SelectItem key={avatar.id} value={Number(avatar.id)}>
-                {avatar.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-      </Select>
-      </div>
-
+      <span className="flex justify-end">
+        {userTokens !== null && <TokenDisplay />}
+      </span>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-2">
-          <Tabs
-            defaultValue="avatars"
-            className="mb-6"
-          >
-            <TabsList className="bg-gray-800 text-white rounded-lg">
+          <Tabs defaultValue="avatars" className="mb-6">
+            <TabsList className="flex justify-center bg-gray-800 text-white rounded-lg">
               <TabsTrigger
                 value="avatars"
-                className="text-white"
+                className="w-1/3 flex items-center justify-center gap-2 text-white"
               >
-                Avatars
+                <User size={18} /> Avatars
               </TabsTrigger>
               <TabsTrigger
                 value="professionals"
-                className="text-white"
+                className="w-1/3 flex items-center justify-center gap-2 text-white"
               >
-                Professionals
+                <Briefcase size={18} /> Professionals
               </TabsTrigger>
               <TabsTrigger
                 value="facilities"
-                className="text-white"
+                className="w-1/3 flex items-center justify-center gap-2 text-white"
               >
-                Facilities
+                <Building size={18} /> Facilities
               </TabsTrigger>
             </TabsList>
             <TabsContent value="avatars">
-              <h2 className="text-xl font-semibold mb-4 text-blue-400">
+              <h2 className="text-2xl font-semibold mb-4 text-blue-400">
                 User Avatars
               </h2>
               {userAvatars.length === 0 ? (
@@ -427,75 +418,115 @@ const Gamification = () => {
                 </div>
               )}
             </TabsContent>
+
             <TabsContent value="professionals">
-              <h2 className="text-xl font-semibold mb-4 text-blue-400">
-                  Available Professionals
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {professionals.map((prof) => (
-                    <div
-                      key={prof.id}
-                      className="border p-4 rounded"
-                    >
-                      <h3 className="text-lg font-semibold">{prof.name}</h3>
-                      <p>Specialization: {prof.specialization}</p>
-                      <Button onClick={() => handleProfessionalSelect(prof)}>
-                        View Available Slots
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-                {selectedProfessional && (
-                  <div>
-                    <h3 className="text-lg font-semibold mt-4">
-                      Available Slots for {selectedProfessional.name}
-                    </h3>
-                    {availableSlots.length > 0 ? (
-                      availableSlots.map((slot, index) => (
-                        <div
-                          key={index}
-                          className="border p-4 rounded"
-                        >
-                          <p>
-                            Available Slot: {slot[0].toLocaleString()} -{" "}
-                            {slot[1].toLocaleString()}
-                          </p>
+              <h2 className="text-2xl font-semibold mb-4 text-blue-400">
+                Available Professionals
+              </h2>
+
+              <div className="my-6">
+                <h1 className="text-lg font-bold">
+                  Select an Avatar for Visit
+                </h1>
+                <Select
+                  onValueChange={setSelectedAvatarForVisit}
+                  value={selectedAvatarForVisit}
+                >
+                  <SelectTrigger className="w-56">
+                    <SelectValue
+                      placeholder="Select Avatar for Visit"
+                      className="text-white"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {userAvatars.map((avatar) => (
+                      <SelectItem key={avatar.id} value={Number(avatar.id)}>
+                        {avatar.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {professionals.map((prof) => (
+                  <Card key={prof.id}>
+                    <CardHeader>
+                      <CardTitle>{prof.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="flex items-center mb-2">
+                        <UserCheck className="mr-2" size={18} />
+                        Specialization: {prof.specialization}
+                      </p>
+                      <Dialog>
+                        <DialogTrigger asChild>
                           <Button
-                            onClick={() => initiateVisit(selectedProfessional.id)}
+                            onClick={() => handleProfessionalSelect(prof)}
                           >
-                            Book Visit
+                            View Available Slots
                           </Button>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No available slots for booking.</p>
-                    )}
-                  </div>
-                )}
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle>
+                              Available Slots for {prof.name}
+                            </DialogTitle>
+                          </DialogHeader>
+                          <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+                            {availableSlots.length > 0 ? (
+                              availableSlots.map((slot, index) => (
+                                <Card key={index} className="mb-4">
+                                  <CardContent className="pt-4">
+                                    <p className="flex items-center mb-2">
+                                      <Calendar className="mr-2" size={18} />
+                                      {slot[0].toLocaleDateString()}
+                                    </p>
+                                    <p className="flex items-center mb-2">
+                                      <Clock className="mr-2" size={18} />
+                                      {slot[0].toLocaleTimeString()} -{" "}
+                                      {slot[1].toLocaleTimeString()}
+                                    </p>
+                                    <Button
+                                      onClick={() => initiateVisit(prof.id)}
+                                    >
+                                      Book Visit
+                                    </Button>
+                                  </CardContent>
+                                </Card>
+                              ))
+                            ) : (
+                              <p>No available slots for booking.</p>
+                            )}
+                          </ScrollArea>
+                        </DialogContent>
+                      </Dialog>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </TabsContent>
+
             <TabsContent value="facilities">
-              <h2 className="text-xl font-semibold mb-4 text-blue-400">
-                  Available Facilities
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {facilities.map((facility) => (
-                    <div
-                      key={facility.id}
-                      className="border p-4 rounded"
+              <h2 className="text-2xl font-semibold mb-4 text-blue-400">
+                Available Facilities
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {facilities.map((facility) => (
+                  <div key={facility.id} className="border p-4 rounded">
+                    <h3 className="text-lg font-semibold">{facility.name}</h3>
+                    <p>Type: {facility.facilityType}</p>
+                    <Button
+                      onClick={() => {
+                        setSelectedFacility(facility.id);
+                        initiateVisit(facility.id);
+                      }}
                     >
-                      <h3 className="text-lg font-semibold">{facility.name}</h3>
-                      <p>Type: {facility.facilityType}</p>
-                      <Button
-                        onClick={() => {
-                          setSelectedFacility(facility.id);
-                          initiateVisit(facility.id);
-                        }}
-                      >
-                        Book Visit
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                      Book Visit
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </TabsContent>
           </Tabs>
         </div>

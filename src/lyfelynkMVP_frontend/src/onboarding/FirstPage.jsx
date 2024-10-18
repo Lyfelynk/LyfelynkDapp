@@ -56,7 +56,7 @@ export default function FirstPageContent() {
                 onClick={() => checkRegistration("Abha-Id")}
               >
                 <div className="flex items-center">
-                  <UserPlus className="text-primary" /> 
+                  <UserPlus className="text-primary" />
                   <span className="ml-2 font-bold">Register with Abha </span>
                 </div>
                 <ChevronRight />

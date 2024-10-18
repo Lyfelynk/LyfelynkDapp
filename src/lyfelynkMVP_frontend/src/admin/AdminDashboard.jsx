@@ -1,62 +1,95 @@
-import { useState, useContext } from "react";
+import React, { useState, useContext } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
+import { Users, Building2, Database, Coins, UserPlus } from "lucide-react";
+import ProfessionalApproval from "./ProfessionalApproval";
+import FacilityApproval from "./FacilityApproval";
+import ShardManagement from "./ShardManagement";
+import NFTManagement from "./NFTManagement";
 import ActorContext from "../ActorContext";
 
-function AdminDashboard() {
-  const { actors, isAuthenticated, login } = useContext(ActorContext);
-  const [message, setMessage] = useState("");
-  const [wasmFile, setWasmFile] = useState(null);
-  const readFile = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (event) => resolve(event.target.result);
-      reader.onerror = (error) => reject(error);
-      reader.readAsArrayBuffer(file);
-    });
-  };
+const AdminDashboard = () => {
+  const [activeTab, setActiveTab] = useState("professionals");
+  const { actors } = useContext(ActorContext);
 
-  function handleWasmFileChange(event) {
-    setWasmFile(event.target.files[0]);
-  }
+  const tabs = [
+    { id: "professionals", label: "Professional Approval", icon: <Users /> },
+    { id: "facilities", label: "Facility Approval", icon: <Building2 /> },
+    { id: "shards", label: "Shard Management", icon: <Database /> },
+    { id: "nfts", label: "NFT Management", icon: <Coins /> },
+  ];
 
-  async function handleUpdateWasmModule(event) {
-    event.preventDefault();
-    if (!wasmFile) {
-      setMessage("Please select a WASM file first.");
-      return;
-    }
-
+  const adminRegister = async () => {
     try {
-      const arrayBuffer = await readFile(wasmFile);
-      const byteArray = [...new Uint8Array(arrayBuffer)];
-
-      const result = await actors.user.updateUserShardWasmModule(byteArray);
-      if ("ok" in result) {
-        setMessage("WASM module updated successfully.");
+      // Replace this with the actual method to register an admin
+      const result = await actors.admin.registerAdmin();
+      if (result.ok) {
+        console.log("Admin registered successfully");
+        // You might want to show a success message to the user here
       } else {
-        setMessage(`Error: ${result.err}`);
+        console.error("Error registering admin:", result.err);
+        // You might want to show an error message to the user here
       }
     } catch (error) {
-      setMessage(`Error: ${error.message}`);
+      console.error("Error registering admin:", error);
+      // You might want to show an error message to the user here
     }
-  }
+  };
 
   return (
-    <div>
-      <Button onClick={login}>Login</Button>
-      <h1>LyfeLynk Admin Management</h1>
-      <form onSubmit={handleUpdateWasmModule}>
-        <h2>Update WASM Module</h2>
-        <input type="file" accept=".wasm" onChange={handleWasmFileChange} />
-        <button type="submit">Update WASM Module</button>
-      </form>
-      <div>
-        <h2>Message:</h2>
-        <p>{message}</p>
-      </div>
+    <div className="flex h-screen bg-background">
+      <aside className="w-64 bg-card text-card-foreground p-4">
+        <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+        <Button
+          onClick={adminRegister}
+          className="w-full justify-start mb-4"
+          variant="outline"
+        >
+          <UserPlus className="mr-2 h-4 w-4" />
+          Register Admin
+        </Button>
+        <nav>
+          {tabs.map((tab) => (
+            <Button
+              key={tab.id}
+              variant={activeTab === tab.id ? "default" : "ghost"}
+              className="w-full justify-start mb-2"
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.icon}
+              <span className="ml-2">{tab.label}</span>
+            </Button>
+          ))}
+        </nav>
+      </aside>
+      <main className="flex-1 p-6 overflow-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {tabs.find((tab) => tab.id === activeTab)?.label}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsContent value="professionals">
+                <ProfessionalApproval />
+              </TabsContent>
+              <TabsContent value="facilities">
+                <FacilityApproval />
+              </TabsContent>
+              <TabsContent value="shards">
+                <ShardManagement />
+              </TabsContent>
+              <TabsContent value="nfts">
+                <NFTManagement />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
-}
+};
 
 export default AdminDashboard;

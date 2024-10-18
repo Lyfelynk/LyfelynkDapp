@@ -51,7 +51,7 @@ import {
 import LoadingScreen from "../LoadingScreen";
 import ActorContext from "../ActorContext";
 import WasmModuleUploader from "./WasmModuleUploader";
-import MintNFTForm from "./MintNFTForm";
+import MintNFTForm from "./NFTManagement";
 
 function Home() {
   const { actors } = useContext(ActorContext);

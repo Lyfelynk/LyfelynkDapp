@@ -39,7 +39,10 @@ const formSchema = z.object({
     .string()
     .regex(/^\d*$/, "Heart rate must be a whole number")
     .optional(),
-  pincode: z.string().min(1, "Pincode is required"),
+  pincode: z
+    .string()
+    .min(1, { message: "Pincode is required" })
+    .regex(/^\d+$/, { message: "Pincode must be a number" }),
 });
 
 export default function RegisterPage1Content() {

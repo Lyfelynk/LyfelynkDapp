@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActorContext from "../ActorContext";
 import { toast } from "@/components/ui/use-toast";
-function MintNFTForm() {
+function NFTManagement() {
   const { actors } = useContext(ActorContext);
   const [userPrincipal, setUserPrincipal] = useState("");
   const [avatarType, setAvatarType] = useState("");
@@ -53,9 +53,7 @@ function MintNFTForm() {
 
   return (
     <Card className="mt-8">
-      <CardHeader>
-        <CardTitle>Mint NFT for User</CardTitle>
-      </CardHeader>
+      <CardHeader></CardHeader>
       <CardContent>
         <div className="space-y-4">
           <Input
@@ -81,4 +79,4 @@ function MintNFTForm() {
   );
 }
 
-export default MintNFTForm;
+export default NFTManagement;

@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Copy, Coins, Calendar, Clock, UserCheck, User, Briefcase, Building } from "lucide-react";
+import {
+  AlertCircle,
+  Copy,
+  Coins,
+  Calendar,
+  Clock,
+  UserCheck,
+  User,
+  Briefcase,
+  Building,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import AvatarStatus from "./GamificationComponents/AvatarStatus";
@@ -355,22 +365,33 @@ const Gamification = () => {
         Wellness Avatar Platform
       </h1>
 
-      <span className="flex justify-end">{userTokens !== null && <TokenDisplay />}</span>
+      <span className="flex justify-end">
+        {userTokens !== null && <TokenDisplay />}
+      </span>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-2">
           <Tabs defaultValue="avatars" className="mb-6">
             <TabsList className="flex justify-center bg-gray-800 text-white rounded-lg">
-            <TabsTrigger value="avatars" className="w-1/3 flex items-center justify-center gap-2 text-white">
-              <User size={18} /> Avatars
-            </TabsTrigger>
-            <TabsTrigger value="professionals" className="w-1/3 flex items-center justify-center gap-2 text-white">
-              <Briefcase size={18} /> Professionals
-            </TabsTrigger>
-            <TabsTrigger value="facilities" className="w-1/3 flex items-center justify-center gap-2 text-white">
-              <Building size={18} /> Facilities
-            </TabsTrigger>
-          </TabsList>
+              <TabsTrigger
+                value="avatars"
+                className="w-1/3 flex items-center justify-center gap-2 text-white"
+              >
+                <User size={18} /> Avatars
+              </TabsTrigger>
+              <TabsTrigger
+                value="professionals"
+                className="w-1/3 flex items-center justify-center gap-2 text-white"
+              >
+                <Briefcase size={18} /> Professionals
+              </TabsTrigger>
+              <TabsTrigger
+                value="facilities"
+                className="w-1/3 flex items-center justify-center gap-2 text-white"
+              >
+                <Building size={18} /> Facilities
+              </TabsTrigger>
+            </TabsList>
             <TabsContent value="avatars">
               <h2 className="text-2xl font-semibold mb-4 text-blue-400">
                 User Avatars
@@ -440,13 +461,17 @@ const Gamification = () => {
                       </p>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button onClick={() => handleProfessionalSelect(prof)}>
+                          <Button
+                            onClick={() => handleProfessionalSelect(prof)}
+                          >
                             View Available Slots
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
-                            <DialogTitle>Available Slots for {prof.name}</DialogTitle>
+                            <DialogTitle>
+                              Available Slots for {prof.name}
+                            </DialogTitle>
                           </DialogHeader>
                           <ScrollArea className="h-[300px] w-full rounded-md border p-4">
                             {availableSlots.length > 0 ? (
@@ -459,9 +484,12 @@ const Gamification = () => {
                                     </p>
                                     <p className="flex items-center mb-2">
                                       <Clock className="mr-2" size={18} />
-                                      {slot[0].toLocaleTimeString()} - {slot[1].toLocaleTimeString()}
+                                      {slot[0].toLocaleTimeString()} -{" "}
+                                      {slot[1].toLocaleTimeString()}
                                     </p>
-                                    <Button onClick={() => initiateVisit(prof.id)}>
+                                    <Button
+                                      onClick={() => initiateVisit(prof.id)}
+                                    >
                                       Book Visit
                                     </Button>
                                   </CardContent>

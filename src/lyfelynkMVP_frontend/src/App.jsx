@@ -34,6 +34,7 @@ import { HttpAgent } from "@dfinity/agent";
 import Home from "./admin/Home";
 import ConnectPage from "./onboarding/ConnectPage";
 import Dev from "./Dev";
+import AdminDashboard from "./admin/AdminDashboard";
 
 function App() {
   const [actors, setActors] = useState({
@@ -153,7 +154,7 @@ function App() {
         <Router>
           <Routes>
             {/* <Route path="/admin" element={<AdminDashboard />} /> */}
-            <Route path="/admin" element={<Home />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/dev" element={<Dev />} />
 
             <Route path="/" element={<Navigate to="/Connect" />} />

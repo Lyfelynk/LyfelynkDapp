@@ -77,7 +77,9 @@ const NFTCard = ({
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">{nft.name}</h2>
             </div>
-            <Badge className={`${qualityStyles.bg} ${qualityStyles.text} w-fit`}>
+            <Badge
+              className={`${qualityStyles.bg} ${qualityStyles.text} w-fit`}
+            >
               {nft.quality}
             </Badge>
             <p className="text-sm text-gray-400">{nft.type}</p>
@@ -100,7 +102,9 @@ const NFTCard = ({
               ) {
                 return (
                   <div key={key} className="flex flex-col">
-                    <span className="text-xs text-gray-500 uppercase">{key}</span>
+                    <span className="text-xs text-gray-500 uppercase">
+                      {key}
+                    </span>
                     <span className="text-lg font-semibold">{value}</span>
                   </div>
                 );
